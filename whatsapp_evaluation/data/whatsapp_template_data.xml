@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<odoo noupdate="1">
+<odoo noupdate="0">
     <record id="whatsapp_evaluation_template_sale_order" model="whatsapp_evaluation.template">
         <field name="name">Sale Order</field>
         <field name="model_id" ref="sale.model_sale_order"/>

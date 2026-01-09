@@ -94,8 +94,10 @@ class WhatsAppApi:
         
         payload = {
             "number": number,
-            "textMessage": {
-                "text": message_body
+            "text": message_body,
+            "options": {
+                "delay": 1200,
+                "presence": "composing"
             }
         }
         

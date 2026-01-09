@@ -17,7 +17,11 @@
             'whatsapp_evaluation/static/src/core/common/store_service_patch.js',
             'whatsapp_evaluation/static/src/core/common/thread_model_patch.js',
             'whatsapp_evaluation/static/src/core/public_web/discuss_app_model_patch.js',
+            'whatsapp_evaluation/static/src/core/web/channel_member_list_patch.js',
+            'whatsapp_evaluation/static/src/core/web/channel_selector_patch.js',
             'whatsapp_evaluation/static/src/core/web/discuss_app_category_model_patch.js',
+            'whatsapp_evaluation/static/src/core/web/discuss_sidebar_category_item_patch.xml',
+            'whatsapp_evaluation/static/src/core/web/messaging_menu_patch.xml',
         ],
     },
     'external_dependencies': {

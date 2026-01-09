@@ -5,6 +5,7 @@ from odoo import models, fields, api, _
 from odoo.addons.whatsapp_evaluation.tools.whatsapp_api import WhatsAppApi
 from odoo.addons.whatsapp_evaluation.tools.whatsapp_exception import WhatsAppError
 from odoo.exceptions import UserError
+from odoo.tools import html2plaintext
 
 _logger = logging.getLogger(__name__)
 
@@ -42,11 +43,14 @@ class WhatsAppMessage(models.Model):
             if record.state != 'outgoing' or record.message_type != 'outbound':
                 continue
             
+            # Ensure we send plain text, even if stored as HTML
+            text_body = html2plaintext(record.body) if record.body else ''
+            
             api = record.wa_account_id._get_api_client()
             try:
                 # Basic text sending for now
                 # Ensure number is clean? Evolution API usually handles basic cleaning but let's be safe later.
-                response = api._send_whatsapp(record.mobile_number, record.body)
+                response = api._send_whatsapp(record.mobile_number, text_body)
                 
                 # Evolution API v1 sendText response usually has:
                 # { "key": { "id": "..." }, "message": {...} }

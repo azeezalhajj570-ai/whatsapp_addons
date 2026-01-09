@@ -101,6 +101,8 @@ class WhatsAppApi:
             }
         }
         
+        return self.__api_requests("POST", endpoint, data=payload)
+
     def _send_whatsapp_media(self, number, attachment, caption=None):
         """ Send a media message """
         endpoint = f"/message/sendMedia/{self.instance_name}"

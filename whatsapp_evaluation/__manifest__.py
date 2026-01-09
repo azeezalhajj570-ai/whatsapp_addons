@@ -12,6 +12,14 @@
         'views/whatsapp_account_views.xml',
         'views/whatsapp_message_views.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'whatsapp_evaluation/static/src/core/common/store_service_patch.js',
+            'whatsapp_evaluation/static/src/core/common/thread_model_patch.js',
+            'whatsapp_evaluation/static/src/core/public_web/discuss_app_model_patch.js',
+            'whatsapp_evaluation/static/src/core/web/discuss_app_category_model_patch.js',
+        ],
+    },
     'external_dependencies': {
         'python': ['phonenumbers'],
     },

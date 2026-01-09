@@ -10,6 +10,16 @@ class WhatsAppTemplate(models.Model):
     body = fields.Text(string="Body", required=True)
     model_id = fields.Many2one('ir.model', string="Applies to", required=True, ondelete='cascade')
     model = fields.Char(related='model_id.model', string="Related Document Model", store=True)
+    variable_ids = fields.One2many('whatsapp_evaluation.template.variable', 'wa_template_id', string="Variables")
+
+    def _get_formatted_body(self, variable_values=None):
+        self.ensure_one()
+        variable_values = variable_values or {}
+        body = self.body
+        for var in self.variable_ids:
+            if var.line_type == 'body':
+                body = body.replace(var.name, variable_values.get(f'{var.line_type}-{var.name}', var.demo_value))
+        return body
 
     @api.model
     def _can_use_whatsapp(self, model_name):

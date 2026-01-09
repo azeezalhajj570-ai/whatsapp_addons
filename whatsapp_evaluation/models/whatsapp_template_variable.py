@@ -1,0 +1,48 @@
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+from odoo import api, models, fields, _
+from odoo.exceptions import ValidationError
+
+class WhatsAppTemplateVariable(models.Model):
+    _name = 'whatsapp_evaluation.template.variable'
+    _description = 'WhatsApp Template Variable'
+    _order = 'line_type desc, name, id'
+
+    min_name_len = fields.Char(string="Placeholder", required=True)
+    name = fields.Char(string="Placeholder", required=True)
+    wa_template_id = fields.Many2one(comodel_name='whatsapp_evaluation.template', required=True, ondelete='cascade')
+    model = fields.Char(string="Model Name", related='wa_template_id.model')
+
+    line_type = fields.Selection([
+        ('body', 'Body'),
+        ('header', 'Header')], string="Variable location", required=True, default='body')
+    
+    field_type = fields.Selection([
+        ('user_name', 'User Name'),
+        ('user_mobile', 'User Mobile'),
+        ('free_text', 'Free Text'),
+        ('field', 'Field of Model')], string="Type", default='free_text', required=True)
+        
+    field_name = fields.Char(string="Field")
+    demo_value = fields.Char(string="Sample Value", default="Sample Value", required=True)
+
+    def _get_variables_value(self, record):
+        value_by_name = {}
+        user = self.env.user
+        for variable in self:
+            if variable.field_type == 'user_name':
+                value = user.name
+            elif variable.field_type == 'user_mobile':
+                value = user.mobile
+            elif variable.field_type == 'field':
+                try:
+                    value = record.mapped(variable.field_name)[0]
+                except Exception:
+                    value = variable.demo_value
+            else:
+                value = variable.demo_value
+
+            value_str = value and str(value) or ''
+            value_by_name[f"{variable.line_type}-{variable.name}"] = value_str
+
+        return value_by_name

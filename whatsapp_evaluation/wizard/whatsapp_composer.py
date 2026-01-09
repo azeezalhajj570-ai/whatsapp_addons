@@ -38,12 +38,19 @@ class WhatsAppComposer(models.TransientModel):
             if account:
                 result['wa_account_id'] = account.id
             
-            # Sale Order Specific Logic
+            # Template logic
+            template = self.env['whatsapp_evaluation.template']._find_default_for_model(result['res_model'])
+            if template:
+                var_values = template.variable_ids._get_variables_value(record)
+                result['body'] = template._get_formatted_body(variable_values=var_values)
+            
+            # Sale Order Specific Logic (Fallback or PDF attachment)
             if result['res_model'] == 'sale.order':
-                # Pre-fill body
-                currency = record.currency_id.symbol
-                amount = record.amount_total
-                result['body'] = _("Here is your quotation *%s* amounting to *%s %s*.") % (record.name, amount, currency)
+                # Pre-fill body if no template found
+                if not result.get('body'):
+                    currency = record.currency_id.symbol
+                    amount = record.amount_total
+                    result['body'] = _("Here is your quotation *%s* amounting to *%s %s*.") % (record.name, amount, currency)
                 
                 # Attach PDF
                 try:

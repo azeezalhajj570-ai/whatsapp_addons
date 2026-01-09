@@ -1,8 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, Command, tools
 from odoo.exceptions import ValidationError
 from odoo.tools import html2plaintext
+from odoo.addons.mail.tools.discuss import Store
+from markupsafe import Markup
 
 class DiscussChannel(models.Model):
     _inherit = 'discuss.channel'
@@ -15,6 +17,40 @@ class DiscussChannel(models.Model):
     wa_account_id = fields.Many2one('whatsapp_evaluation.account', string="WhatsApp Account")
     whatsapp_partner_id = fields.Many2one('res.partner', string="WhatsApp Partner")
     whatsapp_channel_valid_until = fields.Datetime(string="WhatsApp Channel Valid Until")
+
+    def whatsapp_channel_join_and_pin(self):
+        """ Adds the current partner as a member of self channel and pins them if not already pinned. """
+        self.ensure_one()
+        if self.channel_type != 'whatsapp':
+            raise ValidationError(_('This join method is not possible for regular channels.'))
+
+        self.check_access('write')
+        current_partner = self.env.user.partner_id
+        member = self.channel_member_ids.filtered(lambda m: m.partner_id == current_partner)
+        if member:
+            if not member.is_pinned:
+                member.write({'unpin_dt': False})
+        else:
+            new_member = self.env['discuss.channel.member'].with_context(tools.clean_context(self.env.context)).sudo().create([{
+                'partner_id': current_partner.id,
+                'channel_id': self.id,
+            }])
+            message_body = Markup(f'<div class="o_mail_notification">{_("joined the channel")}</div>')
+            new_member.channel_id.message_post(body=message_body, message_type="notification", subtype_xmlid="mail.mt_comment")
+            self._bus_send_store(Store(new_member).add(self, {"memberCount": self.member_count}))
+        return Store(self).get_result()
+
+    def _to_store(self, store: Store):
+        super()._to_store(store)
+        for channel in self.filtered(lambda channel: channel.channel_type == "whatsapp"):
+            store.add(channel, {
+                "whatsapp_channel_valid_until": channel.whatsapp_channel_valid_until,
+                "whatsapp_partner_id": Store.one(channel.whatsapp_partner_id, only_id=True),
+            })
+
+    def _types_allowing_seen_infos(self):
+        return super()._types_allowing_seen_infos() + ["whatsapp"]
+
     
     @api.model
     def _get_whatsapp_channel(self, whatsapp_number, wa_account_id, create_if_not_found=False):

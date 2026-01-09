@@ -44,13 +44,16 @@ class WhatsAppTemplateVariable(models.Model):
                     value = variable.demo_value
             elif variable.field_type == 'field':
                 try:
-                    value = record.mapped(variable.field_name)[0]
+                    vals = record.mapped(variable.field_name)
+                    value = vals[0] if vals else None
+                    if hasattr(value, 'display_name'):
+                        value = value.display_name
                 except Exception:
                     value = variable.demo_value
             else:
                 value = variable.demo_value
 
-            value_str = value and str(value) or ''
+            value_str = str(value) if value is not None and value is not False else ''
             value_by_name[f"{variable.line_type}-{variable.name}"] = value_str
 
         return value_by_name

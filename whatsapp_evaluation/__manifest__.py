@@ -14,6 +14,7 @@
         'views/whatsapp_template_views.xml',
         'wizard/whatsapp_composer_views.xml',
         'data/whatsapp_evaluation_demo.xml',
+        'data/whatsapp_template_data.xml',
     ],
     'assets': {
         'web.assets_backend': [

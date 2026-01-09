@@ -4,3 +4,4 @@ from . import discuss_channel
 from . import mail_message
 from . import whatsapp_template
 from . import sale_order
+from . import mail_thread

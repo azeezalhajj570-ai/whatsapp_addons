@@ -11,6 +11,7 @@
         'security/ir.model.access.csv',
         'views/whatsapp_account_views.xml',
         'views/whatsapp_message_views.xml',
+        'data/whatsapp_evaluation_demo.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -30,7 +31,4 @@
     'license': 'OEEL-1',
     'application': True,
     'installable': True,
-    'demo': [
-        'data/whatsapp_evaluation_demo.xml',
-    ],
 }

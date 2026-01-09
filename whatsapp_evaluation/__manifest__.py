@@ -13,7 +13,6 @@
         'views/whatsapp_message_views.xml',
         'views/whatsapp_template_views.xml',
         'wizard/whatsapp_composer_views.xml',
-        'views/sale_order_views.xml',
         'data/whatsapp_evaluation_demo.xml',
     ],
     'assets': {

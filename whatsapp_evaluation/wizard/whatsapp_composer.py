@@ -37,6 +37,30 @@ class WhatsAppComposer(models.TransientModel):
             account = self.env['whatsapp_evaluation.account'].search([], limit=1)
             if account:
                 result['wa_account_id'] = account.id
+            
+            # Sale Order Specific Logic
+            if result['res_model'] == 'sale.order':
+                # Pre-fill body
+                currency = record.currency_id.symbol
+                amount = record.amount_total
+                result['body'] = _("Here is your quotation *%s* amounting to *%s %s*.") % (record.name, amount, currency)
+                
+                # Attach PDF
+                try:
+                    report = self.env.ref('sale.action_report_saleorder')
+                    if report:
+                        pdf_content, __ = report._render_qweb_pdf(record.id)
+                        attachment = self.env['ir.attachment'].create({
+                            'name': f"{record.name}.pdf",
+                            'type': 'binary',
+                            'datas': self.env['ir.attachment']._encode_datas(pdf_content),
+                            'res_model': 'sale.order',
+                            'res_id': record.id,
+                            'mimetype': 'application/pdf'
+                        })
+                        result['attachment_ids'] = [(4, attachment.id)]
+                except Exception:
+                    pass
                 
         return result
 

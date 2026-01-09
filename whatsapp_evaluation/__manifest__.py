@@ -30,4 +30,7 @@
     'license': 'OEEL-1',
     'application': True,
     'installable': True,
+    'demo': [
+        'data/whatsapp_evaluation_demo.xml',
+    ],
 }

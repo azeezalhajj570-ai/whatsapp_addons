@@ -8,7 +8,6 @@ class WhatsAppTemplateVariable(models.Model):
     _description = 'WhatsApp Template Variable'
     _order = 'line_type desc, name, id'
 
-    min_name_len = fields.Char(string="Placeholder", required=True)
     name = fields.Char(string="Placeholder", required=True)
     wa_template_id = fields.Many2one(comodel_name='whatsapp_evaluation.template', required=True, ondelete='cascade')
     model = fields.Char(string="Model Name", related='wa_template_id.model')

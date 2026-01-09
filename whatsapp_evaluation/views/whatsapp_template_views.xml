@@ -18,21 +18,21 @@
         </field>
     </record>
 
-    <record id="whatsapp_evaluation_template_view_tree" model="ir.ui.view">
-        <field name="name">whatsapp_evaluation.template.view.tree</field>
+    <record id="whatsapp_evaluation_template_view_list" model="ir.ui.view">
+        <field name="name">whatsapp_evaluation.template.view.list</field>
         <field name="model">whatsapp_evaluation.template</field>
         <field name="arch" type="xml">
-            <tree string="WhatsApp Templates">
+            <list string="WhatsApp Templates">
                 <field name="name"/>
                 <field name="model"/>
-            </tree>
+            </list>
         </field>
     </record>
 
     <record id="whatsapp_evaluation_template_action" model="ir.actions.act_window">
         <field name="name">WhatsApp Templates</field>
         <field name="res_model">whatsapp_evaluation.template</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
     
     <menuitem id="whatsapp_evaluation_template_menu"

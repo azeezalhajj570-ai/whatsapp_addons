@@ -101,4 +101,32 @@ class WhatsAppApi:
             }
         }
         
+    def _send_whatsapp_media(self, number, attachment, caption=None):
+        """ Send a media message """
+        endpoint = f"/message/sendMedia/{self.instance_name}"
+        
+        # Odoo stores content as base64
+        # Evolution API typically expects: { "number":..., "mediaMessage": { "mediatype": "image", "caption": "...", "media": "base64..." } }
+        # Or simpler top-level: { "number": ..., "mediatype": "image", "caption": "...", "media": "..." }
+        
+        # Helper to map mimetype to Evolution type (image, video, document, audio)
+        mimetype = attachment.mimetype
+        if 'image' in mimetype:
+            media_type = 'image'
+        elif 'video' in mimetype:
+            media_type = 'video'
+        elif 'audio' in mimetype:
+            media_type = 'audio'
+        else:
+            media_type = 'document'
+            
+        payload = {
+            "number": number,
+            "mediatype": media_type,
+            "mimetype": mimetype,
+            "caption": caption or attachment.name,
+            "media": attachment.datas.decode('utf-8'), # binary to base64 string
+            "fileName": attachment.name
+        }
+        
         return self.__api_requests("POST", endpoint, data=payload)

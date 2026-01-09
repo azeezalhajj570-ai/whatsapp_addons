@@ -91,7 +91,7 @@ class DiscussChannel(models.Model):
 
     def _create_whatsapp_message(self, message):
         """ Create linked WhatsApp message and send it """
-        if not message.body:
+        if not message.body and not message.attachment_ids:
             return
 
         body_text = html2plaintext(message.body)
@@ -103,5 +103,6 @@ class DiscussChannel(models.Model):
             'mail_message_id': message.id,
             'message_type': 'outbound',
             'state': 'outgoing',
+            'attachment_ids': [Command.set(message.attachment_ids.ids)],
         })
         wa_msg._send_message()

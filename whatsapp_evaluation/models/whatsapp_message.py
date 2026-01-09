@@ -73,7 +73,9 @@ class WhatsAppMessage(models.Model):
                     if not whatsapp_media_type:
                          raise WhatsAppError(_("Attachment mimetype is not supported by WhatsApp: %s.", attachment.mimetype))
                     
-                    response = api._send_whatsapp_media(record.mobile_number, attachment, record.body)
+                    # Ensure we send plain text for caption
+                    caption = html2plaintext(record.body) if record.body else ''
+                    response = api._send_whatsapp_media(record.mobile_number, attachment, caption)
                 else:
                     # Ensure we send plain text, even if stored as HTML
                     text_body = html2plaintext(record.body) if record.body else ''

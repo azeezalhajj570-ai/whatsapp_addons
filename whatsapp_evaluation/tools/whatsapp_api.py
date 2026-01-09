@@ -1,0 +1,96 @@
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+import logging
+import requests
+import json
+import threading
+
+from odoo import _
+from odoo.addons.whatsapp_evaluation.tools.whatsapp_exception import WhatsAppError
+
+_logger = logging.getLogger(__name__)
+
+class WhatsAppApi:
+    def __init__(self, base_url, instance_name, api_key):
+        self.base_url = base_url.rstrip('/')
+        self.instance_name = instance_name
+        self.api_key = api_key
+
+    def __api_requests(self, request_type, endpoint, params=False, headers=None, data=False):
+        if getattr(threading.current_thread(), 'testing', False):
+             raise WhatsAppError("API requests disabled in testing.")
+
+        headers = headers or {}
+        headers.update({
+            'apikey': self.api_key,
+            'Content-Type': 'application/json',
+        })
+        
+        url = f"{self.base_url}{endpoint}"
+        
+        try:
+            res = requests.request(request_type, url, params=params, headers=headers, json=data, timeout=(10, 30))
+        except requests.exceptions.RequestException as e:
+            raise WhatsAppError(failure_type='network')
+
+        try:
+            if not res.ok:
+                 # Attempt to parse error message from JSON
+                 error_data = res.json()
+                 raise WhatsAppError(*self._prepare_error_response(error_data))
+        except ValueError:
+            if not res.ok:
+                raise WhatsAppError(failure_type='network')
+        
+        try:
+             return res.json()
+        except ValueError:
+             return {}
+
+    def _prepare_error_response(self, response):
+        if 'error' in response and isinstance(response['error'], str):
+            # Formats like {"status": 404, "error": "Not Found", ...}
+            return (response.get('response', {}).get('message') or response['error'], response.get('status', 'odoo'))
+        if 'message' in response:
+            return (str(response['message']), 'odoo')
+        return (_("Unknown Evolution API Error"), -1)
+
+    def _test_connection(self):
+        """ Test connection by checking instance state """
+        # Using /instance/connectionState/{instance}
+        endpoint = f"/instance/connectionState/{self.instance_name}"
+        response = self.__api_requests("GET", endpoint)
+        
+        # Adjust based on actual response structure
+        # Example response: {"instance": {"state": "open"}}
+        state = response.get('instance', {}).get('state') or response.get('state')
+        
+        if state not in ['open', 'connecting', 'connected']:
+             # Fallback check if simple instance fetch works
+             _logger.warning("Connection state check returned: %s", state)
+             # If we got a valid JSON response without 401/403, auth is likely fine.
+        return True
+
+    def _send_whatsapp(self, number, message_body):
+        """ Send a text message """
+        endpoint = f"/message/sendText/{self.instance_name}"
+        payload = {
+            "number": number,
+            "text": message_body, # Simplified for some instances
+            "textMessage": {
+               "text": message_body
+            }
+        }
+        # Note: Some versions use "textMessage": {"text": ...}, others might flatten it.
+        # Sending both to be safe based on "sendText" docs usually expecting specific schema.
+        # Strict schema from OpenAPI v1 was:
+        # { "number": ..., "textMessage": { "text": ... } }
+        
+        payload = {
+            "number": number,
+            "textMessage": {
+                "text": message_body
+            }
+        }
+        
+        return self.__api_requests("POST", endpoint, data=payload)

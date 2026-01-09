@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_whatsapp_evaluation_account_user,access.whatsapp_evaluation.account.user,model_whatsapp_evaluation_account,base.group_user,1,0,0,0
 access_whatsapp_evaluation_account_system,access.whatsapp_evaluation.account.system,model_whatsapp_evaluation_account,base.group_system,1,1,1,1
+access_whatsapp_evaluation_message_user,access.whatsapp_evaluation.message.user,model_whatsapp_evaluation_message,base.group_user,1,1,1,1

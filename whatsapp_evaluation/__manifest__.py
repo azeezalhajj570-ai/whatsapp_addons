@@ -10,6 +10,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/whatsapp_account_views.xml',
+        'views/whatsapp_message_views.xml',
     ],
     'external_dependencies': {
         'python': ['phonenumbers'],

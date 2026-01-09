@@ -44,17 +44,6 @@ class WebhookEvaluation(http.Controller):
     def _handle_messages_upsert(self, account, data):
         """
         Process incoming messages.
-        Data structure usually mirrors Baileys event:
-        {
-          "messages": [
-            {
-              "key": { "remoteJid": "...", "fromMe": false, "id": "..." },
-              "message": { "conversation": "..." },
-              ...
-            }
-          ],
-          "type": "notify"
-        }
         """
         messages = data.get('messages', [])
         for msg in messages:
@@ -65,6 +54,9 @@ class WebhookEvaluation(http.Controller):
             remote_jid = key.get('remoteJid')
             if not remote_jid:
                 continue
+
+            # remoteJid is usually "123456789@s.whatsapp.net"
+            mobile_number = remote_jid.split('@')[0]
 
             # Extract message content
             message_content = msg.get('message', {})
@@ -77,9 +69,39 @@ class WebhookEvaluation(http.Controller):
             
             if not body:
                 continue
-                
-            _logger.info("Processing message from %s: %s", remote_jid, body)
             
-            # TODO: Integrate with Odoo mail.thread or other logic
-            # For now, just logging content.
-            # account.message_post(...) 
+            # Find or create channel
+            channel = request.env['discuss.channel'].sudo()._get_whatsapp_channel(
+                mobile_number, account, create_if_not_found=True
+            )
+            
+            # Post message to channel
+            # We use a custom context or kwarg to signal this is inbound to avoid loops if needed,
+            # though our logic checks 'whatsapp_inbound_msg_uid' or similar.
+            
+            # Create the Odoo message
+            channel.message_post(
+                body=body,
+                message_type='whatsapp_message', # Use custom type or 'comment'
+                subtype_xmlid='mail.mt_comment',
+                whatsapp_inbound_msg_uid=key.get('id')
+            )
+            
+            # Also create the whatsapp_evaluation.message record linked to it
+            # Note: discuss.channel.message_post in our model override needs to handle this
+            # OR we handle it here explicitly if the override is for outbound only.
+            
+            # Let's do it explicitly here for clarity and robust linking
+            # Actually, standard whatsapp model does it in notify_thread or similar. 
+            # For simplicity:
+            last_msg = channel.message_ids[0] # The one we just posted
+            
+            request.env['whatsapp_evaluation.message'].sudo().create({
+                 'body': body,
+                 'mobile_number': mobile_number,
+                 'wa_account_id': account.id,
+                 'mail_message_id': last_msg.id,
+                 'message_type': 'inbound',
+                 'state': 'received',
+                 'msg_uid': key.get('id')
+            }) 

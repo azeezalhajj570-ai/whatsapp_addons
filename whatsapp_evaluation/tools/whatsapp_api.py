@@ -30,7 +30,8 @@ class WhatsAppApi:
         
         try:
             _logger.info("WhatsApp Evaluation Request: %s %s Headers: %s Data: %s", request_type, url, headers, data)
-            res = requests.request(request_type, url, params=params, headers=headers, json=data, timeout=(10, 30))
+            json_data = data if data else None
+            res = requests.request(request_type, url, params=params, headers=headers, json=json_data, timeout=(10, 30))
         except requests.exceptions.Timeout:
             _logger.error("WhatsApp Evaluation Timeout: %s", url)
             raise WhatsAppError("Connection timed out. Check firewall or API URL.", error_code="Timeout")

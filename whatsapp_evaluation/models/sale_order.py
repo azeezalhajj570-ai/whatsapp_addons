@@ -24,7 +24,7 @@ class SaleOrder(models.Model):
              
             report = self.env.ref('sale.action_report_saleorder')
             if report:
-                pdf_content, _ = report._render_qweb_pdf(self.id)
+                pdf_content, __ = report._render_qweb_pdf(self.id)
                 attachment = self.env['ir.attachment'].create({
                     'name': f"{self.name}.pdf",
                     'type': 'binary',

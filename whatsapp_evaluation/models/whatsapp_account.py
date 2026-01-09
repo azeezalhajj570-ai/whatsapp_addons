@@ -20,11 +20,18 @@ class WhatsAppAccount(models.Model):
     name = fields.Char(string="Name", tracking=1)
     active = fields.Boolean(default=True, tracking=6)
 
-    app_uid = fields.Char(string="App ID", required=True, tracking=2)
-    app_secret = fields.Char(string="App Secret", groups='base.group_system', required=True)
-    account_uid = fields.Char(string="Account ID", required=True, tracking=3)
-    phone_uid = fields.Char(string="Phone Number ID", required=True, tracking=4)
-    token = fields.Char(string="Access Token", required=True, groups='base.group_system')
+    # Evolution API Credentials
+    base_url = fields.Char('API Base URL', required=True, help="Base URL of your Evolution API instance (e.g., https://api.example.com)")
+    instance_name = fields.Char('Instance Name', required=True, help="Name of the Evolution API instance")
+    api_key = fields.Char('API Key', required=True, groups="base.group_system", help="Global API Key or Instance Token")
+
+    # Removed Meta-specific fields
+    # app_uid = fields.Char(string="App ID", required=True, tracking=2)
+    # app_secret = fields.Char(string="App Secret", groups='base.group_system', required=True)
+    # account_uid = fields.Char(string="Account ID", required=True, tracking=3)
+    # phone_uid = fields.Char(string="Phone Number ID", required=True, tracking=4)
+    # token = fields.Char(string="Access Token", required=True, groups='base.group_system')
+
     webhook_verify_token = fields.Char(string="Webhook Verify Token", compute='_compute_verify_token',
                                        groups='base.group_system', store=True)
     callback_url = fields.Char(string="Callback URL", compute='_compute_callback_url', readonly=True, copy=False)

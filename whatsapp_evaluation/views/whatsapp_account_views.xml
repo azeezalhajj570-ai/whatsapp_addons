@@ -6,9 +6,8 @@
         <field name="arch" type="xml">
             <list>
                 <field name="name"/>
-                <field name="phone_uid"/>
-                <field name="account_uid"/>
-                <field name="app_uid"/>
+                <field name="instance_name"/>
+                <field name="base_url"/>
                 <field name="allowed_company_ids" widget="many2many_tags" groups="base.group_multi_company"/>
             </list>
         </field>
@@ -41,6 +40,7 @@
                     <div class="content-group">
                         <button name="button_test_connection" type="object" string="Test Credentials" icon="fa-key" class="btn-link p-1"/><br/>
                     </div>
+                    </div>
                     <div class="o_horizontal_separator mt-4 mb-3 text-uppercase fw-bolder small">
                         Receiving Messages
                     </div>
@@ -72,9 +72,8 @@
         <field name="arch" type="xml">
             <search>
                 <field name="name"/>
-                <field name="phone_uid"/>
-                <field name="account_uid"/>
-                <field name="app_uid"/>
+                <field name="instance_name"/>
+                <field name="base_url"/>
                 <separator/>
                 <filter string="Archived" name="filter_archived" domain="[('active', '=', False)]"/>
             </search>

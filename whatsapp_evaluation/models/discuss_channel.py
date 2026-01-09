@@ -13,6 +13,8 @@ class DiscussChannel(models.Model):
     )
     whatsapp_number = fields.Char(string="WhatsApp Number")
     wa_account_id = fields.Many2one('whatsapp_evaluation.account', string="WhatsApp Account")
+    whatsapp_partner_id = fields.Many2one('res.partner', string="WhatsApp Partner")
+    whatsapp_channel_valid_until = fields.Datetime(string="WhatsApp Channel Valid Until")
     
     @api.model
     def _get_whatsapp_channel(self, whatsapp_number, wa_account_id, create_if_not_found=False):

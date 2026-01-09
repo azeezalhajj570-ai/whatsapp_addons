@@ -126,7 +126,11 @@ class WhatsAppApi:
             "mimetype": mimetype,
             "caption": caption or attachment.name,
             "media": attachment.datas.decode('utf-8'), # binary to base64 string
-            "fileName": attachment.name
+            "fileName": attachment.name,
+            "options": {
+                "caption": caption or attachment.name
+            }
         }
         
+        _logger.info("Sending Media to %s. Caption: %s. Type: %s", number, payload['caption'], media_type)
         return self.__api_requests("POST", endpoint, data=payload)

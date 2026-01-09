@@ -13,7 +13,7 @@ patch(DiscussApp, {
             icon: "fa fa-whatsapp",
             id: "whatsapp",
             name: _t("WhatsApp"),
-            hideWhenEmpty: true,
+            hideWhenEmpty: false,
             canView: false,
             canAdd: true,
             addTitle: _t("Search WhatsApp Channel"),

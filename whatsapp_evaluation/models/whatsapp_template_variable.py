@@ -21,6 +21,7 @@ class WhatsAppTemplateVariable(models.Model):
         ('user_name', 'User Name'),
         ('user_mobile', 'User Mobile'),
         ('free_text', 'Free Text'),
+        ('portal_url', 'Portal Link'),
         ('field', 'Field of Model')], string="Type", default='free_text', required=True)
         
     field_name = fields.Char(string="Field")
@@ -34,6 +35,14 @@ class WhatsAppTemplateVariable(models.Model):
                 value = user.name
             elif variable.field_type == 'user_mobile':
                 value = user.mobile
+            elif variable.field_type == 'portal_url':
+                try:
+                    if hasattr(record, 'get_portal_url'):
+                        value = record.get_base_url() + record.get_portal_url()
+                    else:
+                        value = record.get_base_url()
+                except Exception:
+                    value = variable.demo_value
             elif variable.field_type == 'field':
                 try:
                     value = record.mapped(variable.field_name)[0]

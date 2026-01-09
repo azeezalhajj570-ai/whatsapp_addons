@@ -6,11 +6,14 @@
     'summary': 'Text your Contacts on WhatsApp via Evaluation API',
     'version': '1.0',
     'description': """This module integrates Odoo with WhatsApp via the Evaluation API""",
-    'depends': ['mail', 'phone_validation'],
+    'depends': ['base', 'web', 'mail', 'phone_validation', 'sale'],
     'data': [
         'security/ir.model.access.csv',
         'views/whatsapp_account_views.xml',
         'views/whatsapp_message_views.xml',
+        'views/whatsapp_template_views.xml',
+        'wizard/whatsapp_composer_views.xml',
+        'views/sale_order_views.xml',
         'data/whatsapp_evaluation_demo.xml',
     ],
     'assets': {

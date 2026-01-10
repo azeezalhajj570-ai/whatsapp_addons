@@ -4,8 +4,9 @@
         <field name="name">whatsapp_evaluation.message.view.list</field>
         <field name="model">whatsapp_evaluation.message</field>
         <field name="arch" type="xml">
-            <list string="WhatsApp Messages" decoration-info="state == 'outgoing'" decoration-muted="state == 'cancel'" decoration-danger="state == 'error'">
+            <list create="0">
                 <field name="create_date"/>
+                <field name="create_uid" widget="many2one_avatar"/>
                 <field name="mobile_number"/>
                 <field name="body"/>
                 <field name="message_type"/>

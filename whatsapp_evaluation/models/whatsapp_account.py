@@ -83,3 +83,25 @@ class WhatsAppAccount(models.Model):
             except Exception as e:
                 _logger.error("WhatsApp Connection Error: %s", str(e))
                 raise UserError(_("Connection Failed. Check logs for details."))
+
+    def button_configure_webhook(self):
+        """ Pushes the callback URL to the Evolution API """
+        self.ensure_one()
+        if not self.callback_url:
+             raise UserError(_("Callback URL is not generated yet."))
+        
+        api = self._get_api_client()
+        try:
+            api.update_webhook(self.callback_url, enabled=True)
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _("Webhook Configured"),
+                    'message': _("Successfully updated webhook settings on Evolution API."),
+                    'type': 'success',
+                    'sticky': False,
+                }
+            }
+        except WhatsAppError as e:
+            raise UserError(_("Webhook Configuration Failed: %s") % str(e))

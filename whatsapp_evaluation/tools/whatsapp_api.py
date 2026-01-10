@@ -136,3 +136,18 @@ class WhatsAppApi:
         
         _logger.info("Sending Media to %s. Caption: %s. Type: %s", number, payload['caption'], media_type)
         return self.__api_requests("POST", endpoint, data=payload)
+
+    def update_webhook(self, webhook_url, enabled=True):
+        """ Update instance webhook configuration """
+        endpoint = f"/webhook/instance/{self.instance_name}"
+        payload = {
+            "enabled": enabled,
+            "url": webhook_url,
+            "webhook_by_events": False,
+            "events": [
+                "MESSAGES_UPSERT",
+                "MESSAGES_UPDATE",
+                "SEND_MESSAGE",
+            ]
+        }
+        return self.__api_requests("POST", endpoint, data=payload)

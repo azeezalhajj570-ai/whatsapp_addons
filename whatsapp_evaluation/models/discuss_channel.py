@@ -76,6 +76,10 @@ class DiscussChannel(models.Model):
             })
             if partner:
                  channel.add_members(partner.ids)
+            
+            # Add notify users from account
+            if wa_account_id.notify_user_ids:
+                channel.add_members(wa_account_id.notify_user_ids.ids)
                  
         return channel
 

@@ -47,6 +47,7 @@
                     <div class="row mt16 o_settings_container" id="toreceive_msg">
                         <setting>
                             <field name="callback_url" widget="CopyClipboardURL"/>
+                            <br/><button name="button_configure_webhook" type="object" string="Push to Evolution API" class="btn-link p-0"/>
                         </setting>
                         <setting>
                             <field name="webhook_verify_token" widget="CopyClipboardChar"/>

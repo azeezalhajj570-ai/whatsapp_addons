@@ -76,7 +76,16 @@ class WebhookEvaluation(http.Controller):
                 message_content.get('conversation') or 
                 message_content.get('extendedTextMessage', {}).get('text') or
                 message_content.get('imageMessage', {}).get('caption') or
+                message_content.get('videoMessage', {}).get('caption') or
+                message_content.get('documentMessage', {}).get('caption') or
                 message_content.get('templateMessage', {}).get('hydratedTemplate', {}).get('hydratedContentText') or
+                
+                # Media fallbacks (if no caption, use filename or type)
+                ('🎥 Video Message' if 'videoMessage' in message_content else '') or
+                ('🎤 Audio Message' if 'audioMessage' in message_content else '') or
+                ('📄 Document Message' if 'documentMessage' in message_content else '') or
+                ('📷 Image Message' if 'imageMessage' in message_content else '') or
+                
                 ''
             )
             

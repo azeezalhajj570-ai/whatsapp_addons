@@ -139,7 +139,7 @@ class WhatsAppApi:
 
     def update_webhook(self, webhook_url, enabled=True):
         """ Update instance webhook configuration """
-        endpoint = f"/webhook/instance/{self.instance_name}"
+        endpoint = f"/webhook/set/{self.instance_name}"
         payload = {
             "enabled": enabled,
             "url": webhook_url,

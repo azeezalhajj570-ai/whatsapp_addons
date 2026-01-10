@@ -44,9 +44,6 @@ class WhatsAppAccount(models.Model):
         domain=[('share', '=', False)], required=True, tracking=5,
         help="Users to notify when a message is received")
 
-    _sql_constraints = [
-        ('phone_uid_unique', 'unique(phone_uid)', "The same phone number ID already exists")]
-
     @api.constrains('notify_user_ids')
     def _check_notify_user_ids(self):
         for phone in self:

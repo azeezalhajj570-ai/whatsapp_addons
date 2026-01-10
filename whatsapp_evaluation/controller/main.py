@@ -64,7 +64,23 @@ class WebhookEvaluation(http.Controller):
                 continue # Skip own messages
             
             remote_jid = key.get('remoteJid')
-            if not remote_jid:
+            msg_uid = key.get('id')
+            if not remote_jid or not msg_uid:
+                continue
+            
+            # Deduplication: Check if we already processed this message ID
+            existing_msg = request.env['whatsapp_evaluation.message'].sudo().search([
+                ('msg_uid', '=', msg_uid)
+            ], limit=1)
+            
+            if existing_msg:
+                # If it exists, it might be an update calling as upsert (rare but possible w/ Evolution)
+                # We can update status if it's different, but we skip posting to chat to avoid duplicates.
+                status = msg.get('status')
+                if status and existing_msg.state != 'read': # Simple status update attempt
+                     # Map status logic could be reused here or we just rely on MESSAGES_UPDATE
+                     pass 
+                _logger.info("WhatsApp Upsert: Duplicate message ID %s, skipping creation.", msg_uid)
                 continue
 
             # remoteJid is usually "123456789@s.whatsapp.net"

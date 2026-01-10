@@ -89,7 +89,7 @@ class WebhookEvaluation(http.Controller):
                 ''
             )
             
-            if not body:
+            if not body and not msg.get('base64'):
                 continue
             
             # Find or create channel
@@ -100,6 +100,42 @@ class WebhookEvaluation(http.Controller):
             )
             _logger.info("WhatsApp Inbound: Channel %s (ID: %s)", channel.name, channel.id)
             
+            # Handle Attachments
+            attachment_ids = []
+            file_content = msg.get('base64')
+            if file_content:
+                # Determine filename and mimetype
+                # Default fallback
+                filename = "whatsapp_media"
+                mimetype = "application/octet-stream"
+                
+                if 'audioMessage' in message_content:
+                    mimetype = message_content['audioMessage'].get('mimetype', 'audio/ogg')
+                    filename = "voice_message.ogg"
+                elif 'imageMessage' in message_content:
+                    mimetype = message_content['imageMessage'].get('mimetype', 'image/jpeg')
+                    filename = "image.jpg"
+                elif 'videoMessage' in message_content:
+                    mimetype = message_content['videoMessage'].get('mimetype', 'video/mp4')
+                    filename = "video.mp4"
+                elif 'documentMessage' in message_content:
+                    mimetype = message_content['documentMessage'].get('mimetype', 'application/pdf')
+                    filename = message_content['documentMessage'].get('fileName', 'document')
+
+                try:
+                    attachment = request.env['ir.attachment'].sudo().create({
+                        'name': filename,
+                        'type': 'binary',
+                        'datas': file_content, # Evolution sends raw base64 string
+                        'res_model': 'discuss.channel',
+                        'res_id': channel.id,
+                        'mimetype': mimetype,
+                    })
+                    attachment_ids.append(attachment.id)
+                    _logger.info("WhatsApp Inbound: Created attachment %s", attachment.id)
+                except Exception as e:
+                    _logger.error("WhatsApp Inbound: Failed to create attachment: %s", str(e))
+
             # Post message to channel
             # We use a custom context or kwarg to signal this is inbound to avoid loops if needed,
             # though our logic checks 'whatsapp_inbound_msg_uid' or similar.
@@ -109,6 +145,7 @@ class WebhookEvaluation(http.Controller):
                 body=body,
                 message_type='whatsapp_message', # Use custom type or 'comment'
                 subtype_xmlid='mail.mt_comment',
+                attachment_ids=attachment_ids,
                 whatsapp_inbound_msg_uid=key.get('id')
             )
             

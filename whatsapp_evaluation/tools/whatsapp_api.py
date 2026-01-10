@@ -145,6 +145,7 @@ class WhatsAppApi:
                 "enabled": enabled,
                 "url": webhook_url,
                 "webhook_by_events": False,
+                "base64": True,
                 "events": [
                     "MESSAGES_UPSERT",
                     "MESSAGES_UPDATE",

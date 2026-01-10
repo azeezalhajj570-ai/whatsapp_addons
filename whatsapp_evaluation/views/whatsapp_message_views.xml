@@ -21,7 +21,7 @@
         <field name="name">whatsapp_evaluation.message.view.form</field>
         <field name="model">whatsapp_evaluation.message</field>
         <field name="arch" type="xml">
-            <form string="WhatsApp Message">
+            <form string="WhatsApp Message" >
                 <header>
                     <button name="button_resend" string="Retry" type="object" class="oe_highlight" invisible="state != 'error'"/>
                     <field name="state" widget="statusbar" statusbar_visible="outgoing,sent,delivered,read,received,error"/>
@@ -89,7 +89,7 @@
     <record id="whatsapp_evaluation_message_action" model="ir.actions.act_window">
         <field name="name">WhatsApp Messages</field>
         <field name="res_model">whatsapp_evaluation.message</field>
-        <field name="view_mode">list,form,graph</field>
+        <field name="view_mode">list,graph</field>
     </record>
     
 

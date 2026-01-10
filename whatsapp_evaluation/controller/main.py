@@ -56,6 +56,9 @@ class WebhookEvaluation(http.Controller):
         Process incoming messages.
         """
         messages = data.get('messages', [])
+        if not messages and 'key' in data:
+            messages = [data]
+
         for msg in messages:
             key = msg.get('key', {})
             if key.get('fromMe', False):

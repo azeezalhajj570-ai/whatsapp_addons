@@ -107,8 +107,6 @@ class WebhookEvaluation(http.Controller):
                  'mail_message_id': last_msg.id,
                  'message_type': 'inbound',
                  'state': 'received',
-                 'msg_uid': key.get('id'),
-                 'state': 'received',
                  'msg_uid': key.get('id')
             }) 
 

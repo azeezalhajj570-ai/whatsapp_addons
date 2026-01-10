@@ -55,22 +55,16 @@ class WebhookEvaluation(http.Controller):
         """
         Process incoming messages.
         """
-        messages = data.get('messages', [])
         if not messages and 'key' in data:
             messages = [data]
-        
-        _logger.info("WhatsApp Upsert: Found %s messages to process", len(messages))
 
         for msg in messages:
-            _logger.info("WhatsApp Upsert: Processing msg: %s", msg.get('key', {}).get('id'))
             key = msg.get('key', {})
             if key.get('fromMe', False):
-                _logger.info("WhatsApp Upsert: Skipping own message")
                 continue # Skip own messages
             
             remote_jid = key.get('remoteJid')
             if not remote_jid:
-                _logger.info("WhatsApp Upsert: No remoteJid")
                 continue
 
             # remoteJid is usually "123456789@s.whatsapp.net"
@@ -86,10 +80,7 @@ class WebhookEvaluation(http.Controller):
                 ''
             )
             
-            _logger.info("WhatsApp Upsert: Extracted body: '%s'", body)
-            
             if not body:
-                _logger.info("WhatsApp Upsert: Body empty, skipping.")
                 continue
             
             # Find or create channel

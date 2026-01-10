@@ -141,13 +141,15 @@ class WhatsAppApi:
         """ Update instance webhook configuration """
         endpoint = f"/webhook/set/{self.instance_name}"
         payload = {
-            "enabled": enabled,
-            "url": webhook_url,
-            "webhook_by_events": False,
-            "events": [
-                "MESSAGES_UPSERT",
-                "MESSAGES_UPDATE",
-                "SEND_MESSAGE",
-            ]
+            "webhook": {
+                "enabled": enabled,
+                "url": webhook_url,
+                "webhook_by_events": False,
+                "events": [
+                    "MESSAGES_UPSERT",
+                    "MESSAGES_UPDATE",
+                    "SEND_MESSAGE",
+                ]
+            }
         }
         return self.__api_requests("POST", endpoint, data=payload)

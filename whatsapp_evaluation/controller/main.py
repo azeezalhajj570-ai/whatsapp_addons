@@ -36,8 +36,11 @@ class WebhookEvaluation(http.Controller):
             return 'OK'
 
         # Process specific events
+        # Process specific events
         if event_type == 'MESSAGES_UPSERT':
             self._handle_messages_upsert(account, data.get('data', {}))
+        elif event_type == 'MESSAGES_UPDATE':
+            self._handle_messages_update(account, data.get('data', {}))
         
         return 'OK'
 
@@ -64,6 +67,7 @@ class WebhookEvaluation(http.Controller):
                 message_content.get('conversation') or 
                 message_content.get('extendedTextMessage', {}).get('text') or
                 message_content.get('imageMessage', {}).get('caption') or
+                message_content.get('templateMessage', {}).get('hydratedTemplate', {}).get('hydratedContentText') or
                 ''
             )
             
@@ -103,5 +107,44 @@ class WebhookEvaluation(http.Controller):
                  'mail_message_id': last_msg.id,
                  'message_type': 'inbound',
                  'state': 'received',
+                 'msg_uid': key.get('id'),
+                 'state': 'received',
                  'msg_uid': key.get('id')
             }) 
+
+    def _handle_messages_update(self, account, data):
+        """
+        Handle message status updates (e.g. READ, DELIVERED)
+        """
+        # data usually contains: { "key": { "id": "..." }, "status": "READ", ... }
+        # Or sometimes directly: { "keyId": "...", "status": "READ" } depending on Evolution version.
+        # Based on user logs:
+        # { "keyId": "...", "remoteJid": "...", "status": "READ", "messageId": "..." }
+        
+        msg_uid = data.get('keyId') or data.get('key', {}).get('id')
+        status = data.get('status')
+        
+        if not msg_uid or not status:
+            return
+
+        # Map Evolution status to Odoo status
+        # Evolution: PENDING, SERVER_ACK, DELIVERY_ACK, READ, PLAYED
+        # Odoo: outgoing, sent, delivered, read, error
+        
+        odoo_state = False
+        if status == 'SERVER_ACK':
+            odoo_state = 'sent'
+        elif status == 'DELIVERY_ACK':
+            odoo_state = 'delivered'
+        elif status in ['READ', 'PLAYED']:
+            odoo_state = 'read'
+            
+        if odoo_state:
+            message = request.env['whatsapp_evaluation.message'].sudo().search([
+                ('msg_uid', '=', msg_uid)
+            ], limit=1)
+            
+            if message:
+                message.write({'state': odoo_state})
+                _logger.info("Updated message %s status to %s", msg_uid, odoo_state)
+

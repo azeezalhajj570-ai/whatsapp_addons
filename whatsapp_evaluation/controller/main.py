@@ -165,7 +165,8 @@ class WebhookEvaluation(http.Controller):
                  'mail_message_id': last_msg.id,
                  'message_type': 'inbound',
                  'state': 'received',
-                 'msg_uid': key.get('id')
+                 'msg_uid': key.get('id'),
+                 'attachment_ids': [(6, 0, attachment_ids)] if attachment_ids else False
             }) 
 
     def _handle_messages_update(self, account, data):

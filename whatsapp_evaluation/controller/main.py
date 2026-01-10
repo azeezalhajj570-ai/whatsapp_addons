@@ -75,9 +75,12 @@ class WebhookEvaluation(http.Controller):
                 continue
             
             # Find or create channel
+            _logger.info("WhatsApp Inbound: Processing for %s (Account: %s)", mobile_number, account.name)
+            
             channel = request.env['discuss.channel'].sudo()._get_whatsapp_channel(
                 mobile_number, account, create_if_not_found=True
             )
+            _logger.info("WhatsApp Inbound: Channel %s (ID: %s)", channel.name, channel.id)
             
             # Post message to channel
             # We use a custom context or kwarg to signal this is inbound to avoid loops if needed,

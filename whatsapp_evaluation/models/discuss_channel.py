@@ -77,9 +77,10 @@ class DiscussChannel(models.Model):
             if partner:
                  channel.add_members(partner.ids)
             
-            # Add notify users from account
-            if wa_account_id.notify_user_ids:
-                channel.add_members(wa_account_id.notify_user_ids.ids)
+        # Ensure notify users are members (in case they were removed or channel existed before fix)
+        if channel and wa_account_id.notify_user_ids:
+            # We use add_members which handles duplication safely (only creates missing members)
+            channel.add_members(wa_account_id.notify_user_ids.ids)
                  
         return channel
 

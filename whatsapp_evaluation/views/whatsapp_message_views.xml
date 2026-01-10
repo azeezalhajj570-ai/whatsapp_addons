@@ -50,16 +50,48 @@
         </field>
     </record>
 
+    <record id="whatsapp_evaluation_message_view_graph" model="ir.ui.view">
+        <field name="name">whatsapp_evaluation.message.view.graph</field>
+        <field name="model">whatsapp_evaluation.message</field>
+        <field name="arch" type="xml">
+            <graph string="WhatsApp Messages" type="line" sample="1">
+                <field name="create_date" interval="day"/>
+                <field name="state"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="whatsapp_evaluation_message_view_search" model="ir.ui.view">
+        <field name="name">whatsapp_evaluation.message.view.search</field>
+        <field name="model">whatsapp_evaluation.message</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="create_date"/>
+                <field name="mobile_number"/>
+                <field name="body"/>
+                <field name="state"/>
+                <filter string="Outgoing" name="filter_state_outgoing" domain="[('state', '=', 'outgoing')]"/>
+                <filter string="Sent" name="filter_state_sent" domain="[('state', '=', 'sent')]"/>
+                <filter string="Delivered" name="filter_state_delivered" domain="[('state', '=', 'delivered')]"/>
+                <filter string="Read" name="filter_state_read" domain="[('state', '=', 'read')]"/>
+                <filter string="Failed" name="filter_state_error" domain="[('state', '=', 'error')]"/>
+                <separator/>
+                <filter string="Create Date" name="filter_create_date" date="create_date"/>
+                <group string="Group By">
+                    <filter string="Sent To" name="groupby_mobile_number" context="{'group_by': 'mobile_number'}"/>
+                    <filter string="State" name="groupby_state" context="{'group_by': 'state'}"/>
+                    <filter string="Account" name="groupby_wa_account_id" context="{'group_by': 'wa_account_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="whatsapp_evaluation_message_action" model="ir.actions.act_window">
         <field name="name">WhatsApp Messages</field>
         <field name="res_model">whatsapp_evaluation.message</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,form,graph</field>
     </record>
     
-    <menuitem id="whatsapp_evaluation_message_menu" 
-              name="Messages" 
-              parent="whatsapp_evaluation_menu_root" 
-              action="whatsapp_evaluation_message_action" 
-              sequence="20"/>
+
 
 </odoo>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <menuitem name="WhatsApp"
+        id="whatsapp_evaluation_menu_main"
+        web_icon="whatsapp_evaluation,static/description/icon.png"
+        sequence="260"/>
+
+    <menuitem name="Messages"
+        id="whatsapp_evaluation_message_menu"
+        parent="whatsapp_evaluation_menu_main"
+        sequence="1"
+        action="whatsapp_evaluation_message_action"/>
+
+    <menuitem name="Configuration"
+        id="whatsapp_evaluation_configuration_menu"
+        parent="whatsapp_evaluation_menu_main"
+        sequence="100"/>
+
+    <menuitem name="WhatsApp Accounts"
+        id="whatsapp_evaluation_account_menu"
+        parent="whatsapp_evaluation_configuration_menu"
+        action="whatsapp_evaluation_account_action"/>
+
+    <menuitem name="Templates"
+        id="whatsapp_evaluation_template_menu"
+        parent="whatsapp_evaluation_menu_main"
+        sequence="0"
+        action="whatsapp_evaluation_template_action"/>
+
+</odoo>

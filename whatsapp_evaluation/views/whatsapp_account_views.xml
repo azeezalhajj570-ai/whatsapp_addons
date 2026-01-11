@@ -40,7 +40,7 @@
                                 <field name="api_key" password="True"/>
                             </group>
                         </group>
-                    </div>
+
                     <div class="content-group">
                         <button name="button_test_connection" type="object" string="Test Credentials" icon="fa-key" class="btn-link p-1"/><br/>
                     </div>

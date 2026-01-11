@@ -158,3 +158,18 @@ msgstr "Échoué"
 #: selection:whatsapp_evaluation.message,state:0
 msgid "Error"
 msgstr "Erreur"
+
+#. module: whatsapp_evaluation
+#: model:ir.model.fields,field_description:whatsapp_evaluation.field_whatsapp_evaluation_account__instance_token
+msgid "Instance Token"
+msgstr "Jeton d'instance"
+
+#. module: whatsapp_evaluation
+#: model:ir.model.fields,field_description:whatsapp_evaluation.field_whatsapp_evaluation_account__allowed_company_ids
+msgid "Allowed companies"
+msgstr "Sociétés autorisées"
+
+#. module: whatsapp_evaluation
+#: model:ir.model.fields,field_description:whatsapp_evaluation.field_whatsapp_evaluation_account__api_key
+msgid "Global API Key"
+msgstr "Clé API Globale"

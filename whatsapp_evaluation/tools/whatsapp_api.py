@@ -19,7 +19,7 @@ class WhatsAppApi:
 
     def __api_requests(self, request_type, endpoint, params=False, headers=None, data=False, use_global_key=False):
         if getattr(threading.current_thread(), 'testing', False):
-             raise WhatsAppError("API requests disabled in testing.")
+             raise WhatsAppError(_("API requests disabled in testing."))
 
         headers = headers or {}
         
@@ -44,7 +44,7 @@ class WhatsAppApi:
             res = requests.request(request_type, url, params=params, headers=headers, json=json_data, timeout=(10, 30))
         except requests.exceptions.Timeout:
             _logger.error("WhatsApp Evaluation Timeout: %s", url)
-            raise WhatsAppError("Connection timed out. Check firewall or API URL.", error_code="Timeout")
+            raise WhatsAppError(_("Connection timed out. Check firewall or API URL."), error_code="Timeout")
         except requests.exceptions.RequestException as e:
             _logger.error("WhatsApp Evaluation Network Error: %s", str(e))
             raise WhatsAppError(failure_type='network')

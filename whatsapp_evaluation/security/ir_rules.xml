@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Account: Restrict by allowed companies -->
+    <record id="security_rule_whatsapp_evaluation_account" model="ir.rule">
+        <field name="name">WA Evaluation Account: Restrict to Allowed Companies</field>
+        <field name="model_id" ref="model_whatsapp_evaluation_account"/>
+        <field name="domain_force">[('allowed_company_ids', 'in', company_ids)]</field>
+    </record>
+
+    <!-- Message: Restrict by Account's allowed companies -->
+    <!-- Users can see messages if they are allowed to see the account -->
+    <record id="security_rule_whatsapp_evaluation_message" model="ir.rule">
+        <field name="name">WA Evaluation Message: Restrict to Account Companies</field>
+        <field name="model_id" ref="model_whatsapp_evaluation_message"/>
+        <field name="domain_force">[('wa_account_id.allowed_company_ids', 'in', company_ids)]</field>
+    </record>
+    
+    <!-- Template: Currently global/shared as it has no account link yet. 
+         Leaving domain as empty (accesible by all) or restrict by create_uid if needed, 
+         but for now the requirements imply replicating 'whatsapp' module logic. 
+         Since 'whatsapp.template' in Odoo has wa_account_id, but ours doesn't, 
+         we can't fully replicate it without adding that field.
+         
+         Decision: For now, I will NOT restrict templates by company because the field is missing.
+         I will only apply the rule to Account and Message (which has wa_account_id).
+    -->
+
+</odoo>

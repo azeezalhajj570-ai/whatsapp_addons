@@ -9,6 +9,7 @@
     'depends': ['base', 'web', 'mail', 'phone_validation', 'sale'],
     'data': [
         'security/ir.model.access.csv',
+        'security/ir_rules.xml',
         'views/whatsapp_account_views.xml',
         'views/whatsapp_message_views.xml',
         'views/whatsapp_template_views.xml',

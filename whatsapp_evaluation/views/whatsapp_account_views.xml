@@ -30,14 +30,17 @@
                     </div>
                     <field name="active" invisible="1"/>
                     <div class="row mt16 o_settings_container" id="app_setup">
-                    <group>
                         <group>
-                            <field name="base_url" placeholder="https://api.yourdomain.com"/>
-                            <field name="instance_name" placeholder="Instance Name"/>
-                            <field name="instance_token" password="True" placeholder="Instance Token (optional)"/>
-                            <field name="api_key" password="True"/>
+                            <group>
+                                <field name="instance_name" placeholder="Instance Name"/>
+                                <field name="base_url" placeholder="https://api.yourdomain.com"/>
+                            </group>
+                            <group>
+                                <field name="instance_token" password="True" placeholder="Instance Token (optional)"/>
+                                <field name="api_key" password="True"/>
+                            </group>
                         </group>
-                    </group>
+                    </div>
                     <div class="content-group">
                         <button name="button_test_connection" type="object" string="Test Credentials" icon="fa-key" class="btn-link p-1"/><br/>
                     </div>

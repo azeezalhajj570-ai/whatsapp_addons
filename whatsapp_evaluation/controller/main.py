@@ -164,10 +164,18 @@ class WebhookEvaluation(http.Controller):
             # We use a custom context or kwarg to signal this is inbound to avoid loops if needed,
             # though our logic checks 'whatsapp_inbound_msg_uid' or similar.
             
+            # Determine Author (Partner)
+            author_partner = request.env['res.partner'].sudo().search([
+                ('mobile', '=', mobile_number)
+            ], limit=1)
+            author_id = author_partner.id if author_partner else None
+            
             # Create the Odoo message
+            # Use message_type='comment' to ensure it appears in Discuss and creating notifications/unread counts.
             channel.with_context(whatsapp_inbound_msg_uid=key.get('id')).message_post(
                 body=body,
-                message_type='whatsapp_message', # Use custom type or 'comment'
+                author_id=author_id,
+                message_type='comment', 
                 subtype_xmlid='mail.mt_comment',
                 attachment_ids=attachment_ids
             )

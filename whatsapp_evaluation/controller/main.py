@@ -39,13 +39,16 @@ class WebhookEvaluation(http.Controller):
             _logger.warning("No WhatsApp Evaluation Account found for instance: %s", instance_name)
             return 'OK'
 
+        # Normalize event type: "messages.upsert" -> "MESSAGES_UPSERT"
+        if event_type:
+            event_type = event_type.upper().replace('.', '_')
+        
         # Process specific events
-        # Process specific events
-        if event_type.upper() == 'MESSAGES_UPSERT':
+        if event_type == 'MESSAGES_UPSERT':
             self._handle_messages_upsert(account, data.get('data', {}))
-        elif event_type.upper() == 'MESSAGES_UPDATE':
+        elif event_type == 'MESSAGES_UPDATE':
             self._handle_messages_update(account, data.get('data', {}))
-        elif event_type.upper() == 'SEND_MESSAGE':
+        elif event_type == 'SEND_MESSAGE':
             # Optional: Log or handle outgoing message ack if distinct from MESSAGES_UPDATE
             pass
         

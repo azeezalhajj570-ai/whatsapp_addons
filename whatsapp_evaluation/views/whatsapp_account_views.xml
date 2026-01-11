@@ -32,12 +32,12 @@
                     <div class="row mt16 o_settings_container" id="app_setup">
                         <group>
                             <group>
-                                <field name="instance_name" placeholder="Instance Name"/>
                                 <field name="base_url" placeholder="https://api.yourdomain.com"/>
+                                <field name="instance_name" placeholder="Instance Name"/>
                             </group>
                             <group>
-                                <field name="instance_token" password="True" placeholder="Instance Token (optional)"/>
                                 <field name="api_key" password="True"/>
+                                <field name="instance_token" password="True" placeholder="Instance Token (optional)"/>
                             </group>
                         </group>
 

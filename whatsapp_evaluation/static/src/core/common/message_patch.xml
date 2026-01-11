@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="whatsapp_evaluation.Message" t-inherit="mail.Message" t-inherit-mode="extension">
+        <xpath expr="//span[contains(@class, 'o-mail-Message-date')]" position="after">
+            <t t-if="message.isWhatsAppMessage and message.whatsappIconClass">
+                <i t-att-class="message.whatsappIconClass + ' ms-1'" title="WhatsApp Status"/>
+            </t>
+        </xpath>
+    </t>
+</templates>

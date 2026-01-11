@@ -169,11 +169,14 @@ class WebhookEvaluation(http.Controller):
                 ('mobile', '=', mobile_number)
             ], limit=1)
             author_id = author_partner.id if author_partner else None
+
+            # Format body (Convert *Bold*, _Italic_, Newlines to HTML)
+            formatted_body = WhatsAppApi.format_whatsapp_to_html(body)
             
             # Create the Odoo message
             # Use message_type='comment' to ensure it appears in Discuss and creating notifications/unread counts.
             channel.with_context(whatsapp_inbound_msg_uid=key.get('id')).message_post(
-                body=body,
+                body=formatted_body,
                 author_id=author_id,
                 message_type='comment', 
                 subtype_xmlid='mail.mt_comment',

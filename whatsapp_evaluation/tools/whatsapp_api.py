@@ -153,4 +153,36 @@ class WhatsAppApi:
                 ]
             }
         }
-        return self.__api_requests("POST", endpoint, data=payload)
+    @staticmethod
+    def format_whatsapp_to_html(text):
+        """
+        Convert WhatsApp Markdown to HTML for Odoo display.
+        Handles: *bold*, _italics_, ~strike~, ```code```
+        """
+        if not text:
+            return ""
+            
+        # 1. Escape HTML first to prevent XSS
+        from odoo import tools
+        text = tools.html_escape(text)
+        
+        # 2. Convert Newlines to <br/>
+        text = text.replace('\n', '<br/>')
+        
+        # 3. Apply Markdown Regex replacements
+        import re
+        
+        # Monospace: ```text``` -> <code>text</code>
+        # We handle this first to avoid matching * or _ inside code blocks
+        text = re.sub(r'```(.*?)```', r'<code>\1</code>', text, flags=re.DOTALL)
+        
+        # Bold: *text* -> <b>text</b>
+        text = re.sub(r'\*(.*?)\*', r'<b>\1</b>', text)
+        
+        # Italics: _text_ -> <i>text</i>
+        text = re.sub(r'_(.*?)_', r'<i>\1</i>', text)
+        
+        # Strikethrough: ~text~ -> <strike>text</strike>
+        text = re.sub(r'~(.*?)~', r'<strike>\1</strike>', text)
+        
+        return text

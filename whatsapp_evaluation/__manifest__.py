@@ -20,7 +20,9 @@
     'assets': {
         'web.assets_backend': [
             'whatsapp_evaluation/static/src/core/common/**/*',
-            'whatsapp_evaluation/static/src/core/web/**/*',
+            'whatsapp_evaluation/static/src/core/web/messaging_menu_patch.xml',
+            'whatsapp_evaluation/static/src/core/common/message_patch.js',
+            'whatsapp_evaluation/static/src/core/common/message_patch.xml',
             'whatsapp_evaluation/static/src/core/public_web/**/*',
             'whatsapp_evaluation/static/src/chatter/web/**/*',
         ],

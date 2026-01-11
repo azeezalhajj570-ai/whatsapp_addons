@@ -165,12 +165,11 @@ class WebhookEvaluation(http.Controller):
             # though our logic checks 'whatsapp_inbound_msg_uid' or similar.
             
             # Create the Odoo message
-            channel.message_post(
+            channel.with_context(whatsapp_inbound_msg_uid=key.get('id')).message_post(
                 body=body,
                 message_type='whatsapp_message', # Use custom type or 'comment'
                 subtype_xmlid='mail.mt_comment',
-                attachment_ids=attachment_ids,
-                whatsapp_inbound_msg_uid=key.get('id')
+                attachment_ids=attachment_ids
             )
             
             # Also create the whatsapp_evaluation.message record linked to it

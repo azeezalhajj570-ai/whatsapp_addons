@@ -4,6 +4,7 @@ import logging
 import json
 from odoo import http
 from odoo.http import request, Response
+from odoo.addons.whatsapp_evaluation.tools.whatsapp_api import WhatsAppApi
 
 _logger = logging.getLogger(__name__)
 

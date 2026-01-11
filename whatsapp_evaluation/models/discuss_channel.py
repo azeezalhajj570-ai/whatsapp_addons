@@ -88,7 +88,8 @@ class DiscussChannel(models.Model):
         """ Override to capture messages posted in WhatsApp channels """
         message = super().message_post(*args, **kwargs)
         
-        if self.channel_type == 'whatsapp' and not kwargs.get('whatsapp_inbound_msg_uid'):
+        # Check context for inbound flag (set in controller) to avoid infinite loop
+        if self.channel_type == 'whatsapp' and not self.env.context.get('whatsapp_inbound_msg_uid'):
             # This is an outbound message from Odoo to WhatsApp
             self._create_whatsapp_message(message)
             

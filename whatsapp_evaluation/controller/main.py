@@ -74,13 +74,7 @@ class WebhookEvaluation(http.Controller):
             ], limit=1)
             
             if existing_msg:
-                # If it exists, it might be an update calling as upsert (rare but possible w/ Evolution)
-                # We can update status if it's different, but we skip posting to chat to avoid duplicates.
-                status = msg.get('status')
-                if status and existing_msg.state != 'read': # Simple status update attempt
-                     # Map status logic could be reused here or we just rely on MESSAGES_UPDATE
-                     pass 
-                _logger.info("WhatsApp Upsert: Duplicate message ID %s, skipping creation.", msg_uid)
+                _logger.info("WhatsApp Upsert: Duplicate message ID %s (State: %s), skipping.", msg_uid, existing_msg.state)
                 continue
 
             # remoteJid is usually "123456789@s.whatsapp.net"
@@ -105,16 +99,24 @@ class WebhookEvaluation(http.Controller):
                 ''
             )
             
+            _logger.info("WhatsApp Upsert: Extracted Body: %s", body)
+
             if not body and not msg.get('base64'):
+                _logger.info("WhatsApp Upsert: No body and no base64. Skipping.")
                 continue
             
             # Find or create channel
-            _logger.info("WhatsApp Inbound: Processing for %s (Account: %s)", mobile_number, account.name)
+            _logger.info("WhatsApp Inbound: Finding Channel for %s", mobile_number)
             
             channel = request.env['discuss.channel'].sudo()._get_whatsapp_channel(
                 mobile_number, account, create_if_not_found=True
             )
-            _logger.info("WhatsApp Inbound: Channel %s (ID: %s)", channel.name, channel.id)
+            
+            if not channel:
+                 _logger.error("WhatsApp Inbound: Failed to create/find channel for %s", mobile_number)
+                 continue
+
+            _logger.info("WhatsApp Inbound: Posting to Channel %s (ID: %s)", channel.name, channel.id)
             
             # Handle Attachments
             attachment_ids = []

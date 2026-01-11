@@ -23,7 +23,8 @@ class WhatsAppAccount(models.Model):
     # Evolution API Credentials
     base_url = fields.Char('API Base URL', required=True, help="Base URL of your Evolution API instance (e.g., https://api.example.com)")
     instance_name = fields.Char('Instance Name', required=True, help="Name of the Evolution API instance")
-    api_key = fields.Char('API Key', required=True, groups="base.group_system", help="Global API Key or Instance Token")
+    api_key = fields.Char('Global API Key', required=True, groups="base.group_system", help="Global API Key (for management)")
+    instance_token = fields.Char('Instance Token', groups="base.group_system", help="Token specific to this instance (for sending messages)")
 
     # Removed Meta-specific fields
     # app_uid = fields.Char(string="App ID", required=True, tracking=2)
@@ -57,7 +58,7 @@ class WhatsAppAccount(models.Model):
     @api.model
     def _get_api_client(self):
         self.ensure_one()
-        return WhatsAppApi(self.base_url, self.instance_name, self.api_key)
+        return WhatsAppApi(self.base_url, self.instance_name, self.api_key, self.instance_token)
 
     def button_test_connection(self):
         for account in self:

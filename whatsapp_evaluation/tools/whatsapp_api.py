@@ -11,20 +11,30 @@ from odoo.addons.whatsapp_evaluation.tools.whatsapp_exception import WhatsAppErr
 _logger = logging.getLogger(__name__)
 
 class WhatsAppApi:
-    def __init__(self, base_url, instance_name, api_key):
+    def __init__(self, base_url, instance_name, api_key, instance_token=False):
         self.base_url = base_url.rstrip('/')
         self.instance_name = instance_name
         self.api_key = api_key
+        self.instance_token = instance_token
 
     def __api_requests(self, request_type, endpoint, params=False, headers=None, data=False):
         if getattr(threading.current_thread(), 'testing', False):
              raise WhatsAppError("API requests disabled in testing.")
 
         headers = headers or {}
-        headers.update({
-            'apikey': self.api_key,
-            'Content-Type': 'application/json',
-        })
+        
+        # Prioritize Instance Token (Authorization: Bearer <token>)
+        if self.instance_token:
+            headers.update({
+                'Authorization': f'Bearer {self.instance_token}',
+                'Content-Type': 'application/json',
+            })
+        else:
+            # Fallback to Global Key (apikey: <key>)
+            headers.update({
+                'apikey': self.api_key,
+                'Content-Type': 'application/json',
+            })
         
         url = f"{self.base_url}{endpoint}"
         

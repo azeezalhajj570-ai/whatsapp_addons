@@ -17,14 +17,14 @@ class WhatsAppApi:
         self.api_key = api_key
         self.instance_token = instance_token
 
-    def __api_requests(self, request_type, endpoint, params=False, headers=None, data=False):
+    def __api_requests(self, request_type, endpoint, params=False, headers=None, data=False, use_global_key=False):
         if getattr(threading.current_thread(), 'testing', False):
              raise WhatsAppError("API requests disabled in testing.")
 
         headers = headers or {}
         
-        # Prioritize Instance Token (Authorization: Bearer <token>)
-        if self.instance_token:
+        # Prioritize Instance Token (Authorization: Bearer <token>) unless global key is forced
+        if self.instance_token and not use_global_key:
             headers.update({
                 'Authorization': f'Bearer {self.instance_token}',
                 'Content-Type': 'application/json',
@@ -73,9 +73,9 @@ class WhatsAppApi:
 
     def _test_connection(self):
         """ Test connection by checking instance state """
-        # Using /instance/connectionState/{instance}
+        # Using /instance/connectionState/{instance} - Requires Global Key
         endpoint = f"/instance/connectionState/{self.instance_name}"
-        response = self.__api_requests("GET", endpoint)
+        response = self.__api_requests("GET", endpoint, use_global_key=True)
         
         # Adjust based on actual response structure
         # Example response: {"instance": {"state": "open"}}

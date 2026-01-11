@@ -1,7 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import models, fields, api, _
+from odoo import models, fields, api, _, tools
 from odoo.exceptions import UserError
+import re
 
 class WhatsAppComposer(models.TransientModel):
     _name = 'whatsapp_evaluation.composer'
@@ -74,11 +75,21 @@ class WhatsAppComposer(models.TransientModel):
     def action_send_whatsapp(self):
         self.ensure_one()
         
+        # Format body for Odoo Chatter (HTML)
+        # 1. Convert newlines to <br/> and linkify URLs
+        body_html = tools.plaintext2html(self.body)
+        
+        # 2. Basic Markdown to HTML conversion
+        # Format *bold*
+        body_html = re.sub(r'\*([^*]+)\*', r'<b>\1</b>', body_html)
+        # Format _italics_
+        body_html = re.sub(r'_([^_]+)_', r'<i>\1</i>', body_html)
+        
         # Create message linked to the document
         mail_message = self.env['mail.message'].create({
             'model': self.res_model,
             'res_id': self.res_id,
-            'body': self.body,
+            'body': body_html,
             'message_type': 'comment',
             'subtype_id': self.env.ref('mail.mt_comment').id,
             'attachment_ids': [(6, 0, self.attachment_ids.ids)]

@@ -56,7 +56,8 @@ class WhatsAppMessage(models.Model):
             if record.state != 'outgoing' or record.message_type != 'outbound':
                 continue
             
-            api = record.wa_account_id._get_api_client()
+            # Use sudo() because api_key/token are restricted to System Users
+            api = record.wa_account_id.sudo()._get_api_client()
             response = {}
             
             try:

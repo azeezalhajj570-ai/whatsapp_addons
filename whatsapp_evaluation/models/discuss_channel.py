@@ -84,12 +84,15 @@ class DiscussChannel(models.Model):
             channel.add_members(wa_account_id.notify_user_ids.ids)
             
             # FORCE PIN for these users so it appears in specific sidebar category (or All)
-            # Odoo 17+ uses 'unpin_dt' to determine if pinned (False = pinned)
-            # 'fold_state' controls open/closed
             members = channel.channel_member_ids.filtered(
                 lambda m: m.partner_id.id in wa_account_id.notify_user_ids.partner_id.ids
             )
             members.sudo().write({'unpin_dt': False, 'fold_state': 'open'})
+            
+        # Self-Healing: If channel exists but was created before the "Public" fix, update it now.
+        if channel and not channel.group_public_id:
+            channel.sudo().write({'group_public_id': self.env.ref('base.group_user').id})
+
         return channel
 
     def message_post(self, *args, **kwargs):

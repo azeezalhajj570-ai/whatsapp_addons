@@ -21,27 +21,27 @@ class WhatsAppApi:
         if getattr(threading.current_thread(), 'testing', False):
              raise WhatsAppError(_("API requests disabled in testing."))
 
-        headers = headers or {}
+        # Use a copy of headers to avoid mutating the argument for retries
+        request_headers = (headers or {}).copy()
         
         # Prioritize Instance Token (Authorization: Bearer <token>) unless global key is forced
         if self.instance_token and not use_global_key:
-            headers.update({
+            request_headers.update({
                 'Authorization': f'Bearer {self.instance_token}',
                 'Content-Type': 'application/json',
             })
         else:
             # Fallback to Global Key (apikey: <key>)
-            headers.update({
+            request_headers.update({
                 'apikey': self.api_key,
                 'Content-Type': 'application/json',
             })
         
         url = f"{self.base_url}{endpoint}"
         
-        
         try:
             # Redact sensitive headers for logging
-            log_headers = headers.copy()
+            log_headers = request_headers.copy()
             if 'apikey' in log_headers:
                 log_headers['apikey'] = '***'
             if 'Authorization' in log_headers:
@@ -49,13 +49,23 @@ class WhatsAppApi:
             
             _logger.info("WhatsApp Evaluation Request: %s %s Headers: %s Data: %s", request_type, url, log_headers, data)
             json_data = data if data else None
-            res = requests.request(request_type, url, params=params, headers=headers, json=json_data, timeout=(10, 30))
+            res = requests.request(request_type, url, params=params, headers=request_headers, json=json_data, timeout=(10, 30))
         except requests.exceptions.Timeout:
             _logger.error("WhatsApp Evaluation Timeout: %s", url)
             raise WhatsAppError(_("Connection timed out. Check firewall or API URL."), error_code="Timeout")
         except requests.exceptions.RequestException as e:
             _logger.error("WhatsApp Evaluation Network Error: %s", str(e))
             raise WhatsAppError(failure_type='network')
+
+        # Retry Logic for 401 (Unauthorized)
+        if res.status_code == 401 and self.instance_token and not use_global_key:
+            _logger.warning("WhatsApp Instance Token rejected (401). Retrying with Global API Key...")
+            try:
+                # Retry with use_global_key=True, passing original parameters
+                return self.__api_requests(request_type, endpoint, params=params, headers=headers, data=data, use_global_key=True)
+            except WhatsAppError:
+                # If retry also fails, fall through to normal error handling
+                pass
 
         try:
             if not res.ok:

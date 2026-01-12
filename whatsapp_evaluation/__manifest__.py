@@ -66,5 +66,5 @@ Fully integrated with Odoo’s messaging and contact management system.
     'application': True,
     'installable': True,
     'price': 99.00,
-    'currency': 'EUR',
+    'currency': 'USD',
 }

@@ -56,6 +56,7 @@ Fully integrated with Odoo’s messaging and contact management system.
             'whatsapp_evaluation/static/src/chatter/web/**/*',
         ],
     },
+    'images': ['static/description/main_screenshot.png'],
     'external_dependencies': {
         'python': ['phonenumbers'],
     },

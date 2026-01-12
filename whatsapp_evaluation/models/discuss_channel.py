@@ -73,7 +73,6 @@ class DiscussChannel(models.Model):
                 'name': name,
                 'whatsapp_number': whatsapp_number,
                 'wa_account_id': wa_account_id.id,
-                'group_public_id': self.env.ref('base.group_user').id, # Allow all internal users to see/join
             })
             if partner:
                  channel.add_members(partner.ids)
@@ -89,10 +88,6 @@ class DiscussChannel(models.Model):
             )
             members.sudo().write({'unpin_dt': False, 'fold_state': 'open'})
             
-        # Self-Healing: If channel exists but was created before the "Public" fix, update it now.
-        if channel and not channel.group_public_id:
-            channel.sudo().write({'group_public_id': self.env.ref('base.group_user').id})
-
         return channel
 
     def message_post(self, *args, **kwargs):

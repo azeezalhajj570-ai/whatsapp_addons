@@ -38,6 +38,9 @@
                             <group>
                                 <field name="api_key" password="True"/>
                                 <field name="instance_token" password="True" placeholder="Instance Token (optional)"/>
+                                <div class="text-muted small" colspan="2">
+                                    <i class="fa fa-info-circle"/> Find your <b>Global API Key</b> in the Evolution Manager under <i>API Security</i>.
+                                </div>
                             </group>
                         </group>
 
@@ -90,7 +93,10 @@
         <field name="view_mode">list,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                No Account Configured yet!
+                Connect your first WhatsApp Instance.
+            </p>
+            <p>
+                You will need your <b>Evolution API Base URL</b> and <b>Global API Key</b>.
             </p>
         </field>
     </record>

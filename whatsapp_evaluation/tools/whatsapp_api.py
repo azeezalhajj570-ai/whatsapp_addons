@@ -38,8 +38,16 @@ class WhatsAppApi:
         
         url = f"{self.base_url}{endpoint}"
         
+        
         try:
-            _logger.info("WhatsApp Evaluation Request: %s %s Headers: %s Data: %s", request_type, url, headers, data)
+            # Redact sensitive headers for logging
+            log_headers = headers.copy()
+            if 'apikey' in log_headers:
+                log_headers['apikey'] = '***'
+            if 'Authorization' in log_headers:
+                log_headers['Authorization'] = 'Bearer ***'
+            
+            _logger.info("WhatsApp Evaluation Request: %s %s Headers: %s Data: %s", request_type, url, log_headers, data)
             json_data = data if data else None
             res = requests.request(request_type, url, params=params, headers=headers, json=json_data, timeout=(10, 30))
         except requests.exceptions.Timeout:

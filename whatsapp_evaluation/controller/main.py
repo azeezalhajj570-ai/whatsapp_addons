@@ -16,7 +16,7 @@ class WebhookEvaluation(http.Controller):
         Handler for Evolution API Webhooks.
         """
         data = request.get_json_data()
-        _logger.info("Evolution API Webhook received: %s", json.dumps(data, indent=2))
+        # _logger.info("Evolution API Webhook received: %s", json.dumps(data, indent=2)) # Redacted for GDPR
 
         # Evolution API typically sends { "event": "...", "instance": "...", "data": { ... } }
         event_type = data.get('event')
@@ -106,7 +106,7 @@ class WebhookEvaluation(http.Controller):
                 ''
             )
             
-            _logger.info("WhatsApp Upsert: Extracted Body: %s", body)
+            _logger.info("WhatsApp Upsert: Extracted Body length: %s", len(body) if body else 0)
 
             if not body and not msg.get('base64'):
                 _logger.info("WhatsApp Upsert: No body and no base64. Skipping.")

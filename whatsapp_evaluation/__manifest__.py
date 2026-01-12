@@ -31,7 +31,9 @@
     'external_dependencies': {
         'python': ['phonenumbers'],
     },
-    'license': 'OEEL-1',
+    'author': 'Azeez',
+    'website': 'https://example.com/whatsapp-evaluation',
+    'license': 'OPL-1',
     'application': True,
     'installable': True,
 }

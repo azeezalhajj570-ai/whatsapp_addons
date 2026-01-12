@@ -100,6 +100,10 @@ class DiscussChannel(models.Model):
         if not message.body and not message.attachment_ids:
             return
 
+        # Prevent sending system notifications to WhatsApp (e.g. "User joined", "Subject changed")
+        if message.message_type not in ('comment', 'whatsapp_message'):
+             return
+
         body_text = html2plaintext(message.body)
         
         wa_msg = self.env['whatsapp_evaluation.message'].create({

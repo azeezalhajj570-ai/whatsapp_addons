@@ -1,12 +1,40 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': 'WhatsApp Evaluation Messaging',
-    'category': 'Marketing/WhatsApp',
-    'summary': 'Text your Contacts on WhatsApp via Evaluation API',
-    'version': '1.0',
-    'description': """This module integrates Odoo with WhatsApp via the Evaluation API""",
-    'depends': ['base', 'web', 'mail', 'phone_validation', 'sale'],
+    'name': 'WhatsApp Messaging for Odoo (Evaluation API)',
+    'category': 'Marketing Automation',
+    'summary': 'Send WhatsApp messages, templates, and notifications directly from Odoo',
+    'version': '1.0.0',
+    'description': """
+WhatsApp Messaging for Odoo allows you to communicate with your customers directly from Odoo using WhatsApp.
+
+🚀 Key Features:
+- Send WhatsApp messages to contacts and customers
+- Use WhatsApp message templates
+- Integrated WhatsApp composer inside Odoo
+- Phone number validation before sending
+- Chatter & messaging menu integration
+- Multi-company support
+- Secure access control and audit-friendly logging
+
+🎯 Use Cases:
+- Sales follow-ups
+- Order confirmations
+- Customer notifications
+- Marketing campaigns
+- Lead engagement
+
+⚠️ This module uses the WhatsApp Evaluation API and is intended for testing, demos, and controlled usage scenarios.
+
+Fully integrated with Odoo’s messaging and contact management system.
+""",
+    'depends': [
+        'base',
+        'web',
+        'mail',
+        'phone_validation',
+        'sale'
+    ],
     'data': [
         'security/ir.model.access.csv',
         'security/ir_rules.xml',
@@ -32,8 +60,10 @@
         'python': ['phonenumbers'],
     },
     'author': 'Azeez',
-    'website': 'https://example.com/whatsapp-evaluation',
+    'website': 'https://github.com/mekhlafi98',
     'license': 'OPL-1',
     'application': True,
     'installable': True,
+    'price': 99.00,
+    'currency': 'EUR',
 }

@@ -61,15 +61,24 @@ class WhatsAppApi:
             if not res.ok:
                  # Attempt to parse error message from JSON
                  error_data = res.json()
+                 _logger.error("Evolution API Request Failed. Status: %s. Response: %s", res.status_code, json.dumps(error_data))
                  raise WhatsAppError(*self._prepare_error_response(error_data))
+            
+            # Success Log (Debug)
+            response_json = res.json()
+            _logger.info("Evolution API Response: %s", json.dumps(response_json))
+            return response_json
+            
         except ValueError:
             if not res.ok:
                 raise WhatsAppError(failure_type='network')
+            return {}
         
-        try:
-             return res.json()
-        except ValueError:
-             return {}
+        # Unreachable code block removed
+        # try:
+        #      return res.json()
+        # except ValueError:
+        #      return {}
 
     def _prepare_error_response(self, response):
         if 'error' in response and isinstance(response['error'], str):

@@ -195,15 +195,25 @@ class WebhookEvaluation(http.Controller):
             last_msg = channel.message_ids[0] # The one we just posted
             
             request.env['whatsapp_evaluation.message'].sudo().create({
-                 'body': body,
-                 'mobile_number': mobile_number,
-                 'wa_account_id': account.id,
-                 'mail_message_id': last_msg.id,
-                 'message_type': 'inbound',
-                 'state': 'received',
-                 'msg_uid': key.get('id'),
-                 'attachment_ids': [(6, 0, attachment_ids)] if attachment_ids else False
-            }) 
+                'body': formatted_body,  # Store HTML so list view renders formatting (Bold/Italic)
+                'mobile_number': mobile_number,
+                'wa_account_id': account.id,
+                'mail_message_id': last_msg.id,
+                'message_type': 'inbound',
+                'state': 'received',
+                'msg_uid': key.get('id'),
+                'attachment_ids': [(6, 0, attachment_ids)] if attachment_ids else False
+            })
+             
+            # Notify users explicitly (Toast)
+            for user in account.notify_user_ids:
+                _logger.info("WhatsApp Inbound: Sending Toast notification to User %s", user.name)
+                user.partner_id._bus_send('simple_notification', {
+                    'type': 'info',
+                    'title': f"New WhatsApp from {mobile_number}",
+                    'message': body[:100] + ("..." if len(body) > 100 else ""),
+                    'sticky': False
+                }) 
 
     def _handle_messages_update(self, account, data):
         """

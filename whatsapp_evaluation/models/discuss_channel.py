@@ -81,7 +81,14 @@ class DiscussChannel(models.Model):
         if channel and wa_account_id.notify_user_ids:
             # We use add_members which handles duplication safely (only creates missing members)
             channel.add_members(wa_account_id.notify_user_ids.ids)
-                 
+            
+            # FORCE PIN for these users so it appears in specific sidebar category (or All)
+            # Odoo 17+ uses 'unpin_dt' to determine if pinned (False = pinned)
+            # 'fold_state' controls open/closed
+            members = channel.channel_member_ids.filtered(
+                lambda m: m.partner_id.id in wa_account_id.notify_user_ids.partner_id.ids
+            )
+            members.sudo().write({'unpin_dt': False, 'fold_state': 'open'})
         return channel
 
     def message_post(self, *args, **kwargs):

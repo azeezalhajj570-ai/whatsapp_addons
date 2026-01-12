@@ -205,15 +205,15 @@ class WebhookEvaluation(http.Controller):
                 'attachment_ids': [(6, 0, attachment_ids)] if attachment_ids else False
             })
              
-            # Notify users explicitly (Toast)
-            for user in account.notify_user_ids:
-                _logger.info("WhatsApp Inbound: Sending Toast notification to User %s", user.name)
-                user.partner_id._bus_send('simple_notification', {
-                    'type': 'info',
-                    'title': f"New WhatsApp from {mobile_number}",
-                    'message': body[:100] + ("..." if len(body) > 100 else ""),
-                    'sticky': False
-                }) 
+            # Notify users explicitly (Toast) - REMOVED per user request
+            # for user in account.notify_user_ids:
+            #     _logger.info("WhatsApp Inbound: Sending Toast notification to User %s", user.name)
+            #     user.partner_id._bus_send('simple_notification', {
+            #        'type': 'info',
+            #        'title': f"New WhatsApp from {mobile_number}",
+            #        'message': body[:100] + ("..." if len(body) > 100 else ""),
+            #        'sticky': False
+            #     }) 
 
     def _handle_messages_update(self, account, data):
         """

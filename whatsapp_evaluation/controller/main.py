@@ -141,18 +141,21 @@ class WebhookEvaluation(http.Controller):
                 filename = "whatsapp_media"
                 mimetype = "application/octet-stream"
                 
-                if 'audioMessage' in message_content:
-                    mimetype = message_content['audioMessage'].get('mimetype', 'audio/ogg')
+                # Use messageType as fallback or primary indicator
+                msg_type = msg.get('messageType')
+                
+                if 'audioMessage' in message_content or msg_type == 'audioMessage':
+                    mimetype = message_content.get('audioMessage', {}).get('mimetype', 'audio/ogg')
                     filename = "voice_message.ogg"
-                elif 'imageMessage' in message_content:
-                    mimetype = message_content['imageMessage'].get('mimetype', 'image/jpeg')
+                elif 'imageMessage' in message_content or msg_type == 'imageMessage':
+                    mimetype = message_content.get('imageMessage', {}).get('mimetype', 'image/jpeg')
                     filename = "image.jpg"
-                elif 'videoMessage' in message_content:
-                    mimetype = message_content['videoMessage'].get('mimetype', 'video/mp4')
+                elif 'videoMessage' in message_content or msg_type == 'videoMessage':
+                    mimetype = message_content.get('videoMessage', {}).get('mimetype', 'video/mp4')
                     filename = "video.mp4"
-                elif 'documentMessage' in message_content:
-                    mimetype = message_content['documentMessage'].get('mimetype', 'application/pdf')
-                    filename = message_content['documentMessage'].get('fileName', 'document')
+                elif 'documentMessage' in message_content or msg_type == 'documentMessage':
+                    mimetype = message_content.get('documentMessage', {}).get('mimetype', 'application/pdf')
+                    filename = message_content.get('documentMessage', {}).get('fileName', 'document')
 
                 try:
                     attachment = request.env['ir.attachment'].sudo().create({

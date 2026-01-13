@@ -157,8 +157,11 @@ class WebhookEvaluation(http.Controller):
                     mimetype = message_content.get('documentMessage', {}).get('mimetype', 'application/pdf')
                     filename = message_content.get('documentMessage', {}).get('fileName', 'document')
 
-                attachments_list.append((filename, file_content, mimetype))
-                _logger.info("WhatsApp Inbound: Prepared attachment %s (%s)", filename, mimetype)
+                # Odoo message_post expects (name, content) or (name, content, info_dict)
+                # Passing mimetype as string caused AttributeError: 'str' object has no attribute 'get'
+                # Odoo will auto-detect mimetype from filename (.jpg, .mp4) and content headers.
+                attachments_list.append((filename, file_content))
+                _logger.info("WhatsApp Inbound: Prepared attachment %s", filename)
 
             # Post message to channel
             # We use a custom context or kwarg to signal this is inbound to avoid loops if needed,

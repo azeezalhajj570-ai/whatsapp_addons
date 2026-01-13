@@ -157,6 +157,8 @@ class WebhookEvaluation(http.Controller):
                     mimetype = message_content.get('documentMessage', {}).get('mimetype', 'application/pdf')
                     filename = message_content.get('documentMessage', {}).get('fileName', 'document')
 
+                _logger.info("WhatsApp Media Debug: Filename: %s, Mime: %s, Base64 Start: %s", filename, mimetype, file_content[:30])
+
                 try:
                     attachment = request.env['ir.attachment'].sudo().create({
                         'name': filename,

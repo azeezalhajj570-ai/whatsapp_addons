@@ -164,8 +164,8 @@ class WebhookEvaluation(http.Controller):
                         'name': filename,
                         'type': 'binary',
                         'datas': file_content, # Evolution sends raw base64 string
-                        'res_model': 'discuss.channel',
-                        'res_id': channel.id,
+                        'res_model': False, # Let message_post assign it to mail.message
+                        'res_id': False,
                         'mimetype': mimetype,
                     })
                     attachment_ids.append(attachment.id)

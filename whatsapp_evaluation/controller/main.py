@@ -112,6 +112,12 @@ class WebhookEvaluation(http.Controller):
                 _logger.info("WhatsApp Upsert: No body and no base64. Skipping.")
                 continue
             
+            # DEBUG: Log structure if it's a media message
+            if 'Image Message' in body or 'Video Message' in body:
+                 _logger.info("WhatsApp Inbound Media Debug: Keys in msg: %s", list(msg.keys()))
+                 if 'message' in msg:
+                      _logger.info("WhatsApp Inbound Media Debug: Keys in msg['message']: %s", list(msg['message'].keys()))
+            
             # Find or create channel
             _logger.info("WhatsApp Inbound: Finding Channel for %s", mobile_number)
             

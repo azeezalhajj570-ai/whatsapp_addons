@@ -132,6 +132,10 @@ class WebhookEvaluation(http.Controller):
             attachment_ids = []
             # file_content already extracted above
             if file_content:
+                # Sanitize Base64: Remove 'data:image/png;base64,' header if present
+                if ',' in file_content and ';base64' in file_content[:50]:
+                    file_content = file_content.split(',')[1]
+
                 # Determine filename and mimetype
                 # Default fallback
                 filename = "whatsapp_media"

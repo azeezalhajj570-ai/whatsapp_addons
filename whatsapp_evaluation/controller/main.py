@@ -108,15 +108,12 @@ class WebhookEvaluation(http.Controller):
             
             _logger.info("WhatsApp Upsert: Extracted Body length: %s", len(body) if body else 0)
 
-            if not body and not msg.get('base64'):
+            # Extract base64 content (Evolution v2 often puts it inside 'message')
+            file_content = msg.get('base64') or msg.get('message', {}).get('base64')
+
+            if not body and not file_content:
                 _logger.info("WhatsApp Upsert: No body and no base64. Skipping.")
                 continue
-            
-            # DEBUG: Log structure if it's a media message
-            if 'Image Message' in body or 'Video Message' in body:
-                 _logger.info("WhatsApp Inbound Media Debug: Keys in msg: %s", list(msg.keys()))
-                 if 'message' in msg:
-                      _logger.info("WhatsApp Inbound Media Debug: Keys in msg['message']: %s", list(msg['message'].keys()))
             
             # Find or create channel
             _logger.info("WhatsApp Inbound: Finding Channel for %s", mobile_number)
@@ -133,7 +130,7 @@ class WebhookEvaluation(http.Controller):
             
             # Handle Attachments
             attachment_ids = []
-            file_content = msg.get('base64')
+            # file_content already extracted above
             if file_content:
                 # Determine filename and mimetype
                 # Default fallback

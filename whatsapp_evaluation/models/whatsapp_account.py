@@ -53,7 +53,11 @@ class WhatsAppAccount(models.Model):
 
     def _compute_callback_url(self):
         for account in self:
-            account.callback_url = self.get_base_url() + '/whatsapp_evaluation/webhook'
+            base_url = self.get_base_url()
+            # Force HTTPS for webhook callback as required by many external APIs
+            if base_url.startswith('http://'):
+                base_url = base_url.replace('http://', 'https://', 1)
+            account.callback_url = base_url + '/whatsapp_evaluation/webhook'
 
     @api.model
     def _get_api_client(self):

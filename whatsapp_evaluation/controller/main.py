@@ -2,6 +2,7 @@
 
 import logging
 import json
+import base64
 from odoo import http
 from odoo.http import request, Response
 from odoo.addons.whatsapp_evaluation.tools.whatsapp_api import WhatsAppApi
@@ -158,9 +159,9 @@ class WebhookEvaluation(http.Controller):
                     filename = message_content.get('documentMessage', {}).get('fileName', 'document')
 
                 # Odoo message_post expects (name, content) or (name, content, info_dict)
-                # Passing mimetype as string caused AttributeError: 'str' object has no attribute 'get'
-                # Odoo will auto-detect mimetype from filename (.jpg, .mp4) and content headers.
-                attachments_list.append((filename, file_content))
+                # Content must be raw bytes, not base64 string.
+                decoded_content = base64.b64decode(file_content)
+                attachments_list.append((filename, decoded_content))
                 _logger.info("WhatsApp Inbound: Prepared attachment %s", filename)
 
             # Post message to channel

@@ -19,7 +19,7 @@
                         </group>
                         <group>
                             <field name="instance_name" placeholder="odoo_instance_1"/>
-                            <field name="phone_number"/>
+                            <field name="phone_number" placeholder="e.g. 5511999999999"/>
                         </group>
                     </group>
                     <footer>

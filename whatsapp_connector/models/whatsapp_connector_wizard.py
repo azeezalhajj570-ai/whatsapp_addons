@@ -22,7 +22,7 @@ class WhatsAppConnectorWizard(models.TransientModel):
     api_key = fields.Char(string='Global API Key', required=True, default=_default_api_key)
     
     instance_name = fields.Char(string='Instance Name', required=True, default="MyInstance")
-    phone_number = fields.Char(string='Phone Number', help="Phone number involved in this connection", placeholder="e.g. 5511999999999")
+    phone_number = fields.Char(string='Phone Number', help="Phone number involved in this connection")
     instance_token = fields.Char(string='Instance Token', readonly=True)
     
     qr_code = fields.Binary(string='QR Code', readonly=True)

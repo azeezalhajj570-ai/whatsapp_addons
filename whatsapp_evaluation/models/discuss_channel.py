@@ -3,7 +3,14 @@
 from odoo import models, fields, api, _, Command, tools
 from odoo.exceptions import ValidationError
 from odoo.tools import html2plaintext
-from odoo.addons.mail.tools.discuss import Store
+try:
+    from odoo.addons.mail.tools.discuss import Store
+except ImportError:
+    try:
+        from odoo.addons.mail.models.discuss.store import Store
+    except ImportError:
+        pass # Fallback or let it fail if neither exists
+
 from markupsafe import Markup
 
 class DiscussChannel(models.Model):

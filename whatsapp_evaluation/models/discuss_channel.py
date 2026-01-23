@@ -3,7 +3,7 @@
 from odoo import models, fields, api, _, Command, tools
 from odoo.exceptions import ValidationError
 from odoo.tools import html2plaintext
-from odoo.addons.mail.tools.discuss import Store
+
 from markupsafe import Markup
 
 class DiscussChannel(models.Model):
@@ -37,10 +37,20 @@ class DiscussChannel(models.Model):
             }])
             message_body = Markup(f'<div class="o_mail_notification">{_("joined the channel")}</div>')
             new_member.channel_id.message_post(body=message_body, message_type="notification", subtype_xmlid="mail.mt_comment")
+            try:
+                 from odoo.addons.mail.tools.discuss import Store
+            except ImportError:
+                 from odoo.addons.mail.models.discuss.store import Store
+            
             self._bus_send_store(Store(new_member).add(self, {"memberCount": self.member_count}))
         return Store(self).get_result()
 
-    def _to_store(self, store: Store):
+    def _to_store(self, store):
+        try:
+            from odoo.addons.mail.tools.discuss import Store
+        except ImportError:
+            from odoo.addons.mail.models.discuss.store import Store
+
         super()._to_store(store)
         for channel in self.filtered(lambda channel: channel.channel_type == "whatsapp"):
             store.add(channel, {

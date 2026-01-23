@@ -3,14 +3,6 @@
 from odoo import models, fields, api, _, Command, tools
 from odoo.exceptions import ValidationError
 from odoo.tools import html2plaintext
-try:
-    from odoo.addons.mail.tools.discuss import Store
-except ImportError:
-    try:
-        from odoo.addons.mail.models.discuss.store import Store
-    except ImportError:
-        pass # Fallback or let it fail if neither exists
-
 from markupsafe import Markup
 
 class DiscussChannel(models.Model):
@@ -44,10 +36,30 @@ class DiscussChannel(models.Model):
             }])
             message_body = Markup(f'<div class="o_mail_notification">{_("joined the channel")}</div>')
             new_member.channel_id.message_post(body=message_body, message_type="notification", subtype_xmlid="mail.mt_comment")
+            try:
+                 from odoo.addons.mail.tools.discuss import Store
+            except ImportError:
+                 from odoo.addons.mail.models.discuss.store import Store
+            
             self._bus_send_store(Store(new_member).add(self, {"memberCount": self.member_count}))
         return Store(self).get_result()
 
-    def _to_store(self, store: Store):
+    def _to_store(self, store):
+        # Delayed import to avoid ImportError/NameError if paths differ in versions
+        try:
+            from odoo.addons.mail.tools.discuss import Store
+        except ImportError:
+            try:
+                from odoo.addons.mail.models.discuss.store import Store
+            except ImportError:
+                # If Store is not found (e.g. Odoo 16 or different structure), we can't do much.
+                # Assuming store object passed is valid (duck typing).
+                # But we need Store class for Store.one() and Store(self)
+                # Let's try to get it from the store object itself if possible? No.
+                # We will just pass if checking class, but for Store(self) we need it.
+                # Last resort fallback: Check odoo.addons.mail.models.discuss
+                 from odoo.addons.mail.models.discuss import Store
+
         super()._to_store(store)
         for channel in self.filtered(lambda channel: channel.channel_type == "whatsapp"):
             store.add(channel, {

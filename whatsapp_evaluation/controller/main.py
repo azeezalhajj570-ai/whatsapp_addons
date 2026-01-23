@@ -2,6 +2,7 @@
 
 import logging
 import json
+import base64
 from odoo import http
 from odoo.http import request, Response
 from odoo.addons.whatsapp_evaluation.tools.whatsapp_api import WhatsAppApi
@@ -108,7 +109,10 @@ class WebhookEvaluation(http.Controller):
             
             _logger.info("WhatsApp Upsert: Extracted Body length: %s", len(body) if body else 0)
 
-            if not body and not msg.get('base64'):
+            # Extract base64 content (Evolution v2 often puts it inside 'message')
+            file_content = msg.get('base64') or msg.get('message', {}).get('base64')
+
+            if not body and not file_content:
                 _logger.info("WhatsApp Upsert: No body and no base64. Skipping.")
                 continue
             
@@ -126,40 +130,39 @@ class WebhookEvaluation(http.Controller):
             _logger.info("WhatsApp Inbound: Posting to Channel %s (ID: %s)", channel.name, channel.id)
             
             # Handle Attachments
-            attachment_ids = []
-            file_content = msg.get('base64')
+            attachments_list = []
+            # file_content already extracted above
             if file_content:
+                # Sanitize Base64: Remove 'data:image/png;base64,' header if present
+                if ',' in file_content and ';base64' in file_content[:50]:
+                    file_content = file_content.split(',')[1]
+
                 # Determine filename and mimetype
                 # Default fallback
                 filename = "whatsapp_media"
                 mimetype = "application/octet-stream"
                 
-                if 'audioMessage' in message_content:
-                    mimetype = message_content['audioMessage'].get('mimetype', 'audio/ogg')
+                # Use messageType as fallback or primary indicator
+                msg_type = msg.get('messageType')
+                
+                if 'audioMessage' in message_content or msg_type == 'audioMessage':
+                    mimetype = message_content.get('audioMessage', {}).get('mimetype', 'audio/ogg')
                     filename = "voice_message.ogg"
-                elif 'imageMessage' in message_content:
-                    mimetype = message_content['imageMessage'].get('mimetype', 'image/jpeg')
+                elif 'imageMessage' in message_content or msg_type == 'imageMessage':
+                    mimetype = message_content.get('imageMessage', {}).get('mimetype', 'image/jpeg')
                     filename = "image.jpg"
-                elif 'videoMessage' in message_content:
-                    mimetype = message_content['videoMessage'].get('mimetype', 'video/mp4')
+                elif 'videoMessage' in message_content or msg_type == 'videoMessage':
+                    mimetype = message_content.get('videoMessage', {}).get('mimetype', 'video/mp4')
                     filename = "video.mp4"
-                elif 'documentMessage' in message_content:
-                    mimetype = message_content['documentMessage'].get('mimetype', 'application/pdf')
-                    filename = message_content['documentMessage'].get('fileName', 'document')
+                elif 'documentMessage' in message_content or msg_type == 'documentMessage':
+                    mimetype = message_content.get('documentMessage', {}).get('mimetype', 'application/pdf')
+                    filename = message_content.get('documentMessage', {}).get('fileName', 'document')
 
-                try:
-                    attachment = request.env['ir.attachment'].sudo().create({
-                        'name': filename,
-                        'type': 'binary',
-                        'datas': file_content, # Evolution sends raw base64 string
-                        'res_model': 'discuss.channel',
-                        'res_id': channel.id,
-                        'mimetype': mimetype,
-                    })
-                    attachment_ids.append(attachment.id)
-                    _logger.info("WhatsApp Inbound: Created attachment %s", attachment.id)
-                except Exception as e:
-                    _logger.error("WhatsApp Inbound: Failed to create attachment: %s", str(e))
+                # Odoo message_post expects (name, content) or (name, content, info_dict)
+                # Content must be raw bytes, not base64 string.
+                decoded_content = base64.b64decode(file_content)
+                attachments_list.append((filename, decoded_content))
+                _logger.info("WhatsApp Inbound: Prepared attachment %s", filename)
 
             # Post message to channel
             # We use a custom context or kwarg to signal this is inbound to avoid loops if needed,
@@ -177,32 +180,25 @@ class WebhookEvaluation(http.Controller):
             
             # Create the Odoo message
             # Use message_type='comment' to ensure it appears in Discuss and creating notifications/unread counts.
-            channel.with_context(whatsapp_inbound_msg_uid=key.get('id')).message_post(
+            # Enterprise Pattern: Pass attachments as list of tuples (name, content, mimetype)
+            new_msg = channel.with_context(whatsapp_inbound_msg_uid=key.get('id')).message_post(
                 body=formatted_body,
                 author_id=author_id,
                 message_type='comment', 
                 subtype_xmlid='mail.mt_comment',
-                attachment_ids=attachment_ids
+                attachments=attachments_list
             )
             
             # Also create the whatsapp_evaluation.message record linked to it
-            # Note: discuss.channel.message_post in our model override needs to handle this
-            # OR we handle it here explicitly if the override is for outbound only.
-            
-            # Let's do it explicitly here for clarity and robust linking
-            # Actually, standard whatsapp model does it in notify_thread or similar. 
-            # For simplicity:
-            last_msg = channel.message_ids[0] # The one we just posted
-            
             request.env['whatsapp_evaluation.message'].sudo().create({
                 'body': formatted_body,  # Store HTML so list view renders formatting (Bold/Italic)
                 'mobile_number': mobile_number,
                 'wa_account_id': account.id,
-                'mail_message_id': last_msg.id,
+                'mail_message_id': new_msg.id,
                 'message_type': 'inbound',
                 'state': 'received',
                 'msg_uid': key.get('id'),
-                'attachment_ids': [(6, 0, attachment_ids)] if attachment_ids else False
+                'attachment_ids': [(6, 0, new_msg.attachment_ids.ids)] if new_msg.attachment_ids else False
             })
              
             # Notify users explicitly (Toast) - REMOVED per user request

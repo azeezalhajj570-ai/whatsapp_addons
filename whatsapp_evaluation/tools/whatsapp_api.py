@@ -190,6 +190,9 @@ class WhatsAppApi:
                 ]
             }
         }
+        
+        # Webhook configuration is an admin action, so we Force Global Key
+        return self.__api_requests("POST", endpoint, data=payload, use_global_key=True)
     @staticmethod
     def format_whatsapp_to_html(text):
         """

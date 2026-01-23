@@ -52,7 +52,7 @@ class WhatsAppConnectorWizard(models.TransientModel):
             "token": "", 
             "qrcode": False,
             "webhook_by_events": False,
-            "integration": "WHATSAPP-BA",
+            "integration": "EVOLUTION",
         }
         
         try:

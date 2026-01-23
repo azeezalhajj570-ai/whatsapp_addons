@@ -75,8 +75,10 @@ class WhatsAppConnectorWizard(models.TransientModel):
                      token = data.get('token')
 
                 if not token:
-                     # Attempt to fetch if it already exists logic could go here
-                     raise UserError(_("Instance created but token not found in response: %s") % str(data))
+                     _logger.warning("Token not found in response: %s", data)
+                     # Evolution API v2 might not return token for 'EVOLUTION' integration
+                     # or uses global key as default. We proceed.
+                     token = "Using Global API Key" # Placeholder for UI
 
                 self.instance_token = token
                 self.setup_step = 'scan'

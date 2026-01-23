@@ -4,7 +4,7 @@
     'name': 'WhatsApp Messaging for Odoo (Evaluation API)',
     'category': 'Marketing Automation',
     'summary': 'Send WhatsApp messages, templates, and notifications directly from Odoo',
-    'version': '1.0.0',
+    'version': '17.0.1.0.0',
     'description': """
 WhatsApp Messaging for Odoo allows you to communicate with your customers directly from Odoo using WhatsApp.
 

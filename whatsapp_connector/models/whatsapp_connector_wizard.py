@@ -56,7 +56,7 @@ class WhatsAppConnectorWizard(models.TransientModel):
         
         try:
             _logger.info("Creating Instance at %s", url)
-            response = requests.post(url, json=payload, headers=headers, timeout=10)
+            response = requests.post(url, json=payload, headers=headers, timeout=30)
             
             if response.status_code in [200, 201]:
                 data = response.json()
@@ -103,7 +103,7 @@ class WhatsAppConnectorWizard(models.TransientModel):
         }
         
         try:
-            response = requests.get(url, headers=headers, timeout=10)
+            response = requests.get(url, headers=headers, timeout=30)
             if response.status_code == 200:
                 data = response.json()
                 b64_img = data.get('base64')
@@ -138,7 +138,7 @@ class WhatsAppConnectorWizard(models.TransientModel):
         }
         
         try:
-            response = requests.get(url, headers=headers, timeout=10)
+            response = requests.get(url, headers=headers, timeout=30)
             if response.status_code == 200:
                 data = response.json()
                 state = data.get('instance', {}).get('state')

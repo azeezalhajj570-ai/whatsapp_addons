@@ -12,19 +12,17 @@ class WhatsAppConnectorWizard(models.TransientModel):
     _description = 'WhatsApp Connector Wizard'
 
     def _default_base_url(self):
-        # Try to find an existing account to pre-fill
-        last_account = self.env['whatsapp_evaluation.account'].search([], limit=1, order='id desc')
-        return last_account.base_url if last_account else ''
+        return ''
 
     def _default_api_key(self):
-        last_account = self.env['whatsapp_evaluation.account'].search([], limit=1, order='id desc')
-        return last_account.api_key if last_account else ''
+        return ''
 
     base_url = fields.Char(string='API Base URL', required=True, default=_default_base_url,
                           help="e.g., https://api.yoursite.com")
     api_key = fields.Char(string='Global API Key', required=True, default=_default_api_key)
     
     instance_name = fields.Char(string='Instance Name', required=True, default="MyInstance")
+    phone_number = fields.Char(string='Phone Number', help="Phone number involved in this connection", placeholder="e.g. 5511999999999")
     instance_token = fields.Char(string='Instance Token', readonly=True)
     
     qr_code = fields.Binary(string='QR Code', readonly=True)
@@ -44,10 +42,15 @@ class WhatsAppConnectorWizard(models.TransientModel):
             'apikey': self.api_key,
             'Content-Type': 'application/json'
         }
+        # Evolution API v2 typically handles 'number' in create payload if provided? 
+        # Usually it's just instanceName. We'll send it if specific version supports it, 
+        # but mostly this is for user reference or custom naming.
+        # We will NOT use it as instance name unless user duplicates it, keeping them separate.
+        
         payload = {
             "instanceName": self.instance_name,
-            "token": "", # Let it auto-generate or user specific? Evolution generates if empty usually.
-            "qrcode": False, # We fetch separately
+            "token": "", 
+            "qrcode": False,
             "webhook_by_events": False,
         }
         
@@ -57,25 +60,18 @@ class WhatsAppConnectorWizard(models.TransientModel):
             
             if response.status_code in [200, 201]:
                 data = response.json()
-                # Evolution v2 response structure: 
-                # { "instance": { "instanceName": "...", "token": "..." }, "hash": {...} }
-                # OR sometimes directly { "instance": "name", "token": "token" } depending on version.
                 
                 instance_data = data.get('instance') or data
-                # If 'instance' is nested object
                 if isinstance(instance_data, dict):
                     token = instance_data.get('token')
-                    # Fallback check
-                    if not token and 'auth' in data: # v1 sometimes
+                    if not token and 'auth' in data: 
                         token = data['auth'].get('token')
                 else: 
-                     # If data is flat? unlikely in v2
                      token = data.get('token')
 
                 if not token:
-                     # Attempt to fetch if it already exists?
-                     # Sometimes create fails if exists, but we might want to just connect.
-                     raise UserError(_("Instance might already exist or response format unexpected: %s") % str(data))
+                     # Attempt to fetch if it already exists logic could go here
+                     raise UserError(_("Instance created but token not found in response: %s") % str(data))
 
                 self.instance_token = token
                 self.setup_step = 'scan'
@@ -90,8 +86,8 @@ class WhatsAppConnectorWizard(models.TransientModel):
                     'view_mode': 'form',
                     'target': 'new',
                 }
-            elif response.status_code == 403: # Already exists usually
-                 raise UserError(_("Instance Name already exists. Please choose a different name or delete the old one."))
+            elif response.status_code == 403: 
+                 raise UserError(_("Instance Name already exists. Please choose a different name."))
             else:
                 raise UserError(_("Failed to create instance. Status: %s. Body: %s") % (response.status_code, response.text))
 
@@ -110,23 +106,18 @@ class WhatsAppConnectorWizard(models.TransientModel):
             response = requests.get(url, headers=headers, timeout=10)
             if response.status_code == 200:
                 data = response.json()
-                # Evolution v2: { "base64": "data:image/png;base64,..." }
-                # Or { "code": "..." } for pairing code (not handled here yet)
                 b64_img = data.get('base64')
                 if b64_img:
-                    # Strip header if present
                     if 'base64,' in b64_img:
                         b64_img = b64_img.split('base64,')[1]
                     self.qr_code = b64_img
                     self.connection_status = 'waiting_scan'
                 else:
-                    # Might be already connected
                     if 'instance' in data and data['instance'].get('state') == 'open':
                          self.connection_status = 'connected'
                          self.setup_step = 'done'
             else:
                  _logger.error("Failed to fetch QR: %s", response.text)
-                 # Don't raise, just log, user can retry
         except Exception as e:
             _logger.error("Error fetching QR: %s", str(e))
 
@@ -139,7 +130,7 @@ class WhatsAppConnectorWizard(models.TransientModel):
         }
 
     def action_check_status(self):
-        """ Checks status and creates account if connected """
+        """ Checks status and shows credentials if connected """
         self.ensure_one()
         url = f"{self.base_url.rstrip('/')}/instance/connectionState/{self.instance_name}"
         headers = {
@@ -156,31 +147,15 @@ class WhatsAppConnectorWizard(models.TransientModel):
                     self.connection_status = 'connected'
                     self.setup_step = 'done'
                     
-                    # Create/Update the Odoo Account
-                    Account = self.env['whatsapp_evaluation.account']
-                    existing = Account.search([('instance_name', '=', self.instance_name)], limit=1)
-                    
-                    vals = {
-                        'name': self.instance_name,
-                        'base_url': self.base_url,
-                        'instance_name': self.instance_name,
-                        'api_key': self.api_key,
-                        'instance_token': self.instance_token, # Saved from create step
-                        'active': True
-                    }
-                    
-                    if existing:
-                        existing.write(vals)
-                        account_id = existing.id
-                    else:
-                        account_id = Account.create(vals).id
-                    
-                    # Optional: Configure webhook automatically?
-                    # needed to be done via button on account usually.
+                    # STANDALONE MODE: Do not create account record.
+                    # Just show success message.
                     
                     return {
-                        'type': 'ir.actions.act_window_close', # Close wizard
-                        # Or redirect to the new account?
+                        'type': 'ir.actions.act_window', # Stay on form to show Done step with info
+                        'res_model': self._name,
+                        'res_id': self.id,
+                        'view_mode': 'form',
+                        'target': 'new',
                     }
                 else:
                      self.connection_status = state
@@ -195,7 +170,6 @@ class WhatsAppConnectorWizard(models.TransientModel):
                         }
                     }
             
-            # Refresh View
             return {
                 'type': 'ir.actions.act_window',
                 'res_model': self._name,

@@ -19,6 +19,7 @@
                         </group>
                         <group>
                             <field name="instance_name" placeholder="odoo_instance_1"/>
+                            <field name="phone_number"/>
                         </group>
                     </group>
                     <footer>
@@ -51,8 +52,15 @@
                 <div invisible="setup_step != 'done'">
                     <div class="alert alert-success" role="alert">
                         <h2><i class="fa fa-check-circle"/> Connected Successfully!</h2>
-                        <p>Your WhatsApp account has been configured and is ready to use.</p>
+                        <p>Your WhatsApp instance is ready.</p>
                     </div>
+                    <group>
+                        <group string="Connection Details">
+                            <field name="instance_name" readonly="1"/>
+                            <field name="instance_token" readonly="1"/>
+                            <field name="phone_number" readonly="1"/>
+                        </group>
+                    </group>
                     <footer>
                         <button string="Close" class="btn-primary" special="cancel"/>
                     </footer>
@@ -68,10 +76,12 @@
         <field name="target">new</field>
     </record>
 
-    <!-- Menu Item under Configuration -->
+    <!-- Top Level Menu since independent -->
+    <menuitem id="menu_whatsapp_connector_root" name="WhatsApp Connector" sequence="10"/>
+
     <menuitem id="menu_whatsapp_connector_wizard"
               name="Connect New Account"
-              parent="whatsapp_evaluation.whatsapp_evaluation_configuration_menu"
+              parent="menu_whatsapp_connector_root"
               action="action_whatsapp_connector_wizard"
               sequence="5"/>
 </odoo>

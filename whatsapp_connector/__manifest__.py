@@ -10,7 +10,7 @@
         - Display QR Code
         - Check Connection Status
     """,
-    'depends': ['whatsapp_evaluation'],
+    'depends': ['base', 'web'],
     'data': [
         'security/ir.model.access.csv',
         'views/whatsapp_connector_wizard_views.xml',

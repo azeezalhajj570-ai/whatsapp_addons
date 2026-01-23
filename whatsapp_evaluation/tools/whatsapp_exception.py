@@ -1,8 +1,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo.tools import LazyTranslate
+from odoo import _
 
-_lt = LazyTranslate(__name__)
+_lt = _
 
 
 class WhatsAppError(Exception):

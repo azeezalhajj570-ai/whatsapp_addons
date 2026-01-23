@@ -57,9 +57,13 @@ class WhatsAppConnectorWizard(models.TransientModel):
         try:
             _logger.info("Creating Instance at %s", url)
             response = requests.post(url, json=payload, headers=headers, timeout=30)
+            _logger.info("Create Instance Response Status: %s", response.status_code)
             
             if response.status_code in [200, 201]:
-                data = response.json()
+                try:
+                    data = response.json()
+                except ValueError:
+                    raise UserError(_("Invalid JSON response from server: %s") % response.text)
                 
                 instance_data = data.get('instance') or data
                 if isinstance(instance_data, dict):
@@ -91,7 +95,10 @@ class WhatsAppConnectorWizard(models.TransientModel):
             else:
                 raise UserError(_("Failed to create instance. Status: %s. Body: %s") % (response.status_code, response.text))
 
+        except requests.exceptions.Timeout:
+            raise UserError(_("Connection timed out. The Evolution API is taking too long to respond."))
         except requests.exceptions.RequestException as e:
+            _logger.error("Failed to connect to Evolution API: %s", e)
             raise UserError(_("Connection Error: %s") % str(e))
 
     def action_fetch_qr(self):
@@ -103,9 +110,15 @@ class WhatsAppConnectorWizard(models.TransientModel):
         }
         
         try:
+            _logger.info("Fetching QR code from %s", url)
             response = requests.get(url, headers=headers, timeout=30)
+            
             if response.status_code == 200:
-                data = response.json()
+                try:
+                    data = response.json()
+                except ValueError:
+                    raise UserError(_("Invalid JSON response when fetching QR: %s") % response.text)
+
                 b64_img = data.get('base64')
                 if b64_img:
                     if 'base64,' in b64_img:
@@ -117,9 +130,14 @@ class WhatsAppConnectorWizard(models.TransientModel):
                          self.connection_status = 'connected'
                          self.setup_step = 'done'
             else:
-                 _logger.error("Failed to fetch QR: %s", response.text)
-        except Exception as e:
+                 _logger.error("Failed to fetch QR: Status %s, Body %s", response.status_code, response.text)
+                 raise UserError(_("Failed to fetch QR code from Evolution API. Status: %s") % response.status_code)
+
+        except requests.exceptions.Timeout:
+            raise UserError(_("Timeout while fetching QR code."))
+        except requests.exceptions.RequestException as e:
             _logger.error("Error fetching QR: %s", str(e))
+            raise UserError(_("Network error fetching QR code: %s") % str(e))
 
         return {
             'type': 'ir.actions.act_window',
@@ -138,17 +156,20 @@ class WhatsAppConnectorWizard(models.TransientModel):
         }
         
         try:
+            _logger.info("Checking status at %s", url)
             response = requests.get(url, headers=headers, timeout=30)
+            
             if response.status_code == 200:
-                data = response.json()
+                try:
+                    data = response.json()
+                except ValueError:
+                     raise UserError(_("Invalid JSON response when checking status: %s") % response.text)
+
                 state = data.get('instance', {}).get('state')
                 
                 if state == 'open':
                     self.connection_status = 'connected'
                     self.setup_step = 'done'
-                    
-                    # STANDALONE MODE: Do not create account record.
-                    # Just show success message.
                     
                     return {
                         'type': 'ir.actions.act_window', # Stay on form to show Done step with info
@@ -158,25 +179,22 @@ class WhatsAppConnectorWizard(models.TransientModel):
                         'target': 'new',
                     }
                 else:
-                     self.connection_status = state
+                     self.connection_status = state or 'unknown'
                      return {
                         'type': 'ir.actions.client',
                         'tag': 'display_notification',
                         'params': {
                             'title': _("Status"),
-                            'message': _("Current State: %s. Scan the QR code if visible.") % state,
+                            'message': _("Current State: %s. Scan the QR code if visible.") % (state or 'Unknown'),
                             'type': 'warning',
                             'sticky': False,
                         }
                     }
+            else:
+                 raise UserError(_("Failed to check status. API returned %s") % response.status_code)
             
-            return {
-                'type': 'ir.actions.act_window',
-                'res_model': self._name,
-                'res_id': self.id,
-                'view_mode': 'form',
-                'target': 'new',
-            }
-            
-        except Exception as e:
-            raise UserError(_("Error checking status: %s") % str(e))
+        except requests.exceptions.Timeout:
+             raise UserError(_("Timeout while checking connection status."))
+        except requests.exceptions.RequestException as e:
+            _logger.error("Error checking status: %s", e)
+            raise UserError(_("Network error checking status: %s") % str(e))

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_connector_wizard_form" model="ir.ui.view">
+        <field name="name">whatsapp.connector.wizard.form</field>
+        <field name="model">whatsapp.connector.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Connect WhatsApp">
+                <field name="setup_step" invisible="1"/>
+                
+                <!-- STEP 1: CREATE INSTANCE -->
+                <div invisible="setup_step != 'create'">
+                    <div class="alert alert-info" role="alert">
+                        Enter your Evolution API details and a unique name for this connection.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="base_url" placeholder="https://api.example.com"/>
+                            <field name="api_key" password="True"/>
+                        </group>
+                        <group>
+                            <field name="instance_name" placeholder="odoo_instance_1"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_create_instance" string="Create &amp; Connect" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </div>
+
+                <!-- STEP 2: SCAN QR -->
+                <div invisible="setup_step != 'scan'">
+                    <div class="alert alert-warning" role="alert">
+                        Scan the QR Code below with your WhatsApp app on your phone.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="connection_status" widget="badge" decoration-info="connection_status == 'waiting_scan'" decoration-success="connection_status == 'connected'"/>
+                            <button name="action_fetch_qr" string="Refresh QR" type="object" icon="fa-refresh" class="btn-link"/>
+                        </group>
+                    </group>
+                    <div class="text-center">
+                        <field name="qr_code" widget="image" width="250px" height="250px" nolabel="1" readonly="1"/>
+                    </div>
+                    <footer>
+                        <button name="action_check_status" string="I have Scanned it" type="object" class="btn-primary"/>
+                        <button string="Close" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </div>
+
+                <!-- STEP 3: DONE -->
+                <div invisible="setup_step != 'done'">
+                    <div class="alert alert-success" role="alert">
+                        <h2><i class="fa fa-check-circle"/> Connected Successfully!</h2>
+                        <p>Your WhatsApp account has been configured and is ready to use.</p>
+                    </div>
+                    <footer>
+                        <button string="Close" class="btn-primary" special="cancel"/>
+                    </footer>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_whatsapp_connector_wizard" model="ir.actions.act_window">
+        <field name="name">Connect New Account</field>
+        <field name="res_model">whatsapp.connector.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu Item under Configuration -->
+    <menuitem id="menu_whatsapp_connector_wizard"
+              name="Connect New Account"
+              parent="whatsapp_evaluation.whatsapp_evaluation_configuration_menu"
+              action="action_whatsapp_connector_wizard"
+              sequence="5"/>
+</odoo>

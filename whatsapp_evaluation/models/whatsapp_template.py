@@ -8,10 +8,17 @@ class WhatsAppTemplate(models.Model):
     _description = 'WhatsApp Template'
 
     name = fields.Char(string="Name", required=True)
-    body = fields.Text(string="Body", required=True)
+    body = fields.Text(string="Body", required=True, translate=True)
     model_id = fields.Many2one('ir.model', string="Applies to", required=True, ondelete='cascade')
     model = fields.Char(related='model_id.model', string="Related Document Model", store=True)
     variable_ids = fields.One2many('whatsapp_evaluation.template.variable', 'wa_template_id', string="Variables")
+
+    Languages = [
+        ('en', 'English'),
+        ('ar', 'Arabic'),
+        ('fr', 'French'),
+        ('es', 'Spanish'),
+    ]
 
     header_type = fields.Selection([
         ('none', 'None'),
@@ -26,6 +33,7 @@ class WhatsAppTemplate(models.Model):
         domain="[('model', '=', model)]")
     header_attachment_ids = fields.Many2many(
         'ir.attachment', string="Template Static Header")
+    lang_code = fields.Selection(string="Language", selection=Languages, default='en', required=True)
 
     def _generate_attachment_from_report(self, record=False):
         """Create attachment from report if relevant"""
@@ -67,5 +75,14 @@ class WhatsAppTemplate(models.Model):
         return len(self._find_default_for_model(model_name)) > 0
 
     @api.model
-    def _find_default_for_model(self, model_name):
-        return self.search([('model', '=', model_name)], limit=1)
+    def _find_default_for_model(self, model_name, lang_code=False):
+        domain = [('model', '=', model_name)]
+        if lang_code:
+            domain.append(('lang_code', '=', lang_code))
+        
+        template = self.search(domain, limit=1)
+        if not template and lang_code:
+             # Fallback to English/Default if specific lang not found
+             domain = [('model', '=', model_name)]
+             template = self.search(domain, limit=1)
+        return template

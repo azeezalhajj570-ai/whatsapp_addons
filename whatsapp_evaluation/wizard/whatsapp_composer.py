@@ -39,8 +39,28 @@ class WhatsAppComposer(models.TransientModel):
             if account:
                 result['wa_account_id'] = account.id
             
+            # Determine Language
+            lang_code = 'en'
+            if result.get('res_model') == 'res.partner':
+                partner = record
+            elif 'partner_id' in record:
+                partner = record.partner_id
+            else:
+                partner = False
+            
+            if partner and partner.lang:
+                # Map Odoo lang (ar_SY) to WhatsApp lang (ar) if needed
+                # For now, simplistic mapping or direct usage if key matches
+                if partner.lang.startswith('ar'):
+                    lang_code = 'ar'
+                elif partner.lang.startswith('fr'):
+                    lang_code = 'fr'
+                elif partner.lang.startswith('es'):
+                    lang_code = 'es'
+                # Add more mappings as needed or implement robust mapping
+            
             # Template logic
-            template = self.env['whatsapp_evaluation.template']._find_default_for_model(result['res_model'])
+            template = self.env['whatsapp_evaluation.template']._find_default_for_model(result['res_model'], lang_code=lang_code)
             if template:
                 var_values = template.variable_ids._get_variables_value(record)
                 result['body'] = template._get_formatted_body(variable_values=var_values)

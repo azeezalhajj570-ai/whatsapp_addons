@@ -158,3 +158,76 @@ msgstr "فشل"
 #: selection:whatsapp_evaluation.message,state:0
 msgid "Error"
 msgstr "خطأ"
+
+#. module: whatsapp_evaluation
+#: model:whatsapp_evaluation.template,body:whatsapp_evaluation.whatsapp_evaluation_template_sale_order
+msgid ""
+"Hello {{1}},\n"
+"\n"
+"Congratulations! Your order *{{2}}* from *{{3}}* has been confirmed for a total of *{{4}}{{5}}*.\n"
+"\n"
+"To track your order: {{6}}\n"
+"\n"
+"Thank you."
+msgstr ""
+"مرحباً {{1}}،\n"
+"\n"
+"تهانينا! لقد تم تأكيد طلبك *{{2}}* من *{{3}}* بقيمة إجمالية قدرها *{{4}}{{5}}*.\n"
+"\n"
+"لمتابعة طلبك: {{6}}\n"
+"\n"
+"شكراً لك."
+
+#. module: whatsapp_evaluation
+#: model:whatsapp_evaluation.template,body:whatsapp_evaluation.whatsapp_evaluation_template_invoice
+msgid ""
+"Dear {{1}},\n"
+"\n"
+"Here is your invoice *{{2}}* amounting to *{{3}}{{4}}*.\n"
+"Please remit payment at your earliest convenience.\n"
+"\n"
+"Thank you."
+msgstr ""
+"عزيزي {{1}}،\n"
+"\n"
+"إليك فاتورتك *{{2}}* بقيمة *{{3}}{{4}}*.\n"
+"يرجى السداد في أقرب وقت ممكن.\n"
+"\n"
+"شكراً لك."
+
+#. module: whatsapp_evaluation
+#: model:whatsapp_evaluation.template,body:whatsapp_evaluation.whatsapp_evaluation_template_payment
+msgid ""
+"Dear {{1}},\n"
+"\n"
+"We have received your payment of *{{2}} {{3}}*.\n"
+"Attached is your payment receipt.\n"
+"\n"
+"Thank you."
+msgstr ""
+"عزيزي {{1}}،\n"
+"\n"
+"لقد استلمنا دفعتك بقيمة *{{2}} {{3}}*.\n"
+"مرفق إيصال الدفع الخاص بك.\n"
+"\n"
+"شكراً لك."
+
+#. module: whatsapp_evaluation
+#: model:whatsapp_evaluation.template,body:whatsapp_evaluation.whatsapp_evaluation_template_pos
+msgid ""
+"Hello {{1}},\n"
+"\n"
+"Here is your receipt for order *{{2}}* amounting to *{{3}}{{4}}*.\n"
+"\n"
+"Thank you for shopping with us!"
+msgstr ""
+"مرحباً {{1}}،\n"
+"\n"
+"إليك إيصال طلبك *{{2}}* بقيمة *{{3}}{{4}}*.\n"
+"\n"
+"شكراً لتسوقك معنا!"
+
+#. module: whatsapp_evaluation
+#: model:whatsapp_evaluation.template,header_text:whatsapp_evaluation.whatsapp_evaluation_template_pos
+msgid "Receipt"
+msgstr "الإيصال"

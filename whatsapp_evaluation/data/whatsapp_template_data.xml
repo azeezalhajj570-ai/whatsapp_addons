@@ -145,8 +145,8 @@ Thank you.</field>
     <record id="whatsapp_evaluation_template_pos" model="whatsapp_evaluation.template">
         <field name="name">POS Receipt</field>
         <field name="model_id" ref="point_of_sale.model_pos_order"/>
-        <field name="header_type">document</field>
-        <field name="report_id" ref="point_of_sale.action_report_pos_order"/>
+        <field name="header_type">text</field>
+        <field name="header_text">Receipt</field>
         <field name="body">Hello {{1}},
 
 Here is your receipt for order *{{2}}* amounting to *{{3}}{{4}}*.

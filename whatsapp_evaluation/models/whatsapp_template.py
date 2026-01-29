@@ -20,6 +20,7 @@ class WhatsAppTemplate(models.Model):
         ('video', 'Video'),
         ('document', 'Document'),
         ('location', 'Location')], string="Header Type", default='none')
+    header_text = fields.Char(string="Header Text")
     report_id = fields.Many2one(
         comodel_name='ir.actions.report', string="Report",
         domain="[('model', '=', model)]")
@@ -47,11 +48,16 @@ class WhatsAppTemplate(models.Model):
     def _get_formatted_body(self, variable_values=None):
         self.ensure_one()
         variable_values = variable_values or {}
+        header = ''
+        if self.header_type == 'text' and self.header_text:
+            header = f"*{self.header_text}*\n\n"
+        
         body = self.body
         for var in self.variable_ids:
             if var.line_type == 'body':
                 body = body.replace(var.name, variable_values.get(f'{var.line_type}-{var.name}', var.demo_value))
-        return body
+        
+        return header + body
 
     @api.model
     def _can_use_whatsapp(self, model_name):

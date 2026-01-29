@@ -50,6 +50,7 @@ Fully integrated with Odoo’s messaging and contact management system.
         'web.assets_backend': [
             'whatsapp_evaluation/static/src/core/common/**/*',
             'whatsapp_evaluation/static/src/core/web/**/*',
+            ('remove', 'whatsapp_evaluation/static/src/core/web/discuss_sidebar_category_item_patch.xml'),
             'whatsapp_evaluation/static/src/core/public_web/**/*',
             'whatsapp_evaluation/static/src/chatter/web/**/*',
         ],

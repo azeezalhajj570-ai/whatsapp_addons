@@ -39,37 +39,21 @@ class WhatsAppComposer(models.TransientModel):
             if account:
                 result['wa_account_id'] = account.id
             
+            # Language Detection
+            lang_code = 'en_US' # Default
+            if 'partner_id' in record and record.partner_id.lang:
+                lang_code = record.partner_id.lang
+            
             # Template logic
-            template = self.env['whatsapp_evaluation.template']._find_default_for_model(result['res_model'])
+            template = self.env['whatsapp_evaluation.template']._find_default_for_model(result['res_model'], lang_code=lang_code)
             if template:
                 var_values = template.variable_ids._get_variables_value(record)
                 result['body'] = template._get_formatted_body(variable_values=var_values)
-            
-            # Sale Order Specific Logic (Fallback or PDF attachment)
-            if result['res_model'] == 'sale.order':
-                # Pre-fill body if no template found
-                if not result.get('body'):
-                    currency = record.currency_id.symbol
-                    amount = record.amount_total
-                    result['body'] = _("Here is your quotation *%s* amounting to *%s %s*.") % (record.name, amount, currency)
                 
-                # Attach PDF
-                try:
-                    report = self.env.ref('sale.action_report_saleorder')
-                    if report:
-                        pdf_content, __ = report._render_qweb_pdf(record.id)
-                        attachment = self.env['ir.attachment'].create({
-                            'name': f"{record.name}.pdf",
-                            'type': 'binary',
-                            'datas': self.env['ir.attachment']._encode_datas(pdf_content),
-                            'res_model': 'sale.order',
-                            'res_id': record.id,
-                            'mimetype': 'application/pdf'
-                        })
-                        result['attachment_ids'] = [(4, attachment.id)]
-                except Exception:
-                    pass
-                
+                # Dynamic Attachment
+                attachment = template._generate_attachment_from_report(record)
+                if attachment:
+                    result['attachment_ids'] = [(4, attachment.id)]
         return result
 
     def action_send_whatsapp(self):

@@ -1,6 +1,5 @@
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 from odoo import models, fields, api
+from odoo.tools.safe_eval import safe_eval
 
 class WhatsAppTemplate(models.Model):
     _name = 'whatsapp_evaluation.template'
@@ -39,20 +38,23 @@ class WhatsAppTemplate(models.Model):
         self.ensure_one()
         if self.header_type == 'document' and self.report_id:
             try:
-                pdf_content, _ = self.report_id._render_qweb_pdf(record.id)
-                attachment = self.env['ir.attachment'].create({
-                    'name': f"{record.display_name}.pdf",
-                    'type': 'binary',
-                    'datas': self.env['ir.attachment']._encode_datas(pdf_content),
+                report_content, report_format = self.report_id._render_qweb_pdf(self.report_id, record.id)
+                if self.report_id.print_report_name:
+                    report_name = safe_eval(self.report_id.print_report_name, {'object': record}) + '.' + report_format
+                else:
+                    report_name = self.display_name + '.' + report_format
+                
+                return self.env['ir.attachment'].create({
+                    'name': report_name,
+                    'raw': report_content, 
+                    'mimetype': 'application/pdf',
                     'res_model': record._name,
                     'res_id': record.id,
-                    'mimetype': 'application/pdf'
                 })
-                return attachment
             except Exception as e:
                 # Log error or handle gracefully
-                return None
-        return None
+                return self.env['ir.attachment']
+        return self.env['ir.attachment']
 
     @api.model
     def _can_use_whatsapp(self, model_name):

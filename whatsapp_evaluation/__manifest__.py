@@ -33,7 +33,9 @@ Fully integrated with Odoo’s messaging and contact management system.
         'web',
         'mail',
         'phone_validation',
-        'sale'
+        'sale',
+        'account',
+        'point_of_sale',
     ],
     'data': [
         'security/ir.model.access.csv',

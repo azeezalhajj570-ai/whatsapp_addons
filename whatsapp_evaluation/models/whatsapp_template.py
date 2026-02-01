@@ -1,5 +1,6 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, tools, _
 from odoo.tools.safe_eval import safe_eval
+import re
 
 class WhatsAppTemplate(models.Model):
     _name = 'whatsapp_evaluation.template'
@@ -79,3 +80,74 @@ class WhatsAppTemplate(models.Model):
                  template = self.search([('model', '=', model_name)], limit=1)
                  
         return template
+
+    def action_send_template(self, record):
+        """
+        Send this template to the given record.
+        Designed for use in Automation Rules.
+        """
+        self.ensure_one()
+        
+        # 1. Determine Phone
+        phone = False
+        partner = False
+        if 'mobile' in record and record.mobile:
+            phone = record.mobile
+        elif 'phone' in record and record.phone:
+            phone = record.phone
+        elif 'partner_id' in record and record.partner_id:
+            partner = record.partner_id
+            phone = partner.mobile or partner.phone
+            
+        if not phone:
+            # Cannot send without phone
+            return False
+            
+        # 2. Render Body
+        var_values = self.variable_ids._get_variables_value(record)
+        body = self._get_formatted_body(variable_values=var_values)
+        
+        # 3. Generate Attachment
+        attachment_ids = []
+        attachment = self._generate_attachment_from_report(record)
+        if attachment:
+            attachment_ids.append(attachment.id)
+            
+        # 4. Create Odoo Mail Message (HTML)
+        body_html = tools.plaintext2html(body)
+        # Basic Markdown support
+        body_html = re.sub(r'\*([^*]+)\*', r'<b>\1</b>', body_html)
+        body_html = re.sub(r'_([^_]+)_', r'<i>\1</i>', body_html)
+        
+        mail_values = {
+            'model': record._name,
+            'res_id': record.id,
+            'body': body_html,
+            'message_type': 'comment',
+            'subtype_id': self.env.ref('mail.mt_comment').id,
+            'attachment_ids': [(6, 0, attachment_ids)]
+        }
+        if partner:
+            mail_values['partner_ids'] = [(4, partner.id)]
+            
+        mail_message = self.env['mail.message'].create(mail_values)
+        
+        # 5. Create and Send WhatsApp Message
+        # Find default account
+        wa_account = self.env['whatsapp_evaluation.account'].search([], limit=1)
+        if not wa_account:
+             return False
+             
+        wa_msg = self.env['whatsapp_evaluation.message'].create({
+            'body': body,
+            'mobile_number': phone,
+            'wa_account_id': wa_account.id,
+            'mail_message_id': mail_message.id,
+            'message_type': 'outbound',
+            'state': 'outgoing',
+            'attachment_ids': [(6, 0, attachment_ids)],
+            'partner_id': partner.id if partner else False
+        })
+        
+        wa_msg._send_message()
+        return wa_msg

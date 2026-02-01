@@ -7,7 +7,9 @@
             <list create="0">
                 <field name="create_date"/>
                 <field name="create_uid" widget="many2one_avatar"/>
+                <field name="partner_id"/>
                 <field name="mobile_number"/>
+                <field name="tag_ids" widget="many2many_tags"/>
                 <field name="body"/>
                 <field name="message_type"/>
                 <field name="state" widget="badge" decoration-info="state == 'outgoing'" decoration-success="state == 'sent'" decoration-danger="state == 'error'"/>
@@ -30,7 +32,9 @@
                 <sheet>
                     <group>
                         <group>
+                            <field name="partner_id"/>
                             <field name="mobile_number"/>
+                            <field name="tag_ids" widget="many2many_tags"/>
                             <field name="wa_account_id" readonly="state != 'outgoing'"/>
                             <field name="msg_uid" readonly="1"/>
                         </group>
@@ -47,6 +51,12 @@
                         <field name="failure_reason" readonly="1"/>
                     </group>
                 </sheet>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
             </form>
         </field>
     </record>
@@ -68,7 +78,9 @@
         <field name="arch" type="xml">
             <search>
                 <field name="create_date"/>
+                <field name="partner_id"/>
                 <field name="mobile_number"/>
+                <field name="tag_ids"/>
                 <field name="body"/>
                 <field name="state"/>
                 <filter string="Outgoing" name="filter_state_outgoing" domain="[('state', '=', 'outgoing')]"/>
@@ -79,6 +91,8 @@
                 <separator/>
                 <filter string="Create Date" name="filter_create_date" date="create_date"/>
                 <group string="Group By">
+                    <filter string="Partner" name="groupby_partner_id" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Tags" name="groupby_tag_ids" context="{'group_by': 'tag_ids'}"/>
                     <filter string="Sent To" name="groupby_mobile_number" context="{'group_by': 'mobile_number'}"/>
                     <filter string="State" name="groupby_state" context="{'group_by': 'state'}"/>
                     <filter string="Account" name="groupby_wa_account_id" context="{'group_by': 'wa_account_id'}"/>

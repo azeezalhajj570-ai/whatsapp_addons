@@ -5,3 +5,4 @@ from . import mail_message
 from . import whatsapp_template_variable
 from . import whatsapp_template
 from . import mail_thread
+from . import whatsapp_tag

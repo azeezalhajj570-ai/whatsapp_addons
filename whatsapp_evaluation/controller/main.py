@@ -198,6 +198,7 @@ class WebhookEvaluation(http.Controller):
                 'message_type': 'inbound',
                 'state': 'received',
                 'msg_uid': key.get('id'),
+                'partner_id': author_id,
                 'attachment_ids': [(6, 0, new_msg.attachment_ids.ids)] if new_msg.attachment_ids else False
             })
              

@@ -5,3 +5,4 @@ access_whatsapp_evaluation_message,whatsapp_evaluation.message,model_whatsapp_ev
 access_whatsapp_evaluation_template,whatsapp_evaluation.template,model_whatsapp_evaluation_template,base.group_user,1,1,1,1
 access_whatsapp_evaluation_template_variable,whatsapp_evaluation.template.variable,model_whatsapp_evaluation_template_variable,base.group_user,1,1,1,1
 access_whatsapp_evaluation_composer,whatsapp_evaluation.composer,model_whatsapp_evaluation_composer,base.group_user,1,1,1,1
+access_whatsapp_tag_user,whatsapp.tag user,model_whatsapp_evaluation_tag,base.group_user,1,1,1,1

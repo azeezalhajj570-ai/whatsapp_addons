@@ -15,10 +15,15 @@ class WhatsAppMessage(models.Model):
     _order = 'id desc'
     _rec_name = 'mobile_number'
 
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
     body = fields.Html(string="Body")
     mobile_number = fields.Char(string="Phone Number", required=True)
     msg_uid = fields.Char(string="WhatsApp Message ID")
     
+    partner_id = fields.Many2one('res.partner', string='Contact', tracking=True)
+    tag_ids = fields.Many2many('whatsapp_evaluation.tag', string='Tags', tracking=True)
+
     state = fields.Selection([
         ('outgoing', 'In Queue'),
         ('sent', 'Sent'),
@@ -26,7 +31,7 @@ class WhatsAppMessage(models.Model):
         ('read', 'Read'),
         ('received', 'Received'),
         ('error', 'Failed'),
-    ], string="State", default='outgoing')
+    ], string="State", default='outgoing', tracking=True)
 
     message_type = fields.Selection([
         ('outbound', 'Outbound'),
@@ -36,7 +41,7 @@ class WhatsAppMessage(models.Model):
     wa_account_id = fields.Many2one('whatsapp_evaluation.account', string="WhatsApp Account", required=True)
     mail_message_id = fields.Many2one('mail.message', string="Related Mail Message")
     attachment_ids = fields.Many2many('ir.attachment', string="Attachments")
-    failure_reason = fields.Char(string="Failure Reason")
+    failure_reason = fields.Char(string="Failure Reason", tracking=True)
 
     _SUPPORTED_ATTACHMENT_TYPE = {
         'audio': ('audio/aac', 'audio/mp4', 'audio/mpeg', 'audio/amr', 'audio/ogg'),

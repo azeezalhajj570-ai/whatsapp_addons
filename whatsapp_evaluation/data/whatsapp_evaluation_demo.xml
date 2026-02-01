@@ -4,7 +4,7 @@
         <!-- Demo Account -->
         <record id="account_demo" model="whatsapp_evaluation.account">
             <field name="name">Demo Account</field>
-            <field name="base_url">https://api.hamedco.com</field>
+            <field name="base_url">https://api.example.com</field>
             <field name="instance_name">demo_instance</field>
             <field name="api_key">demo_key</field>
             <field name="notify_user_ids" eval="[Command.link(ref('base.user_admin'))]"/>
@@ -13,7 +13,7 @@
         <!-- Partner -->
         <record id="partner_demo_whatsapp_eval" model="res.partner">
             <field name="name">Demo WhatsApp User</field>
-            <field name="mobile">+967774544394</field>
+            <field name="mobile">+967777777777</field>
             <field name="country_id" ref="base.ye"/>
         </record>
 
@@ -21,7 +21,7 @@
         <record model="discuss.channel" id="demo_whatsapp_evaluation_channel">
             <field name="name">Demo WhatsApp User</field>
             <field name="channel_type">whatsapp</field>
-            <field name="whatsapp_number">967774544394</field>
+            <field name="whatsapp_number">967777777777</field>
             <field name="whatsapp_partner_id" ref="partner_demo_whatsapp_eval"/>
             <field name="channel_partner_ids" eval="[Command.link(ref('partner_demo_whatsapp_eval')), Command.link(ref('base.partner_root'))]"/>
             <field name="wa_account_id" ref="account_demo"/>

@@ -25,32 +25,42 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
         # 1. Build Service Catalog
         # Fetch services (Products)
-        # We assume 'service' type and 'sale_ok'
         products = self.env['product.template'].search([
             ('type', '=', 'service'),
             ('sale_ok', '=', True)
         ])
         
-        # Build lightweight catalog
-        # Use product.tags (product.tag) for keywords
+        # Build lightweight service catalog
         service_catalog = []
         for p in products:
             service_catalog.append({
                 "id": p.id,
                 "name": p.name,
-                "tags": [t.name for t in p.product_tag_ids], # product_tag_ids (product.template)
+                "tags": [t.name for t in p.product_tag_ids],
                 "category": p.categ_id.complete_name
             })
-            
-        catalog_json = json.dumps(service_catalog, indent=2)
+
+        # Fetch Project Tags for Intent Classification
+        project_tags = self.env['project.tags'].search([])
+        tag_list = [t.name for t in project_tags]
+
+        catalog_json = json.dumps({
+            "services": service_catalog,
+            "available_intents": tag_list
+        }, indent=2)
 
         # 2. Call AI
         try:
             prompt = (
                 f"Message: {message.body}\n"
                 f"Sender Phone: {message.mobile_number}\n\n"
-                f"### SERVICE CATALOG ###\n"
-                f"{catalog_json}"
+                f"### DATA CATALOG ###\n"
+                f"{catalog_json}\n\n"
+                f"Instructions:\n"
+                f"1. Analyze the message.\n"
+                f"2. Select the most appropriate 'intent_tag' from 'available_intents'.\n"
+                f"3. If clear match to a service, return 'service_id'.\n"
+                f"4. Output JSON: {{ 'intent_tag': '...', 'service_id': ... }}"
             )
             
             responses = agent.get_direct_response(prompt=prompt)
@@ -66,13 +76,25 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
                 ai_output_str = ai_output_str.split("```")[1].split("```")[0].strip()
 
             ai_data = json.loads(ai_output_str)
+            intent_tag_name = ai_data.get('intent_tag')
             
+            # Apply Tags
+            tag_ids = []
+            if intent_tag_name:
+                # Find or Create PROJECT Tag
+                # We use project.tags directly now
+                p_tag = self.env['project.tags'].search([('name', '=', intent_tag_name)], limit=1)
+                if not p_tag:
+                    p_tag = self.env['project.tags'].create({'name': intent_tag_name})
+                tag_ids.append(p_tag.id)
+
             # 3. Update Message Record
             vals = {
-                'ai_intent': ai_data.get('intent'),
+                # 'ai_intent': intent_tag_name, # Removed to avoid Selection Error, relies on Tags now
                 'ai_confidence': ai_data.get('confidence', 0.0),
                 'ai_rationale': ai_data.get('rationale'),
                 'is_ai_processed': True,
+                'tag_ids': [(4, t_id) for t_id in tag_ids]
             }
             message.write(vals)
 

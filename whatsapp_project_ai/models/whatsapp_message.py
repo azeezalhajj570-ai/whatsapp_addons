@@ -18,6 +18,9 @@ class WhatsAppMessage(models.Model):
     linked_model = fields.Char(string="Linked Model")
     linked_res_id = fields.Integer(string="Linked Record ID")
 
+    # Override Tags to use Project Tags directly
+    tag_ids = fields.Many2many('project.tags', string="Tags")
+
     @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)

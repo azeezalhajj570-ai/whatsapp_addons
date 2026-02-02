@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_message_form_ai_inherit" model="ir.ui.view">
+        <field name="name">whatsapp.evaluation.message.form.ai.inherit</field>
+        <field name="model">whatsapp_evaluation.message</field>
+        <field name="inherit_id" ref="whatsapp_evaluation.view_whatsapp_message_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button name="%(whatsapp_evaluation.action_whatsapp_message_resend)d" string="Retry Send" type="action" 
+                            invisible="state != 'error'" class="oe_highlight"/>
+                    <button name="action_reprocess_ai" string="Reprocess with AI" type="object" 
+                            class="btn-primary" invisible="is_ai_processed"/>
+                </header>
+            </xpath>
+            <xpath expr="//group" position="after">
+                <group string="AI Analysis" invisible="not is_ai_processed">
+                    <group>
+                        <field name="ai_intent"/>
+                        <field name="ai_confidence"/>
+                        <field name="is_ai_processed" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="linked_model"/>
+                        <field name="linked_res_id"/>
+                    </group>
+                    <field name="ai_rationale"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_message_tree_ai_inherit" model="ir.ui.view">
+        <field name="name">whatsapp.evaluation.message.tree.ai.inherit</field>
+        <field name="model">whatsapp_evaluation.message</field>
+        <field name="inherit_id" ref="whatsapp_evaluation.view_whatsapp_message_tree"/>
+        <field name="arch" type="xml">
+            <field name="state" position="before">
+                <field name="ai_intent" optional="show"/>
+                <field name="ai_confidence" optional="hide"/>
+            </field>
+        </field>
+    </record>
+</odoo>

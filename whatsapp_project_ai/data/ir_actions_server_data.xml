@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_process_whatsapp_ai" model="ir.actions.server">
+        <field name="name">WhatsApp: AI Process Message</field>
+        <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+        <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+        <field name="state">code</field>
+        <field name="code">
+for record in records:
+    env['whatsapp.project.ai.orchestrator'].process_incoming_message(record)
+        </field>
+    </record>
+</odoo>

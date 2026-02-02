@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- 1. Product Categories -->
+        <!-- Root Service Category -->
+        <record id="categ_services_root" model="product.category">
+            <field name="name">Services</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+
+        <!-- Student Assistance (Projects) -->
+        <record id="categ_student_projects" model="product.category">
+            <field name="name">Student Projects</field>
+            <field name="parent_id" ref="categ_services_root"/>
+        </record>
+
+        <!-- Student Support (Quick Help) -->
+        <record id="categ_student_support" model="product.category">
+            <field name="name">Student Support</field>
+            <field name="parent_id" ref="categ_services_root"/>
+        </record>
+
+        <!-- 2. Product Tags (Keywords for AI) -->
+        <record id="tag_essay" model="product.tag">
+            <field name="name">essay</field>
+        </record>
+        <record id="tag_writing" model="product.tag">
+            <field name="name">writing</field>
+        </record>
+        <record id="tag_thesis" model="product.tag">
+            <field name="name">thesis</field>
+        </record>
+        <record id="tag_research" model="product.tag">
+            <field name="name">research</field>
+        </record>
+        <record id="tag_assignment" model="product.tag">
+            <field name="name">assignment</field>
+        </record>
+        <record id="tag_tutoring" model="product.tag">
+            <field name="name">tutoring</field>
+        </record>
+        <record id="tag_math" model="product.tag">
+            <field name="name">math</field>
+        </record>
+        <record id="tag_coding" model="product.tag">
+            <field name="name">coding</field>
+        </record>
+
+        <!-- 3. Products (Services) -->
+        
+        <!-- Essay Writing (Project) -->
+        <record id="service_essay_writing" model="product.template">
+            <field name="name">Essay Writing Assistance</field>
+            <field name="type">service</field>
+            <field name="service_tracking">project_only</field>
+            <field name="invoice_policy">order</field>
+            <field name="categ_id" ref="categ_student_projects"/>
+            <field name="list_price">50.0</field>
+            <field name="sale_ok">True</field>
+            <field name="product_tag_ids" eval="[(6, 0, [ref('tag_essay'), ref('tag_writing')])]"/>
+        </record>
+
+        <!-- Thesis Support (Project) -->
+        <record id="service_thesis_help" model="product.template">
+            <field name="name">Thesis &amp; Dissertation Help</field>
+            <field name="type">service</field>
+            <field name="service_tracking">project_only</field>
+            <field name="invoice_policy">order</field>
+            <field name="categ_id" ref="categ_student_projects"/>
+            <field name="list_price">150.0</field>
+            <field name="sale_ok">True</field>
+            <field name="product_tag_ids" eval="[(6, 0, [ref('tag_thesis'), ref('tag_research'), ref('tag_writing')])]"/>
+        </record>
+
+        <!-- Assignment Review (Project/Task) -->
+        <record id="service_assignment_review" model="product.template">
+            <field name="name">Assignment Review</field>
+            <field name="type">service</field>
+            <field name="service_tracking">task_global_project</field>
+            <field name="invoice_policy">order</field>
+            <field name="categ_id" ref="categ_student_projects"/>
+            <field name="list_price">30.0</field>
+            <field name="sale_ok">True</field>
+            <field name="product_tag_ids" eval="[(6, 0, [ref('tag_assignment')])]"/>
+        </record>
+
+        <!-- Hourly Tutoring (Support/Time-based) -->
+        <record id="service_tutoring" model="product.template">
+            <field name="name">1-on-1 Tutoring Session</field>
+            <field name="type">service</field>
+            <field name="service_tracking">task_global_project</field>
+            <field name="invoice_policy">delivery</field> <!-- Timesheet-based usually -->
+            <field name="categ_id" ref="categ_student_support"/>
+            <field name="list_price">40.0</field>
+            <field name="sale_ok">True</field>
+            <field name="product_tag_ids" eval="[(6, 0, [ref('tag_tutoring'), ref('tag_math'), ref('tag_coding')])]"/>
+        </record>
+
+    </data>
+</odoo>

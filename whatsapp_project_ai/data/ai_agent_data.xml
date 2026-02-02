@@ -4,6 +4,7 @@
         <field name="name">WhatsApp Project Manager</field>
         <field name="subtitle">Automated Project &amp; Task creation from WhatsApp</field>
         <field name="response_style">analytical</field>
+        <field name="topic_ids" eval="[(6, 0, [ref('ai.ai_topic_information_retrieval_query'), ref('ai.ai_topic_natural_language_query')])]"/>
         <field name="system_prompt">
 You are an expert Project Management Assistant for a freelancing agency.
 Your job is to analyze incoming WhatsApp messages and match them to an EXISTING Service from the provided catalog.

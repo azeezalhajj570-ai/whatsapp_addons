@@ -3,6 +3,7 @@
     <record id="agent_whatsapp_pm" model="ai.agent">
         <field name="name">WhatsApp Project Manager</field>
         <field name="subtitle">Automated Project &amp; Task creation from WhatsApp</field>
+        <field name="llm_model_id" ref="ai.model_gemini_2_5_flash"/>
         <field name="response_style">analytical</field>
         <field name="topic_ids" eval="[(6, 0, [ref('ai.ai_topic_information_retrieval_query'), ref('ai.ai_topic_natural_language_query')])]"/>
         <field name="system_prompt">

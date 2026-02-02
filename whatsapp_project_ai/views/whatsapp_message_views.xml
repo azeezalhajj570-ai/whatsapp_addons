@@ -3,15 +3,11 @@
     <record id="view_whatsapp_message_form_ai_inherit" model="ir.ui.view">
         <field name="name">whatsapp.evaluation.message.form.ai.inherit</field>
         <field name="model">whatsapp_evaluation.message</field>
-        <field name="inherit_id" ref="whatsapp_evaluation.view_whatsapp_message_form"/>
+        <field name="inherit_id" ref="whatsapp_evaluation.whatsapp_evaluation_message_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//sheet" position="before">
-                <header>
-                    <button name="%(whatsapp_evaluation.action_whatsapp_message_resend)d" string="Retry Send" type="action" 
-                            invisible="state != 'error'" class="oe_highlight"/>
-                    <button name="action_reprocess_ai" string="Reprocess with AI" type="object" 
-                            class="btn-primary" invisible="is_ai_processed"/>
-                </header>
+            <xpath expr="//header" position="inside">
+                <button name="action_reprocess_ai" string="Reprocess with AI" type="object" 
+                        class="btn-primary" invisible="is_ai_processed"/>
             </xpath>
             <xpath expr="//group" position="after">
                 <group string="AI Analysis" invisible="not is_ai_processed">
@@ -33,7 +29,7 @@
     <record id="view_whatsapp_message_tree_ai_inherit" model="ir.ui.view">
         <field name="name">whatsapp.evaluation.message.tree.ai.inherit</field>
         <field name="model">whatsapp_evaluation.message</field>
-        <field name="inherit_id" ref="whatsapp_evaluation.view_whatsapp_message_tree"/>
+        <field name="inherit_id" ref="whatsapp_evaluation.whatsapp_evaluation_message_view_tree"/>
         <field name="arch" type="xml">
             <field name="state" position="before">
                 <field name="ai_intent" optional="show"/>

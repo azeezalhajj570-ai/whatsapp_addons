@@ -127,34 +127,23 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         intent = ai_data.get('intent')
         service_id = ai_data.get('service_id')
         reply_text = ai_data.get('suggested_reply')
-
-        redirect_record = None
         
+        redirect_record = None
         product = None
         if service_id:
             product = self.env['product.template'].browse(service_id)
 
-        # Decision Logic based on Product Category (if service found) OR Intent
+        # --- DECISION LOGIC ---
+        if intent in ['new_service_request', 'pricing_question']:
+            redirect_record = self._create_lead(message, product, ai_data)
         
-        if intent == 'new_service' and product:
-            # Check Category for Routing
-            category_path = product.categ_id.complete_name or ""
+        elif intent == 'confirmed_work':
+            redirect_record = self._convert_lead_to_project(message, product, ai_data)
             
-            if 'Project' in category_path:
-                 redirect_record = self._create_project(message, product, ai_data)
-            elif 'Support' in category_path:
-                 redirect_record = self._create_support_task(message, product, ai_data)
-            else:
-                 # Default fallback if category doesn't specify
-                 redirect_record = self._create_lead_only(message, product, ai_data)
-
-        elif intent == 'support':
-             # Even if no specific product, handle generic support
-             redirect_record = self._create_support_task(message, product, ai_data) # product might be None
-
-        elif intent == 'inquiry':
-             redirect_record = self._create_lead_only(message, product, ai_data)
-        
+        elif intent in ['support_issue', 'revision']:
+            redirect_record = self._create_task_in_project(message, product, ai_data)
+            
+        # Update Link
         if redirect_record:
             try:
                 message.write({
@@ -167,52 +156,68 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         if reply_text:
             self._send_auto_reply(message, reply_text)
 
-    def _create_project(self, message, product, ai_data):
-        # Create Lead first (always good practice)
+    def _create_lead(self, message, product, ai_data):
         Lead = self.env['crm.lead']
-        lead = Lead.create({
-            'name': f"WA Project: {product.name}",
-            'partner_id': message.partner_id.id if message.partner_id else False,
-            'description': f"Service: {product.name}\nMsg: {message.body}\nRationale: {ai_data.get('rationale')}",
-        })
+        name = f"Inquiry: {product.name}" if product else f"Inquiry: {message.body[:30]}"
         
-        # Create Project
-        Project = self.env['project.project']
-        project = Project.create({
-            'name': f"{message.mobile_number} - {product.name}",
-            'partner_id': message.partner_id.id if message.partner_id else False,
-            'description': lead.description,
-            'tag_ids': [(6, 0, product.product_tag_ids.ids)] # Copy tags
-        })
-        return project
-
-    def _create_support_task(self, message, product, ai_data):
-        Project = self.env['project.project']
-        # Find generic support project or specific logic
-        support_project = Project.search([('name', 'ilike', 'Support')], limit=1)
-        if not support_project:
-            support_project = Project.create({'name': 'General Support'})
-
-        Task = self.env['project.task']
-        task_name = f"Support: {product.name}" if product else f"Support: {message.body[:30]}"
-        
-        task = Task.create({
-            'name': task_name,
-            'project_id': support_project.id,
-            'partner_id': message.partner_id.id if message.partner_id else False,
-            'description': f"From: {message.mobile_number}\n\n{message.body}",
-        })
-        return task
-
-    def _create_lead_only(self, message, product, ai_data):
-        Lead = self.env['crm.lead']
-        name = f"WA Inquiry: {product.name}" if product else f"WA Inquiry: {message.body[:30]}"
         lead = Lead.create({
             'name': name,
             'partner_id': message.partner_id.id if message.partner_id else False,
-            'description': message.body,
+            'contact_name': message.mobile_number, 
+            'description': f"Msg: {message.body}\nRationale: {ai_data.get('rationale')}",
+            'type': 'lead',
+            'tag_ids': [(6, 0, message.tag_ids.ids)] # Project Tags synced to Lead Tags if models match
         })
         return lead
+
+    def _convert_lead_to_project(self, message, product, ai_data):
+        # 1. Find recent open lead
+        Lead = self.env['crm.lead']
+        domain = [('partner_id', '=', message.partner_id.id), ('type', '=', 'lead'), ('probability', '<', 100)]
+        lead = Lead.search(domain, order='create_date desc', limit=1)
+        
+        if not lead:
+            # Fallback: Create new lead first if none exists to convert
+            lead = self._create_lead(message, product, ai_data)
+            
+        # 2. Mark Lead as Won (Workflow)
+        lead.action_set_won()
+        
+        # 3. Create Project
+        Project = self.env['project.project']
+        project_name = f"Project: {product.name}" if product else f"Project: {lead.name}"
+        
+        project = Project.create({
+            'name': project_name,
+            'partner_id': message.partner_id.id,
+            'description': f"Converted from Lead: {lead.name}\n\nLatest Msg: {message.body}",
+            'tag_ids': [(6, 0, message.tag_ids.ids)]
+        })
+        return project
+
+    def _create_task_in_project(self, message, product, ai_data):
+        # Find active project for this user
+        Project = self.env['project.project']
+        # Look for recent project
+        project = Project.search([('partner_id', '=', message.partner_id.id)], order='create_date desc', limit=1)
+        
+        if not project:
+            # Fallback: Support Project
+            project = Project.search([('name', 'ilike', 'Support')], limit=1)
+            if not project:
+                project = Project.create({'name': 'General Support'})
+
+        Task = self.env['project.task']
+        task_name = f"Task: {product.name}" if product else f"Request: {message.body[:30]}"
+        
+        task = Task.create({
+            'name': task_name,
+            'project_id': project.id,
+            'partner_id': message.partner_id.id,
+            'description': f"Msg: {message.body}\nRationale: {ai_data.get('rationale')}",
+            'tag_ids': [(6, 0, message.tag_ids.ids)]
+        })
+        return task
 
     def _send_auto_reply(self, original_message, reply_text):
         try:

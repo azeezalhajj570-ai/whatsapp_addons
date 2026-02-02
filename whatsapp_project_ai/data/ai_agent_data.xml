@@ -17,17 +17,21 @@ You will receive a "DATA CATALOG" containing:
 ### INSTRUCTIONS ###
 1. Analyze the message content.
 2. Select the most relevant 'intent_tag' from the 'available_intents' list.
-3. Determine the Functional Intent ('new_service', 'support', 'inquiry', 'noise').
-4. If 'new_service', find the matching 'service_id'.
-5. Return the result in STRICT JSON format.
+3. Determine the Functional Intent:
+    - 'new_service_request' or 'pricing_question': User is asking/inquiring (Lead).
+    - 'confirmed_work': User accepts offer/says go ahead (Project).
+    - 'support_issue' or 'revision': Actionable items on existing work (Task).
+    - 'noise': Irrelevant.
+4. If 'new_service_request', find matching 'service_id'.
+5. Return JSON.
 
 ### OUTPUT FORMAT ###
 {
-    "intent": "new_service",  // or "support", "inquiry"
-    "intent_tag": "string",   // Selected matching tag from available_intents
+    "intent": "new_service_request", // pricing_question, confirmed_work, support_issue, revision
+    "intent_tag": "string",
     "confidence": 0.95,
     "rationale": "Reasoning...",
-    "service_id": 123,        // ID of the matched service (if applicable)
+    "service_id": 123,
     "suggested_reply": "..."
 }
 

@@ -2,6 +2,8 @@ import json
 import logging
 from odoo import models, api, _
 
+from .extended_whatsapp_api import ExtendedWhatsAppApi
+
 _logger = logging.getLogger(__name__)
 
 class WhatsAppProjectAIOrchestrator(models.AbstractModel):
@@ -81,8 +83,23 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             self._execute_decision(message, ai_data)
             
         except Exception as e:
+            error_msg = str(e)
             _logger.exception("AI Orchestrator: Error processing message.")
-            message.write({'is_ai_processed': True, 'ai_rationale': f"Error: {str(e)}"})
+            
+            # Notify Admin for Critical AI Failures
+            if "Quota exceeded" in error_msg or "429" in error_msg or "insufficient_quota" in error_msg:
+                try:
+                    admin_user = self.env.ref('base.user_admin')
+                    message.activity_schedule(
+                        'mail.mail_activity_data_todo',
+                        user_id=admin_user.id,
+                        summary=f"AI Quota Exceeded: {message.mobile_number}",
+                        note=f"The AI processing failed due to a quota/rate-limit error. Please check your AI Provider billing/plans.<br/>Error: {error_msg}"
+                    )
+                except Exception as ex:
+                    _logger.error(f"Failed to create admin activity: {ex}")
+
+            message.write({'is_ai_processed': True, 'ai_rationale': f"Error: {error_msg}"})
 
     def _execute_decision(self, message, ai_data):
         intent = ai_data.get('intent')
@@ -177,14 +194,36 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
     def _send_auto_reply(self, original_message, reply_text):
         try:
-            new_msg = self.env['whatsapp_evaluation.message'].create({
+            # 1. Instantiate Extended API
+            account = original_message.wa_account_id
+            api = ExtendedWhatsAppApi(
+                base_url=account.api_url,
+                instance_name=account.instance_name,
+                api_key=account.api_key,
+                instance_token=account.instance_token
+            )
+            
+            # 2. Send with Delay (15s)
+            # This bypasses the model's standard _send_message but ensures we use our specific delay logic
+            response = api._send_whatsapp(original_message.mobile_number, reply_text, delay=15000)
+            
+            msg_uid = False
+            if isinstance(response, dict):
+                if 'key' in response:
+                    msg_uid = response['key'].get('id')
+                elif 'id' in response:
+                    msg_uid = response['id']
+
+            # 3. Log the message in Odoo
+            self.env['whatsapp_evaluation.message'].create({
                 'body': reply_text,
                 'mobile_number': original_message.mobile_number,
-                'wa_account_id': original_message.wa_account_id.id,
+                'wa_account_id': account.id,
                 'message_type': 'outbound',
-                'state': 'outgoing',
+                'state': 'sent',
+                'msg_uid': msg_uid,
             })
-            new_msg._send_message()
-            _logger.info(f"AI Orchestrator: Auto-reply sent to {original_message.mobile_number}")
+            
+            _logger.info(f"AI Orchestrator: Auto-reply sent to {original_message.mobile_number} (Delayed 15s)")
         except Exception as e:
-            _logger.error(f"AI Orchestrator: Failed to send auto-reply: {e}")
+            _logger.exception(f"AI Orchestrator: Failed to send auto-reply: {e}")

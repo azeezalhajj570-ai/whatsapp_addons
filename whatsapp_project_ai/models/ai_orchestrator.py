@@ -160,13 +160,22 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         Lead = self.env['crm.lead']
         name = f"Inquiry: {product.name}" if product else f"Inquiry: {message.body[:30]}"
         
+        # Map Project Tags -> CRM Tags (by Name)
+        crm_tag_ids = []
+        for p_tag in message.tag_ids:
+            # Find or Create corresponding CRM Tag
+            c_tag = self.env['crm.tag'].search([('name', '=', p_tag.name)], limit=1)
+            if not c_tag:
+                c_tag = self.env['crm.tag'].create({'name': p_tag.name})
+            crm_tag_ids.append(c_tag.id)
+
         lead = Lead.create({
             'name': name,
             'partner_id': message.partner_id.id if message.partner_id else False,
             'contact_name': message.mobile_number, 
             'description': f"Msg: {message.body}\nRationale: {ai_data.get('rationale')}",
             'type': 'lead',
-            'tag_ids': [(6, 0, message.tag_ids.ids)] # Project Tags synced to Lead Tags if models match
+            'tag_ids': [(6, 0, crm_tag_ids)]
         })
         return lead
 

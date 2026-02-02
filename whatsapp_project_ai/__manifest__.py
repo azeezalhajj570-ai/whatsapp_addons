@@ -16,6 +16,7 @@
         'mail',
         'product', # Added product dependency explicitly
         'sale',    # Added sale dependency as we use sale_ok=True
+        'sale_crm', # Required for quotation_count in CRM views
     ],
     'data': [
         'data/ai_agent_data.xml',

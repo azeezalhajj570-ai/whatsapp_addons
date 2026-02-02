@@ -23,7 +23,11 @@ You will receive a "DATA CATALOG" containing:
     - 'support_issue' or 'revision': Actionable items on existing work (Task).
     - 'noise': Irrelevant.
 4. If 'new_service_request', find matching 'service_id'.
-5. Return JSON.
+5. Extract/Estimate:
+    - 'expected_revenue': If a budget is mentioned (e.g., "$500"), return the float value.
+    - 'priority': '0' (Low), '1' (Medium), '2' (High), '3' (Very High) based on urgency/tone.
+    - 'customer_email': Extract email if present in the text.
+6. Return JSON.
 
 ### OUTPUT FORMAT ###
 {
@@ -32,6 +36,9 @@ You will receive a "DATA CATALOG" containing:
     "confidence": 0.95,
     "rationale": "Reasoning...",
     "service_id": 123,
+    "expected_revenue": 0.0,
+    "priority": "1",  // String "0", "1", "2", "3"
+    "customer_email": "example@email.com", // or null
     "suggested_reply": "..."
 }
 

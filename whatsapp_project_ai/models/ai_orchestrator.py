@@ -224,7 +224,7 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             # 1. Instantiate Extended API
             account = original_message.wa_account_id
             api = ExtendedWhatsAppApi(
-                base_url=account.api_url,
+                base_url=account.base_url,
                 instance_name=account.instance_name,
                 api_key=account.api_key,
                 instance_token=account.instance_token

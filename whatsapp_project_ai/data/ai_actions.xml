@@ -7,9 +7,51 @@
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="state">code</field>
+            <field name="use_in_ai">True</field>
+            <field name="ai_tool_description">Creates a new CRM Lead/Opportunity from the message. Use this when the user expresses interest in a service or product.</field>
+            <field name="ai_tool_schema">{
+                "type": "object",
+                "properties": {
+                    "service_id": {
+                        "type": "integer",
+                        "description": "The ID of the service (product.template) the user is interested in. Leave empty if general inquiry."
+                    },
+                    "rationale": {
+                        "type": "string",
+                        "description": "Short explanation of why this lead is being created (e.g., 'User asked for pricing on Website Design')."
+                    },
+                    "priority": {
+                        "type": "string",
+                        "enum": ["0", "1", "2", "3"],
+                        "description": "Priority of the lead (0=Low, 1=Medium, 2=High, 3=Very High)."
+                    },
+                    "customer_email": {
+                        "type": "string",
+                        "description": "Email address extracted from the message, if any."
+                    }
+                }
+            }</field>
             <field name="code">
+# Prepare arguments from AI execution context (local variables)
+service_id = locals().get('service_id')
+rationale = locals().get('rationale')
+priority = locals().get('priority')
+customer_email = locals().get('customer_email')
+
+# Construct AI Data dict expected by Orchestrator
+ai_data = {
+    'rationale': rationale,
+    'priority': priority,
+    'customer_email': customer_email,
+}
+
+# Resolve Product
+product = None
+if service_id:
+    product = env['product.template'].browse(service_id)
+
 for record in records:
-    env['whatsapp.project.ai.orchestrator'].action_create_lead(record, ai_data=env.context.get('ai_data'))
+    env['whatsapp.project.ai.orchestrator'].action_create_lead(record, product=product, ai_data=ai_data)
             </field>
         </record>
 
@@ -19,9 +61,33 @@ for record in records:
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="state">code</field>
+            <field name="use_in_ai">True</field>
+            <field name="ai_tool_description">Creates a new Project or converts an existing Lead to a Project. Use this when the work is confirmed or a deposit is made.</field>
+            <field name="ai_tool_schema">{
+                "type": "object",
+                "properties": {
+                    "service_id": {
+                        "type": "integer",
+                        "description": "The ID of the service (product.template) being purchased."
+                    },
+                     "rationale": {
+                        "type": "string",
+                        "description": "Reason for project creation."
+                    }
+                }
+            }</field>
             <field name="code">
+service_id = locals().get('service_id')
+rationale = locals().get('rationale')
+
+ai_data = {'rationale': rationale}
+
+product = None
+if service_id:
+    product = env['product.template'].browse(service_id)
+
 for record in records:
-    env['whatsapp.project.ai.orchestrator'].action_create_project(record, ai_data=env.context.get('ai_data'))
+    env['whatsapp.project.ai.orchestrator'].action_create_project(record, product=product, ai_data=ai_data)
             </field>
         </record>
 
@@ -31,9 +97,41 @@ for record in records:
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="state">code</field>
+            <field name="use_in_ai">True</field>
+            <field name="ai_tool_description">Creates a Task in an existing Project. Use this for support requests, bug reports, or new requirements on ongoing work.</field>
+            <field name="ai_tool_schema">{
+                "type": "object",
+                "properties": {
+                    "service_id": {
+                        "type": "integer",
+                        "description": "The ID of the service (product.template) related to the task, if any."
+                    },
+                    "deadline_days": {
+                        "type": "integer",
+                        "description": "Number of days until deadline (default 3)."
+                    },
+                    "rationale": {
+                        "type": "string",
+                        "description": "Description of the task content."
+                    }
+                }
+            }</field>
             <field name="code">
+service_id = locals().get('service_id')
+rationale = locals().get('rationale')
+deadline_days = locals().get('deadline_days')
+
+ai_data = {
+    'rationale': rationale,
+    'deadline_days': deadline_days
+}
+
+product = None
+if service_id:
+    product = env['product.template'].browse(service_id)
+
 for record in records:
-    env['whatsapp.project.ai.orchestrator'].action_create_task(record, ai_data=env.context.get('ai_data'))
+    env['whatsapp.project.ai.orchestrator'].action_create_task(record, product=product, ai_data=ai_data)
             </field>
         </record>
 
@@ -43,14 +141,26 @@ for record in records:
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="state">code</field>
+            <field name="use_in_ai">True</field>
+            <field name="ai_tool_description">Sends a WhatsApp reply to the user. Use this when no other specific action (Lead/Project/Task) is needed, or to ask clarifying questions.</field>
+            <field name="ai_tool_schema">{
+                "type": "object",
+                "required": ["reply_text"],
+                "properties": {
+                    "reply_text": {
+                        "type": "string",
+                        "description": "The text content of the reply message to send."
+                    }
+                }
+            }</field>
             <field name="code">
-reply_text = env.context.get('default_body') or "No reply text provided."
-# If context has ai_data, try to extract suggested reply
-if env.context.get('ai_data'):
-    reply_text = env.context.get('ai_data').get('suggested_reply') or reply_text
+# Support both manual context-based and AI argument-based calls
+msg_body = locals().get('reply_text')
+if not msg_body:
+    msg_body = env.context.get('default_body') or env.context.get('ai_data', {}).get('suggested_reply') or "No reply text provided."
 
 for record in records:
-    env['whatsapp.project.ai.orchestrator'].action_reply_to_user(record, reply_text)
+    env['whatsapp.project.ai.orchestrator'].action_reply_to_user(record, msg_body)
             </field>
         </record>
 
@@ -60,6 +170,12 @@ for record in records:
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="state">code</field>
+            <field name="use_in_ai">True</field>
+            <field name="ai_tool_description">Checks the status of the user's most recent project and sends them a summary.</field>
+            <field name="ai_tool_schema">{
+                 "type": "object",
+                 "properties": {}
+            }</field>
             <field name="code">
 for record in records:
     env['whatsapp.project.ai.orchestrator'].action_follow_up_project(record)

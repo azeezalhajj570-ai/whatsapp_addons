@@ -90,7 +90,6 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
             # 3. Update Message Record
             vals = {
-                # 'ai_intent': intent_tag_name, # Removed to avoid Selection Error, relies on Tags now
                 'ai_confidence': ai_data.get('confidence', 0.0),
                 'ai_rationale': ai_data.get('rationale'),
                 'is_ai_processed': True,

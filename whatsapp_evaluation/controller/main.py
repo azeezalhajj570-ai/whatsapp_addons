@@ -169,9 +169,14 @@ class WebhookEvaluation(http.Controller):
             # though our logic checks 'whatsapp_inbound_msg_uid' or similar.
             
             # Determine Author (Partner)
-            author_partner = request.env['res.partner'].sudo().search([
-                ('mobile', '=', mobile_number)
-            ], limit=1)
+            # Try to find partner by mobile or phone, with or without '+' prefix
+            domain = ['|', '|', '|',
+                ('mobile', '=', mobile_number),
+                ('mobile', '=', '+' + mobile_number),
+                ('phone', '=', mobile_number),
+                ('phone', '=', '+' + mobile_number)
+            ]
+            author_partner = request.env['res.partner'].sudo().search(domain, limit=1)
             author_id = author_partner.id if author_partner else None
 
             # Format body (Convert *Bold*, _Italic_, Newlines to HTML)

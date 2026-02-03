@@ -3,12 +3,7 @@ from odoo import models, fields, api
 class WhatsAppMessage(models.Model):
     _inherit = 'whatsapp_evaluation.message'
 
-    ai_intent = fields.Selection([
-        ('new_service', 'New Service'),
-        ('support', 'Support'),
-        ('inquiry', 'Inquiry'),
-        ('noise', 'Noise'),
-    ], string="AI Intent")
+    # ai_intent field removed in favor of Project Tags
     
     ai_confidence = fields.Float(string="AI Confidence")
     ai_rationale = fields.Text(string="AI Rationale")

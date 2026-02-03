@@ -17,6 +17,7 @@
         'product', # Added product dependency explicitly
         'sale',    # Added sale dependency as we use sale_ok=True
         'sale_crm', # Required for quotation_count in CRM views
+        'base_automation',
     ],
     'data': [
         'data/ai_agent_data.xml',
@@ -25,6 +26,7 @@
         'data/ai_master_action.xml',
         'data/product_data.xml',
         'views/whatsapp_message_views.xml',
+        'views/whatsapp_ai_menus.xml',
     ],
     'application': True,
     'installable': True,

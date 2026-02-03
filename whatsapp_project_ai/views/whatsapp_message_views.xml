@@ -12,7 +12,6 @@
             <xpath expr="//group" position="after">
                 <group string="AI Analysis" invisible="not is_ai_processed">
                     <group>
-                        <field name="ai_intent"/>
                         <field name="ai_confidence"/>
                         <field name="is_ai_processed" readonly="1"/>
                     </group>
@@ -32,7 +31,6 @@
         <field name="inherit_id" ref="whatsapp_evaluation.whatsapp_evaluation_message_view_tree"/>
         <field name="arch" type="xml">
             <field name="state" position="before">
-                <field name="ai_intent" optional="show"/>
                 <field name="ai_confidence" optional="hide"/>
             </field>
         </field>

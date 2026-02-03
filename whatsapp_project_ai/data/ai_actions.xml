@@ -11,6 +11,7 @@
             <field name="ai_tool_description">Creates a new CRM Lead/Opportunity from the message. Use this when the user expresses interest in a service or product.</field>
             <field name="ai_tool_schema">{
                 "type": "object",
+                "required": [],
                 "properties": {
                     "service_id": {
                         "type": "integer",
@@ -65,6 +66,7 @@ for record in records:
             <field name="ai_tool_description">Creates a new Project or converts an existing Lead to a Project. Use this when the work is confirmed or a deposit is made.</field>
             <field name="ai_tool_schema">{
                 "type": "object",
+                "required": [],
                 "properties": {
                     "service_id": {
                         "type": "integer",
@@ -101,6 +103,7 @@ for record in records:
             <field name="ai_tool_description">Creates a Task in an existing Project. Use this for support requests, bug reports, or new requirements on ongoing work.</field>
             <field name="ai_tool_schema">{
                 "type": "object",
+                "required": [],
                 "properties": {
                     "service_id": {
                         "type": "integer",
@@ -174,6 +177,7 @@ for record in records:
             <field name="ai_tool_description">Checks the status of the user's most recent project and sends them a summary.</field>
             <field name="ai_tool_schema">{
                  "type": "object",
+                 "required": [],
                  "properties": {}
             }</field>
             <field name="code">

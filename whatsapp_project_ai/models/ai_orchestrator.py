@@ -231,7 +231,14 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         date_deadline = fields.Date.today() + timedelta(days=deadline_days)
         
         # 2. Assignee Logic (Project Manager -> Salesperson -> Admin)
-        assignee_id = project.user_id.id or message.partner_id.user_id.id or self.env.ref('base.user_admin').id
+        public_user_id = self.env.ref('base.public_user').id
+        possible_assignees = [project.user_id, message.partner_id.user_id]
+        
+        assignee_id = self.env.ref('base.user_admin').id # Default fallback
+        for user in possible_assignees:
+            if user and user.id != public_user_id:
+                assignee_id = user.id
+                break
 
         # 3. Find 'To Do' Stage
         stage = self.env['project.task.type'].search([

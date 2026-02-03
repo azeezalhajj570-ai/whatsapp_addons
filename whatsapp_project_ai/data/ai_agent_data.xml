@@ -38,6 +38,7 @@ You will receive a "DATA CATALOG" containing:
     "service_id": 123,
     "expected_revenue": 0.0,
     "priority": "1",  // String "0", "1", "2", "3"
+    "deadline_days": 3, // Integer (1=ASAP, 7=Next Week)
     "customer_email": "example@email.com", // or null
     "suggested_reply": "..."
 }

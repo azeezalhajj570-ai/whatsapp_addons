@@ -225,12 +225,33 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         Task = self.env['project.task']
         task_name = f"Task: {product.name}" if product else f"Request: {message.body[:30]}"
         
+        # 1. Deadline Calculation
+        from datetime import timedelta
+        deadline_days = int(ai_data.get('deadline_days', 3))
+        date_deadline = fields.Date.today() + timedelta(days=deadline_days)
+        
+        # 2. Assignee Logic (Project Manager -> Salesperson -> Admin)
+        assignee_id = project.user_id.id or message.partner_id.user_id.id or self.env.ref('base.user_admin').id
+
+        # 3. Find 'To Do' Stage
+        stage = self.env['project.task.type'].search([
+            ('name', 'in', ['To Do', 'New']),
+            ('project_ids', 'in', [project.id])
+        ], limit=1)
+        
+        # Fallback to generic 'To Do' if not specific to this project
+        if not stage:
+             stage = self.env['project.task.type'].search([('name', '=', 'To Do')], limit=1)
+
         task = Task.create({
             'name': task_name,
             'project_id': project.id,
             'partner_id': message.partner_id.id,
             'description': f"Msg: {message.body}\nRationale: {ai_data.get('rationale')}",
-            'tag_ids': [(6, 0, message.tag_ids.ids)]
+            'tag_ids': [(6, 0, message.tag_ids.ids)],
+            'user_ids': [(4, assignee_id)],
+            'date_deadline': date_deadline,
+            'stage_id': stage.id if stage else False
         })
         return task
 

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- MASTER ACTION: I am the one who knocks (executes) -->
+        <record id="action_ai_execute_decision" model="ir.actions.server">
+            <field name="name">AI: Execute Decision</field>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="state">ai</field>
+            <field name="ai_tool_ids" eval="[(6, 0, [ref('action_ai_create_lead'), ref('action_ai_create_project'), ref('action_ai_create_task'), ref('action_ai_reply_to_user'), ref('action_ai_follow_up_project')])]"/>
+            <field name="ai_action_prompt">
+You are an Action Executor for a WhatsApp Project Management AI.
+
+**Your Goal:**
+Read the current message and the 'AI Rationale' / 'AI Confidence' fields on the record (which have already been populated by the classification step).
+Based on this information, DECIDE which tool to execute.
+
+**Rules:**
+1. If the rationale indicates a **new inquiry** or **pricing question**, use `AI: Create Lead`.
+2. If the rationale indicates **confirmed work** or **payment made**, use `AI: Create Project`.
+3. If the rationale indicates a **support request**, **bug**, or **revision**, use `AI: Create Task`.
+4. If the user is just **asking for a status update**, use `AI: Follow Up Project`.
+5. If none of the above apply, or if the confidence is low, or if the user is just saying "Hello", use `AI: Reply to User` to carry on the conversation.
+6. **Prioritize** the specific actions (Lead/Project/Task) over generic replies if the intent is clear.
+
+**Inputs:**
+- Message Body: {{ object.body }}
+- AI Rationale: {{ object.ai_rationale }}
+- AI Confidence: {{ object.ai_confidence }}
+            </field>
+        </record>
+    </data>
+</odoo>

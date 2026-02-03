@@ -99,10 +99,12 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             message.write(vals)
 
             if vals['ai_confidence'] < 0.60:
-                _logger.info(f"AI Orchestrator: Confidence {vals['ai_confidence']} too low. Skipping automation.")
+                _logger.info(f"AI Orchestrator: Confidence {vals['ai_confidence']} too low. No high-confidence intent detected.")
+                # We stop here. Execution is now handled separately (e.g., via "AI: Execute Decision" action)
                 return
 
-            self._execute_decision(message, ai_data)
+            # self._execute_decision(message, ai_data) # DEPRECATED: Split into separate AI Action
+            _logger.info(f"AI Orchestrator: Message {message.id} classified. Intent: {intent_tag_name}. Ready for execution phase.")
             
         except Exception as e:
             error_msg = str(e)
@@ -123,38 +125,7 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
             message.write({'is_ai_processed': True, 'ai_rationale': f"Error: {error_msg}"})
 
-    def _execute_decision(self, message, ai_data):
-        intent = ai_data.get('intent')
-        service_id = ai_data.get('service_id')
-        reply_text = ai_data.get('suggested_reply')
-        
-        related_record = None
-        product = None
-        if service_id:
-            product = self.env['product.template'].browse(service_id)
-
-        # --- DECISION LOGIC ---
-        if intent in ['new_service_request', 'pricing_question']:
-            related_record = self.action_create_lead(message, product, ai_data)
-        
-        elif intent == 'confirmed_work':
-            related_record = self.action_create_project(message, product, ai_data)
-            
-        elif intent in ['support_issue', 'revision']:
-            related_record = self.action_create_task(message, product, ai_data)
-
-        # Update Link
-        if related_record:
-            try:
-                message.write({
-                    'linked_model': related_record._name,
-                    'linked_res_id': related_record.id,
-                })
-            except Exception:
-                pass
-
-        if reply_text:
-            self.action_reply_to_user(message, reply_text)
+    # _execute_decision Removed - Logic moved to 'action_ai_execute_decision' Server Action
 
     def action_create_lead(self, message, product=None, ai_data=None):
         """Public action to create a lead from a message"""

@@ -1,6 +1,6 @@
 import json
 import logging
-from odoo import models, api, _
+from odoo import models, api, fields, _
 
 from .extended_whatsapp_api import ExtendedWhatsAppApi
 

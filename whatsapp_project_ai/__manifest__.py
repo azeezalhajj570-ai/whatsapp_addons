@@ -21,6 +21,7 @@
     'data': [
         'data/ai_agent_data.xml',
         'data/ir_actions_server_data.xml',
+        'data/ai_actions.xml',
         'data/product_data.xml',
         'views/whatsapp_message_views.xml',
     ],

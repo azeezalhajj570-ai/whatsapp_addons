@@ -128,36 +128,39 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         service_id = ai_data.get('service_id')
         reply_text = ai_data.get('suggested_reply')
         
-        redirect_record = None
+        related_record = None
         product = None
         if service_id:
             product = self.env['product.template'].browse(service_id)
 
         # --- DECISION LOGIC ---
         if intent in ['new_service_request', 'pricing_question']:
-            redirect_record = self._create_lead(message, product, ai_data)
+            related_record = self.action_create_lead(message, product, ai_data)
         
         elif intent == 'confirmed_work':
-            redirect_record = self._convert_lead_to_project(message, product, ai_data)
+            related_record = self.action_create_project(message, product, ai_data)
             
         elif intent in ['support_issue', 'revision']:
-            redirect_record = self._create_task_in_project(message, product, ai_data)
-            
+            related_record = self.action_create_task(message, product, ai_data)
+
         # Update Link
-        if redirect_record:
+        if related_record:
             try:
                 message.write({
-                    'linked_model': redirect_record._name,
-                    'linked_res_id': redirect_record.id,
+                    'linked_model': related_record._name,
+                    'linked_res_id': related_record.id,
                 })
             except Exception:
                 pass
 
         if reply_text:
-            self._send_auto_reply(message, reply_text)
+            self.action_reply_to_user(message, reply_text)
 
-    def _create_lead(self, message, product, ai_data):
+    def action_create_lead(self, message, product=None, ai_data=None):
+        """Public action to create a lead from a message"""
+        if not ai_data: ai_data = {}
         Lead = self.env['crm.lead']
+        
         name = f"Inquiry: {product.name}" if product else f"Inquiry: {message.body[:30]}"
         
         # Map Project Tags -> CRM Tags (by Name)
@@ -175,7 +178,7 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             'name': name,
             'partner_id': message.partner_id.id if message.partner_id else False,
             'contact_name': message.partner_id.name or message.mobile_number, 
-            'description': f"Msg: {message.body}\nRationale: {ai_data.get('rationale')}",
+            'description': f"Msg: {message.body}\nRationale: {ai_data.get('rationale', 'Manual Action')}",
             'type': 'lead',
             'tag_ids': [(6, 0, crm_tag_ids)],
             'user_id': salesperson_id,
@@ -183,9 +186,13 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             'expected_revenue': ai_data.get('expected_revenue', 0.0),
             'email_from': ai_data.get('customer_email') or message.partner_id.email
         })
+        _logger.info(f"AI Orchestrator: Created Lead {lead.id} for message {message.id}")
         return lead
 
-    def _convert_lead_to_project(self, message, product, ai_data):
+    def action_create_project(self, message, product=None, ai_data=None):
+        """Public action to create a project (converting lead if exists)"""
+        if not ai_data: ai_data = {}
+        
         # 1. Find recent open lead
         Lead = self.env['crm.lead']
         domain = [('partner_id', '=', message.partner_id.id), ('type', '=', 'lead'), ('probability', '<', 100)]
@@ -193,7 +200,7 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         
         if not lead:
             # Fallback: Create new lead first if none exists to convert
-            lead = self._create_lead(message, product, ai_data)
+            lead = self.action_create_lead(message, product, ai_data)
             
         # 2. Mark Lead as Won (Workflow)
         lead.action_set_won()
@@ -208,9 +215,13 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             'description': f"Converted from Lead: {lead.name}\n\nLatest Msg: {message.body}",
             'tag_ids': [(6, 0, message.tag_ids.ids)]
         })
+        _logger.info(f"AI Orchestrator: Created Project {project.id} from Lead {lead.id}")
         return project
 
-    def _create_task_in_project(self, message, product, ai_data):
+    def action_create_task(self, message, product=None, ai_data=None):
+        """Public action to create a task"""
+        if not ai_data: ai_data = {}
+        
         # Find active project for this user
         Project = self.env['project.project']
         # Look for recent project
@@ -254,18 +265,20 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             'name': task_name,
             'project_id': project.id,
             'partner_id': message.partner_id.id,
-            'description': f"Msg: {message.body}\nRationale: {ai_data.get('rationale')}",
+            'description': f"Msg: {message.body}\nRationale: {ai_data.get('rationale', 'Manual Action')}",
             'tag_ids': [(6, 0, message.tag_ids.ids)],
             'user_ids': [(4, assignee_id)],
             'date_deadline': date_deadline,
             'stage_id': stage.id if stage else False
         })
+        _logger.info(f"AI Orchestrator: Created Task {task.id}")
         return task
 
-    def _send_auto_reply(self, original_message, reply_text):
+    def action_reply_to_user(self, message, reply_text):
+        """Public action to send a reply"""
         try:
             # 1. Instantiate Extended API
-            account = original_message.wa_account_id
+            account = message.wa_account_id
             api = ExtendedWhatsAppApi(
                 base_url=account.base_url,
                 instance_name=account.instance_name,
@@ -274,8 +287,7 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             )
             
             # 2. Send with Delay (15s)
-            # This bypasses the model's standard _send_message but ensures we use our specific delay logic
-            response = api._send_whatsapp(original_message.mobile_number, reply_text, delay=15000)
+            response = api._send_whatsapp(message.mobile_number, reply_text, delay=15000)
             
             msg_uid = False
             if isinstance(response, dict):
@@ -287,13 +299,38 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             # 3. Log the message in Odoo
             self.env['whatsapp_evaluation.message'].create({
                 'body': reply_text,
-                'mobile_number': original_message.mobile_number,
+                'mobile_number': message.mobile_number,
                 'wa_account_id': account.id,
                 'message_type': 'outbound',
                 'state': 'sent',
                 'msg_uid': msg_uid,
             })
             
-            _logger.info(f"AI Orchestrator: Auto-reply sent to {original_message.mobile_number} (Delayed 15s)")
+            _logger.info(f"AI Orchestrator: Auto-reply sent to {message.mobile_number}")
         except Exception as e:
             _logger.exception(f"AI Orchestrator: Failed to send auto-reply: {e}")
+
+    def action_follow_up_project(self, message):
+        """Public action to follow up on the user's latest project"""
+        # Find latest project
+        Project = self.env['project.project']
+        project = Project.search([('partner_id', '=', message.partner_id.id)], order='create_date desc', limit=1)
+        
+        if not project:
+            # If no project, maybe just reply saying no project found? Or treat as new lead?
+            # For now, we'll log a warning and maybe send a generic reply
+            self.action_reply_to_user(message, "I couldn't find an ongoing project to follow up on. How can I help you today?")
+            return
+
+        # Create a status report or check status
+        # This is a good place to use AI to summarize, but for this specific action, 
+        # let's just create a generic follow-up note or task
+        
+        # Logic: Check if there are open tasks
+        open_tasks = self.env['project.task'].search_count([
+            ('project_id', '=', project.id),
+            ('stage_id.is_closed', '=', False)
+        ])
+        
+        reply = f"Regarding project '{project.name}': You have {open_tasks} open tasks."
+        self.action_reply_to_user(message, reply)

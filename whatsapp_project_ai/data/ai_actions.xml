@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Action: Create Lead -->
+        <record id="action_ai_create_lead" model="ir.actions.server">
+            <field name="name">AI: Create Lead</field>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    env['whatsapp.project.ai.orchestrator'].action_create_lead(record, ai_data=env.context.get('ai_data'))
+            </field>
+        </record>
+
+        <!-- Action: Create Project -->
+        <record id="action_ai_create_project" model="ir.actions.server">
+            <field name="name">AI: Create Project</field>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    env['whatsapp.project.ai.orchestrator'].action_create_project(record, ai_data=env.context.get('ai_data'))
+            </field>
+        </record>
+
+        <!-- Action: Create Task -->
+        <record id="action_ai_create_task" model="ir.actions.server">
+            <field name="name">AI: Create Task</field>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    env['whatsapp.project.ai.orchestrator'].action_create_task(record, ai_data=env.context.get('ai_data'))
+            </field>
+        </record>
+
+        <!-- Action: Reply to User -->
+        <record id="action_ai_reply_to_user" model="ir.actions.server">
+            <field name="name">AI: Reply to User</field>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="state">code</field>
+            <field name="code">
+reply_text = env.context.get('default_body') or "No reply text provided."
+# If context has ai_data, try to extract suggested reply
+if env.context.get('ai_data'):
+    reply_text = env.context.get('ai_data').get('suggested_reply') or reply_text
+
+for record in records:
+    env['whatsapp.project.ai.orchestrator'].action_reply_to_user(record, reply_text)
+            </field>
+        </record>
+
+        <!-- Action: Follow Up Project -->
+        <record id="action_ai_follow_up_project" model="ir.actions.server">
+            <field name="name">AI: Follow Up Project</field>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="state">code</field>
+            <field name="code">
+for record in records:
+    env['whatsapp.project.ai.orchestrator'].action_follow_up_project(record)
+            </field>
+        </record>
+    </data>
+</odoo>

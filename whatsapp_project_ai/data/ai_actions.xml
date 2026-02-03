@@ -34,10 +34,10 @@
             }</field>
             <field name="code">
 # Prepare arguments from AI execution context (local variables)
-service_id = locals().get('service_id')
-rationale = locals().get('rationale')
-priority = locals().get('priority')
-customer_email = locals().get('customer_email')
+service_id = env.context.get('service_id')
+rationale = env.context.get('rationale')
+priority = env.context.get('priority')
+customer_email = env.context.get('customer_email')
 
 # Construct AI Data dict expected by Orchestrator
 ai_data = {
@@ -120,9 +120,9 @@ for record in records:
                 }
             }</field>
             <field name="code">
-service_id = locals().get('service_id')
-rationale = locals().get('rationale')
-deadline_days = locals().get('deadline_days')
+service_id = env.context.get('service_id')
+rationale = env.context.get('rationale')
+deadline_days = env.context.get('deadline_days')
 
 ai_data = {
     'rationale': rationale,
@@ -158,7 +158,7 @@ for record in records:
             }</field>
             <field name="code">
 # Support both manual context-based and AI argument-based calls
-msg_body = locals().get('reply_text')
+msg_body = env.context.get('reply_text')
 if not msg_body:
     msg_body = env.context.get('default_body') or env.context.get('ai_data', {}).get('suggested_reply') or "No reply text provided."
 

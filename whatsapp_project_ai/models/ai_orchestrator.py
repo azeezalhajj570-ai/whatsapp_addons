@@ -69,8 +69,16 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             _logger.warning("AI: Empty response")
             return None
 
-        raw = self._extract_json(responses[0])
-        return json.loads(raw)
+        raw = self._extract_json(responses[0]).strip()
+        if not raw:
+            _logger.warning("AI: Blank JSON response")
+            return None
+
+        try:
+            return json.loads(raw)
+        except Exception:
+            _logger.exception("AI: Invalid JSON response: %s", raw[:500])
+            return None
 
     def _build_prompt(self, message):
         intents = self._available_intents()

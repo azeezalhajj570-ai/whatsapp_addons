@@ -40,5 +40,26 @@ for record in records:
             </field>
             <field name="base_automation_id" ref="wa_ai_auto_reply_low_confidence"/>
         </record>
+
+        <record id="wa_ai_auto_execute_decision" model="base.automation">
+            <field name="name">WhatsApp: AI Execute Lead/Project/Task</field>
+            <field name="active" eval="False"/>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="trigger">on_write</field>
+            <field name="filter_domain">[
+                ('message_type','=','inbound'),
+                ('is_ai_processed','=',True),
+                ('ai_confidence','&gt;=',0.6)
+            ]</field>
+        </record>
+
+        <record id="wa_ai_action_execute_decision" model="ir.actions.server">
+            <field name="name">WhatsApp: AI Execute Lead/Project/Task</field>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="state">ai</field>
+            <field name="ai_action_prompt">Use the AI tools to create a lead, project, or task based on the message and AI rationale.</field>
+            <field name="ai_tool_ids" eval="[(6, 0, [ref('action_ai_create_lead'), ref('action_ai_create_project'), ref('action_ai_create_task'), ref('action_ai_reply_to_user'), ref('action_ai_follow_up_project')])]"/>
+            <field name="base_automation_id" ref="wa_ai_auto_execute_decision"/>
+        </record>
     </data>
 </odoo>

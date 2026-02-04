@@ -133,7 +133,18 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
     def _apply_ai_result(self, message, ai_data):
         tag_ids = []
 
-        intent = ai_data.get("intent_tag")
+        intent = (
+            ai_data.get("intent_tag")
+            or ai_data.get("project_tag")
+            or ai_data.get("tag")
+            or ai_data.get("intent")
+        )
+        if not intent:
+            _logger.warning(
+                "AI: No intent tag returned for message %s (keys=%s)",
+                message.id,
+                ", ".join(sorted(ai_data.keys())),
+            )
         if intent:
             tag = self.env["project.tags"].search(
                 [("name", "=", intent)], limit=1

@@ -93,9 +93,24 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         )
 
     def _extract_json(self, text):
-        if "```" in text:
-            text = text.split("```")[1]
-        return text.strip()
+        cleaned = (text or "").strip()
+        if "```" in cleaned:
+            parts = cleaned.split("```")
+            if len(parts) >= 2:
+                cleaned = parts[1].strip()
+
+        if cleaned.lower().startswith("json"):
+            cleaned = cleaned[4:].strip()
+
+        if cleaned.startswith("{") or cleaned.startswith("["):
+            return cleaned
+
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            return cleaned[start:end + 1].strip()
+
+        return cleaned
 
     # -------------------------
     # DATA BUILDERS

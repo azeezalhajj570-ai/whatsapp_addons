@@ -15,8 +15,6 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
     def process_incoming_message(self, message):
         """Main entry point for AI classification"""
-        self.ensure_one()
-
         if message.is_ai_processed:
             _logger.info("AI: Message %s already processed, skipping", message.id)
             return
@@ -194,3 +192,18 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             ) or self.env["crm.tag"].create({"name": tag.name})
             crm_tag_ids.append(crm_tag.id)
         return crm_tag_ids
+
+    def action_reply_to_user(self, message, msg_body):
+        """Send a WhatsApp reply for a given inbound message."""
+        if not msg_body:
+            msg_body = "Thanks for your message! Could you share a few more details?"
+
+        wa_msg = self.env["whatsapp_evaluation.message"].create({
+            "body": msg_body,
+            "mobile_number": message.mobile_number,
+            "message_type": "outbound",
+            "wa_account_id": message.wa_account_id.id,
+            "partner_id": message.partner_id.id,
+        })
+        wa_msg._send_message()
+        return wa_msg

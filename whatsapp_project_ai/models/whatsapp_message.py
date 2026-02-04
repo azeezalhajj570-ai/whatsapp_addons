@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields
 
 class WhatsAppMessage(models.Model):
     _inherit = 'whatsapp_evaluation.message'
@@ -16,20 +16,17 @@ class WhatsAppMessage(models.Model):
     # Override Tags to use Project Tags directly
     tag_ids = fields.Many2many('project.tags', string="Tags")
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        records = super().create(vals_list)
-        for record in records:
-            # Code-based Trigger: Safe, Always-on (unless disabled via context)
-            if (
-                record.message_type == 'inbound' 
-                and not record.is_ai_processed 
-                and self.env.context.get('ai_auto_process', True)
-            ):
-                self.env['whatsapp.project.ai.orchestrator'].process_incoming_message(record)
-        return records
+    def action_ai_classify(self):
+        """Automation/UI entry point for AI processing."""
+        for record in self:
+            if record.is_ai_processed:
+                continue
+            self.env["whatsapp.project.ai.orchestrator"].process_incoming_message(
+                record
+            )
 
     def action_reprocess_ai(self):
         """Manual trigger for AI processing"""
         for record in self:
-            self.with_context(ai_auto_process=True).env['whatsapp.project.ai.orchestrator'].process_incoming_message(record)
+            record.write({"is_ai_processed": False})
+            record.action_ai_classify()

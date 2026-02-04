@@ -1,6 +1,7 @@
 import json
 import logging
-from odoo import models
+from datetime import timedelta
+from odoo import fields, models
 
 _logger = logging.getLogger(__name__)
 
@@ -195,6 +196,19 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
     def action_reply_to_user(self, message, msg_body):
         """Send a WhatsApp reply for a given inbound message."""
+        if message.ai_replied:
+            message.write({"ai_reply_skipped_reason": "already_replied"})
+            return False
+
+        if self._reply_throttled(message, minutes=2):
+            _logger.info(
+                "AI: Reply throttled for %s (message %s)",
+                message.mobile_number,
+                message.id,
+            )
+            message.write({"ai_reply_skipped_reason": "sender_throttle_2m"})
+            return False
+
         if not msg_body:
             msg_body = "Thanks for your message! Could you share a few more details?"
 
@@ -206,4 +220,20 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             "partner_id": message.partner_id.id,
         })
         wa_msg._send_message()
+        message.write({
+            "ai_replied": True,
+            "ai_replied_at": fields.Datetime.now(),
+        })
         return wa_msg
+
+    def _reply_throttled(self, message, minutes=2):
+        if not message.mobile_number:
+            return False
+
+        since = fields.Datetime.now() - timedelta(minutes=minutes)
+        recent = self.env["whatsapp_evaluation.message"].search_count([
+            ("message_type", "=", "outbound"),
+            ("mobile_number", "=", message.mobile_number),
+            ("create_date", ">=", since),
+        ])
+        return recent > 0

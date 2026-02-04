@@ -9,6 +9,7 @@
             <field name="filter_domain">[
                 ('message_type','=','inbound'),
                 ('is_ai_processed','=',True),
+                ('ai_replied','=',False),
                 ('ai_confidence','&lt;',0.6)
             ]</field>
         </record>

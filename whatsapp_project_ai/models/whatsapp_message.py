@@ -8,6 +8,9 @@ class WhatsAppMessage(models.Model):
     ai_confidence = fields.Float(string="AI Confidence")
     ai_rationale = fields.Text(string="AI Rationale")
     is_ai_processed = fields.Boolean(string="AI Processed", default=False)
+    ai_replied = fields.Boolean(string="AI Replied", default=False)
+    ai_replied_at = fields.Datetime(string="AI Replied At")
+    ai_reply_skipped_reason = fields.Char(string="AI Reply Skipped Reason")
     
     # Links to created records
     linked_model = fields.Char(string="Linked Model")

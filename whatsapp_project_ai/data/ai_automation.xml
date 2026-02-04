@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <record id="wa_ai_auto_reply_low_confidence" model="base.automation">
+            <field name="name">WhatsApp: AI Reply on Low Confidence</field>
+            <field name="active" eval="False"/>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="trigger">on_write</field>
+            <field name="filter_domain">[
+                ('message_type','=','inbound'),
+                ('is_ai_processed','=',True),
+                ('ai_confidence','&lt;',0.6)
+            ]</field>
+        </record>
+
         <record id="wa_ai_auto_classify_inbound" model="base.automation">
             <field name="name">WhatsApp: AI Classify Inbound Message</field>
             <field name="active" eval="False"/>
@@ -26,18 +38,6 @@ for record in records:
     env['whatsapp.project.ai.orchestrator'].action_reply_to_user(record, False)
             </field>
             <field name="base_automation_id" ref="wa_ai_auto_reply_low_confidence"/>
-        </record>
-
-        <record id="wa_ai_auto_reply_low_confidence" model="base.automation">
-            <field name="name">WhatsApp: AI Reply on Low Confidence</field>
-            <field name="active" eval="False"/>
-            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
-            <field name="trigger">on_write</field>
-            <field name="filter_domain">[
-                ('message_type','=','inbound'),
-                ('is_ai_processed','=',True),
-                ('ai_confidence','&lt;',0.6)
-            ]</field>
         </record>
     </data>
 </odoo>

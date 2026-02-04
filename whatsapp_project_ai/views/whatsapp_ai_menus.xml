@@ -4,6 +4,5 @@
               id="whatsapp_ai_automation_rules_menu"
               parent="whatsapp_evaluation.whatsapp_evaluation_configuration_menu"
               action="base_automation.base_automation_act"
-              groups="whatsapp_evaluation.group_whatsapp_evaluation_admin"
               sequence="50"/>
 </odoo>

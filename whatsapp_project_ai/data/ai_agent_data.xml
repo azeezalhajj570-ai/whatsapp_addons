@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<odoo>
+<odoo noupdate="1">
     <record id="agent_whatsapp_pm" model="ai.agent">
         <field name="name">WhatsApp Project Manager</field>
         <field name="subtitle">Automated Project &amp; Task creation from WhatsApp</field>

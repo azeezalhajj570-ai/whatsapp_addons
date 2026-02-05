@@ -228,6 +228,88 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             crm_tag_ids.append(crm_tag.id)
         return crm_tag_ids
 
+    def action_create_project(self, message, product=None, ai_data=None):
+        ai_data = ai_data or {}
+        
+        project_vals = {
+            "name": ai_data.get("rationale") or f"Project for {message.partner_id.name}",
+            "partner_id": message.partner_id.id,
+            "description": message.body,
+        }
+        
+        if product:
+            project_vals["name"] = product.name
+            # If product has a project template, we could use it here, 
+            # but for now we just create a basic project
+        
+        project = self.env["project.project"].create(project_vals)
+        
+        # Post message to project
+        project.message_post(
+            body=f"Created from WhatsApp Message: {message.body}",
+            partner_ids=[message.partner_id.id]
+        )
+        
+        # Link back
+        message.write({
+            "linked_model": "project.project",
+            "linked_res_id": project.id,
+        })
+        
+        return project
+
+    def action_create_task(self, message, product=None, ai_data=None):
+        ai_data = ai_data or {}
+        
+        # Find a relevant project
+        domain = [("partner_id", "=", message.partner_id.id)]
+        if product:
+             # Try to find a project related to this service/product if possible
+             pass
+             
+        project = self.env["project.project"].search(domain, limit=1, order="write_date desc")
+        
+        if not project:
+            # Fallback: create a new project if none exists
+            project = self.action_create_project(message, product, ai_data)
+
+        task = self.env["project.task"].create({
+            "name": ai_data.get("rationale") or f"Task from {message.partner_id.name}",
+            "project_id": project.id,
+            "partner_id": message.partner_id.id,
+            "description": message.body,
+            "date_deadline": fields.Date.today() + timedelta(days=ai_data.get("deadline_days", 3)),
+        })
+        
+        # Link back
+        message.write({
+            "linked_model": "project.task",
+            "linked_res_id": task.id,
+        })
+        
+        return task
+
+    def action_follow_up_project(self, message):
+        # Find user's projects
+        projects = self.env["project.project"].search([
+            ("partner_id", "=", message.partner_id.id),
+            ("stage_id.fold", "=", False) # Assuming stage logic, or just open projects
+        ], limit=5, order="write_date desc")
+        
+        if not projects:
+            self.action_reply_to_user(message, "I couldn't find any active projects under your name.")
+            return
+
+        summary_lines = ["Here is the status of your projects:"]
+        for p in projects:
+            task_count = self.env["project.task"].search_count([
+                ("project_id", "=", p.id),
+                ("is_closed", "=", False)
+            ])
+            summary_lines.append(f"- *{p.name}*: {task_count} open tasks.")
+
+        self.action_reply_to_user(message, "\n".join(summary_lines))
+
     def action_reply_to_user(self, message, msg_body):
         """Send a WhatsApp reply for a given inbound message."""
         if message.ai_replied:

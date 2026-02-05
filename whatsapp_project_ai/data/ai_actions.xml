@@ -33,6 +33,11 @@
                 }
             }</field>
             <field name="code">
+service_id = locals().get('service_id')
+rationale = locals().get('rationale')
+priority = locals().get('priority')
+customer_email = locals().get('customer_email')
+
 # Construct AI Data dict expected by Orchestrator
 ai_data = {
     'rationale': rationale,
@@ -73,6 +78,9 @@ for record in records:
                 }
             }</field>
             <field name="code">
+service_id = locals().get('service_id')
+rationale = locals().get('rationale')
+
 ai_data = {'rationale': rationale}
 
 product = None
@@ -111,6 +119,10 @@ for record in records:
                 }
             }</field>
             <field name="code">
+service_id = locals().get('service_id')
+rationale = locals().get('rationale')
+deadline_days = locals().get('deadline_days')
+
 ai_data = {
     'rationale': rationale,
     'deadline_days': deadline_days
@@ -144,6 +156,7 @@ for record in records:
                 }
             }</field>
             <field name="code">
+reply_text = locals().get('reply_text')
 if not reply_text:
     # Fallback to context if manually called, or check other AI keys
     reply_text = env.context.get('default_body') or env.context.get('ai_data', {}).get('suggested_reply') or "No reply text provided."

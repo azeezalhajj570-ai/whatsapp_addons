@@ -1,0 +1,54 @@
+<odoo>
+    <record id="view_openrouter_company_tree" model="ir.ui.view">
+        <field name="name">ai.openrouter.company.tree</field>
+        <field name="model">ai.openrouter.company</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="external_code" optional="hide"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_openrouter_company_form" model="ir.ui.view">
+        <field name="name">ai.openrouter.company.form</field>
+        <field name="model">ai.openrouter.company</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="external_code"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_openrouter_company_search" model="ir.ui.view">
+        <field name="name">ai.openrouter.company.search</field>
+        <field name="model">ai.openrouter.company</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="external_code"/>
+                <separator/>
+                <filter name="filter_active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="filter_inactive" string="Archived" domain="[('active','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_name" string="Name" context="{'group_by':'name'}"/>
+                    <filter name="group_active" string="Active" context="{'group_by':'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_openrouter_company" model="ir.actions.act_window">
+        <field name="name">OpenRouter Providers</field>
+        <field name="res_model">ai.openrouter.company</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_openrouter_company_search"/>
+    </record>
+</odoo>

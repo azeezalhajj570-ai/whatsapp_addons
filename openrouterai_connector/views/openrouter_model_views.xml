@@ -7,21 +7,21 @@
                 <field name="name"/>
                 <field name="external_id"/>
                 <field name="company_provider_id"/>
-                <field name="provider_name"/>
+                <field name="provider_name" optional="hide"/>
                 <field name="context_length"/>
                 <field name="prompt_price"/>
                 <field name="completion_price"/>
-                <field name="image_price"/>
-                <field name="request_price"/>
-                <field name="modality"/>
-                <field name="architecture_modality"/>
-                <field name="architecture_tokenizer"/>
-                <field name="architecture_instruct_type"/>
-                <field name="top_provider_context_length"/>
-                <field name="top_provider_max_completion_tokens"/>
-                <field name="top_provider_is_moderated"/>
-                <field name="per_request_prompt_tokens"/>
-                <field name="per_request_completion_tokens"/>
+                <field name="image_price" optional="hide"/>
+                <field name="request_price" optional="hide"/>
+                <field name="modality" optional="hide"/>
+                <field name="architecture_modality" optional="hide"/>
+                <field name="architecture_tokenizer" optional="hide"/>
+                <field name="architecture_instruct_type" optional="hide"/>
+                <field name="top_provider_context_length" optional="hide"/>
+                <field name="top_provider_max_completion_tokens" optional="hide"/>
+                <field name="top_provider_is_moderated" optional="hide"/>
+                <field name="per_request_prompt_tokens" optional="hide"/>
+                <field name="per_request_completion_tokens" optional="hide"/>
                 <field name="is_free"/>
                 <field name="active"/>
             </list>

@@ -1,5 +1,6 @@
 <odoo>
     <menuitem id="menu_openrouter_root" name="OpenRouter AI" sequence="70"/>
     <menuitem id="menu_openrouter_provider" name="Providers" parent="menu_openrouter_root" action="action_openrouter_provider" sequence="10"/>
-    <menuitem id="menu_openrouter_model" name="Models" parent="menu_openrouter_root" action="action_openrouter_model" sequence="20"/>
+    <menuitem id="menu_openrouter_company" name="Company Providers" parent="menu_openrouter_root" action="action_openrouter_company" sequence="20"/>
+    <menuitem id="menu_openrouter_model" name="Models" parent="menu_openrouter_root" action="action_openrouter_model" sequence="30"/>
 </odoo>

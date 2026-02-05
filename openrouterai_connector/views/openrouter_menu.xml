@@ -1,7 +1,7 @@
 <odoo>
     <menuitem id="menu_openrouter_root" name="OpenRouter AI" sequence="70"/>
-    <menuitem id="menu_openrouter_provider" name="Configrations" parent="menu_openrouter_root" action="action_openrouter_provider" sequence="10"/>
-    <menuitem id="menu_openrouter_company" name="Company Prvider" parent="menu_openrouter_root" action="action_openrouter_company" sequence="20"/>
+    <menuitem id="menu_openrouter_company" name="Providers" parent="menu_openrouter_root" action="action_openrouter_company" sequence="20"/>
     <menuitem id="menu_openrouter_model" name="Models" parent="menu_openrouter_root" action="action_openrouter_model" sequence="30"/>
-    <menuitem id="menu_openrouter_usage" name="Useage Logs" parent="menu_openrouter_root" action="action_openrouter_request_log" sequence="40"/>
+    <menuitem id="menu_openrouter_usage" name="Useage" parent="menu_openrouter_root" action="action_openrouter_request_log" sequence="40"/>
+    <menuitem id="menu_openrouter_provider" name="Configrations" parent="menu_openrouter_root" action="action_openrouter_provider" sequence="50"/>
 </odoo>

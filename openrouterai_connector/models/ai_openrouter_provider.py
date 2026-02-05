@@ -16,7 +16,12 @@ class AIOpenRouterProvider(models.Model):
 
     name = fields.Char(string="Name", default="OpenRouter", required=True)
     active = fields.Boolean(default=True)
-    code = fields.Char(string="Provider Code", default="openrouter", required=True)
+    code = fields.Selection(
+        selection_add=[("openrouter", "OpenRouter")],
+        string="Provider Code",
+        default="openrouter",
+        required=True,
+    )
     api_key = fields.Char(string="API Key", required=True)
     base_url = fields.Char(string="Base URL", default="https://openrouter.ai/api/v1", required=True)
     app_url = fields.Char(string="App URL")

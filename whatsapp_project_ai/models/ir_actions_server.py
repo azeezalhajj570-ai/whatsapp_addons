@@ -17,6 +17,7 @@ class IrActionsServer(models.Model):
         selection=[
             ("openai", "OpenAI"),
             ("google", "Google"),
+            ("openrouter", "OpenRouter"),
         ],
         string="AI Provider Override",
         help="Optional provider override for AI server actions.",

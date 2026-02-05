@@ -32,6 +32,7 @@
         <field name="arch" type="xml">
             <field name="state" position="before">
                 <field name="ai_confidence" optional="hide"/>
+                <field name="is_ai_processed" optional="show"/>
             </field>
         </field>
     </record>

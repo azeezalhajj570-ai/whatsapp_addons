@@ -33,27 +33,6 @@
                 }
             }</field>
             <field name="code">
-# Safely retrieve optional arguments
-try:
-    service_id
-except NameError:
-    service_id = None
-
-try:
-    rationale
-except NameError:
-    rationale = None
-
-try:
-    priority
-except NameError:
-    priority = None
-
-try:
-    customer_email
-except NameError:
-    customer_email = None
-
 # Construct AI Data dict expected by Orchestrator
 ai_data = {
     'rationale': rationale,
@@ -94,17 +73,6 @@ for record in records:
                 }
             }</field>
             <field name="code">
-# Safely retrieve optional arguments
-try:
-    service_id
-except NameError:
-    service_id = None
-
-try:
-    rationale
-except NameError:
-    rationale = None
-
 ai_data = {'rationale': rationale}
 
 product = None
@@ -143,22 +111,6 @@ for record in records:
                 }
             }</field>
             <field name="code">
-# Safely retrieve optional arguments
-try:
-    service_id
-except NameError:
-    service_id = None
-
-try:
-    rationale
-except NameError:
-    rationale = None
-
-try:
-    deadline_days
-except NameError:
-    deadline_days = None
-
 ai_data = {
     'rationale': rationale,
     'deadline_days': deadline_days
@@ -192,18 +144,12 @@ for record in records:
                 }
             }</field>
             <field name="code">
-# Safely retrieve optional arguments
-try:
-    msg_body = reply_text
-except NameError:
-    msg_body = None
-
-if not msg_body:
+if not reply_text:
     # Fallback to context if manually called, or check other AI keys
-    msg_body = env.context.get('default_body') or env.context.get('ai_data', {}).get('suggested_reply') or "No reply text provided."
+    reply_text = env.context.get('default_body') or env.context.get('ai_data', {}).get('suggested_reply') or "No reply text provided."
 
 for record in records:
-    env['whatsapp.project.ai.orchestrator'].action_reply_to_user(record, msg_body)
+    env['whatsapp.project.ai.orchestrator'].action_reply_to_user(record, reply_text)
             </field>
         </record>
 

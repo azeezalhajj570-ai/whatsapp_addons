@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import logging
 
 from odoo import _, api, fields, models
@@ -46,6 +47,38 @@ class AIOpenRouterProvider(models.Model):
             app_url=self.app_url,
             app_name=self.app_name,
         )
+
+    def request_chat_completion(self, payload, model_id=None):
+        self.ensure_one()
+        client = self._get_client()
+        response = client.chat_completions(payload)
+
+        usage = OpenRouterClient.extract_usage(response)
+        response_text = None
+        choices = (response or {}).get("choices") or []
+        if choices:
+            response_text = (choices[0].get("message") or {}).get("content")
+
+        self.env["ai.openrouter.request.log"].sudo().create({
+            "provider_id": self.id,
+            "model_id": model_id,
+            "generation_id": (response or {}).get("id"),
+            "prompt_tokens": usage.get("prompt_tokens"),
+            "completion_tokens": usage.get("completion_tokens"),
+            "total_tokens": usage.get("total_tokens"),
+            "reasoning_tokens": usage.get("reasoning_tokens"),
+            "cached_tokens": usage.get("cached_tokens"),
+            "cache_write_tokens": usage.get("cache_write_tokens"),
+            "audio_tokens": usage.get("audio_tokens"),
+            "total_cost": usage.get("cost") or 0.0,
+            "upstream_inference_cost": usage.get("upstream_inference_cost") or 0.0,
+            "usage_payload": usage.get("usage_payload"),
+            "response_text": response_text,
+            "request_payload": json.dumps(payload, ensure_ascii=False),
+            "response_payload": json.dumps(response, ensure_ascii=False),
+            "state": "success",
+        })
+        return response
 
     def action_open_sync_wizard(self):
         self.ensure_one()

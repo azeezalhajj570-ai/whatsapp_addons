@@ -266,3 +266,8 @@ msgstr "OpenRouter a renvoyé un JSON invalide pour les complétions de chat"
 #: code:addons/openrouterai_connector/models/ai_openrouter_model.py
 msgid "This OpenRouter model already exists for this provider."
 msgstr "Ce modèle OpenRouter existe déjà pour ce fournisseur."
+
+#. module: openrouterai_connector
+#: code:addons/openrouterai_connector/services/openrouter_client.py
+msgid "OpenRouter returned invalid JSON for generation"
+msgstr "OpenRouter a renvoye un JSON invalide pour la generation"

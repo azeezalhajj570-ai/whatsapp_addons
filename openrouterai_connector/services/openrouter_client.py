@@ -67,3 +67,44 @@ class OpenRouterClient:
             return response.json()
         except json.JSONDecodeError:
             raise UserError(_("OpenRouter returned invalid JSON for chat completions"))
+
+    def get_generation(self, generation_id):
+        url = f"{self.base_url}/generation"
+        try:
+            response = requests.get(
+                url,
+                headers=self._headers(),
+                params={"id": generation_id},
+                timeout=self.timeout,
+            )
+        except Exception as exc:
+            _logger.exception("OpenRouter generation request failed")
+            raise UserError(_("OpenRouter request failed: %s") % exc)
+
+        if response.status_code >= 400:
+            _logger.error("OpenRouter generation error %s: %s", response.status_code, response.text)
+            raise UserError(_("OpenRouter error %s: %s") % (response.status_code, response.text))
+
+        try:
+            return response.json()
+        except json.JSONDecodeError:
+            raise UserError(_("OpenRouter returned invalid JSON for generation"))
+
+    @staticmethod
+    def extract_usage(response_json):
+        usage = (response_json or {}).get("usage") or {}
+        prompt_details = usage.get("prompt_tokens_details") or {}
+        completion_details = usage.get("completion_tokens_details") or {}
+        cost_details = usage.get("cost_details") or {}
+        return {
+            "prompt_tokens": usage.get("prompt_tokens"),
+            "completion_tokens": usage.get("completion_tokens"),
+            "total_tokens": usage.get("total_tokens"),
+            "reasoning_tokens": completion_details.get("reasoning_tokens"),
+            "cached_tokens": prompt_details.get("cached_tokens"),
+            "cache_write_tokens": prompt_details.get("cache_write_tokens"),
+            "audio_tokens": prompt_details.get("audio_tokens"),
+            "cost": usage.get("cost"),
+            "upstream_inference_cost": cost_details.get("upstream_inference_cost"),
+            "usage_payload": usage,
+        }

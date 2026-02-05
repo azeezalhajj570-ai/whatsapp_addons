@@ -266,3 +266,8 @@ msgstr "أعاد OpenRouter JSON غير صالح لاكتمالات الدردش
 #: code:addons/openrouterai_connector/models/ai_openrouter_model.py
 msgid "This OpenRouter model already exists for this provider."
 msgstr "هذا النموذج من OpenRouter موجود بالفعل لهذا المزود."
+
+#. module: openrouterai_connector
+#: code:addons/openrouterai_connector/services/openrouter_client.py
+msgid "OpenRouter returned invalid JSON for generation"
+msgstr "اعاد OpenRouter JSON غير صالح للمولّد"

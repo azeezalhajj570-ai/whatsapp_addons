@@ -12,6 +12,7 @@ class AIOpenRouterRequestLog(models.Model):
         string="Provider",
         ondelete="set null",
     )
+    generation_id = fields.Char(string="Generation ID", index=True)
     model_id = fields.Many2one(
         comodel_name="ai.openrouter.model",
         string="Model",
@@ -21,7 +22,13 @@ class AIOpenRouterRequestLog(models.Model):
     prompt_tokens = fields.Integer(string="Prompt Tokens")
     completion_tokens = fields.Integer(string="Completion Tokens")
     total_tokens = fields.Integer(string="Total Tokens")
+    reasoning_tokens = fields.Integer(string="Reasoning Tokens")
+    cached_tokens = fields.Integer(string="Cached Tokens")
+    cache_write_tokens = fields.Integer(string="Cache Write Tokens")
+    audio_tokens = fields.Integer(string="Audio Tokens")
     total_cost = fields.Float(string="Total Cost", digits=(16, 6))
+    upstream_inference_cost = fields.Float(string="Upstream Inference Cost", digits=(16, 6))
+    usage_payload = fields.Json(string="Usage Payload")
     response_text = fields.Text(string="Response Text")
     request_payload = fields.Text(string="Request Payload")
     response_payload = fields.Text(string="Response Payload")

@@ -39,10 +39,15 @@ class AIOpenRouterSyncWizard(models.TransientModel):
             pricing = item.get("pricing") or {}
             prompt_price = _safe_float(pricing.get("prompt"))
             completion_price = _safe_float(pricing.get("completion"))
+            image_price = _safe_float(pricing.get("image"))
+            request_price = _safe_float(pricing.get("request"))
 
-            modality = item.get("modality")
+            architecture = item.get("architecture") or {}
+            modality = item.get("modality") or architecture.get("modality")
             if isinstance(modality, list):
                 modality = ", ".join(modality)
+            elif isinstance(modality, dict):
+                modality = ", ".join([str(value) for value in modality.values()])
 
             top_provider = item.get("top_provider") or {}
             provider_name = (
@@ -80,15 +85,27 @@ class AIOpenRouterSyncWizard(models.TransientModel):
             vals = {
                 "name": item.get("name") or external_id,
                 "external_id": external_id,
+                "description": item.get("description"),
                 "provider_id": provider.id,
                 "company_provider_id": company_provider.id if company_provider else False,
                 "context_length": item.get("context_length") or 0,
                 "prompt_price": prompt_price,
                 "completion_price": completion_price,
+                "image_price": image_price,
+                "request_price": request_price,
                 "provider_name": provider_name,
                 "modality": modality,
+                "architecture_modality": architecture.get("modality"),
+                "architecture_tokenizer": architecture.get("tokenizer"),
+                "architecture_instruct_type": architecture.get("instruct_type"),
+                "top_provider_context_length": top_provider.get("context_length"),
+                "top_provider_max_completion_tokens": top_provider.get("max_completion_tokens"),
+                "top_provider_is_moderated": bool(top_provider.get("is_moderated")),
+                "per_request_prompt_tokens": (item.get("per_request_limits") or {}).get("prompt_tokens"),
+                "per_request_completion_tokens": (item.get("per_request_limits") or {}).get("completion_tokens"),
                 "is_free": bool(item.get("is_free")) or (prompt_price == 0 and completion_price == 0),
                 "active": True,
+                "raw_payload": item,
             }
 
             existing = OpenRouterModel.search(

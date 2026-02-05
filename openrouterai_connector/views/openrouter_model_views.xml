@@ -40,9 +40,39 @@
         </field>
     </record>
 
+    <record id="view_openrouter_model_search" model="ir.ui.view">
+        <field name="name">ai.openrouter.model.search</field>
+        <field name="model">ai.openrouter.model</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="external_id"/>
+                <field name="provider_name"/>
+                <field name="modality"/>
+                <separator/>
+                <filter name="filter_active" string="Active" domain="[('active','=',True)]"/>
+                <filter name="filter_inactive" string="Archived" domain="[('active','=',False)]"/>
+                <filter name="filter_free" string="Free" domain="[('is_free','=',True)]"/>
+                <filter name="filter_paid" string="Paid" domain="[('is_free','=',False)]"/>
+                <filter name="filter_has_pricing" string="Has Pricing" domain="['|',('prompt_price','>',0),('completion_price','>',0)]"/>
+                <filter name="filter_ctx_8k" string="Context ≥ 8K" domain="[('context_length','>=',8192)]"/>
+                <filter name="filter_ctx_32k" string="Context ≥ 32K" domain="[('context_length','>=',32768)]"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter name="group_provider" string="Provider" context="{'group_by':'provider_id'}"/>
+                    <filter name="group_provider_name" string="Provider Name" context="{'group_by':'provider_name'}"/>
+                    <filter name="group_modality" string="Modality" context="{'group_by':'modality'}"/>
+                    <filter name="group_free" string="Free" context="{'group_by':'is_free'}"/>
+                    <filter name="group_active" string="Active" context="{'group_by':'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="action_openrouter_model" model="ir.actions.act_window">
         <field name="name">OpenRouter Models</field>
         <field name="res_model">ai.openrouter.model</field>
         <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_openrouter_model_search"/>
     </record>
 </odoo>

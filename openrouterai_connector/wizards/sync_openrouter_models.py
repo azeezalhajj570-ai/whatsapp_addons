@@ -43,6 +43,14 @@ class AIOpenRouterSyncWizard(models.TransientModel):
             if isinstance(modality, list):
                 modality = ", ".join(modality)
 
+            top_provider = item.get("top_provider") or {}
+            provider_name = (
+                item.get("provider")
+                or item.get("provider_name")
+                or top_provider.get("name")
+                or item.get("owned_by")
+            )
+
             vals = {
                 "name": item.get("name") or external_id,
                 "external_id": external_id,
@@ -50,7 +58,7 @@ class AIOpenRouterSyncWizard(models.TransientModel):
                 "context_length": item.get("context_length") or 0,
                 "prompt_price": prompt_price,
                 "completion_price": completion_price,
-                "provider_name": item.get("provider") or item.get("provider_name"),
+                "provider_name": provider_name,
                 "modality": modality,
                 "is_free": bool(item.get("is_free")) or (prompt_price == 0 and completion_price == 0),
                 "active": True,

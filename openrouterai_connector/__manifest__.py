@@ -17,7 +17,6 @@
         'views/openrouter_provider_views.xml',
         'views/openrouter_company_views.xml',
         'views/openrouter_model_views.xml',
-        'views/openrouter_chat_wizard_views.xml',
         'views/openrouter_sync_wizard_views.xml',
         'views/openrouter_menu.xml',
     ],

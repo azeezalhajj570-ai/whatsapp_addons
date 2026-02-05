@@ -47,3 +47,37 @@ class AIOpenRouterModel(models.Model):
             "This OpenRouter model already exists for this provider.",
         )
     ]
+
+    def action_open_chat(self):
+        self.ensure_one()
+        provider = self.env["ai.provider"].search([("code", "=", "openrouter")], limit=1)
+        if not provider:
+            provider = self.env["ai.provider"].create({
+                "name": "OpenRouter",
+                "code": "openrouter",
+            })
+
+        ai_model = self.env["ai.model"].search([
+            ("provider_id", "=", provider.id),
+            ("technical_name", "=", self.external_id),
+        ], limit=1)
+        if not ai_model:
+            ai_model = self.env["ai.model"].create({
+                "name": self.name,
+                "provider_id": provider.id,
+                "technical_name": self.external_id,
+            })
+
+        agent = self.env["ai.agent"].search([
+            ("llm_model_id", "=", ai_model.id),
+        ], limit=1)
+        if not agent:
+            agent = self.env["ai.agent"].create({
+                "name": f"OpenRouter: {self.name}",
+                "llm_model_id": ai_model.id,
+                "subtitle": "OpenRouter Chat",
+            })
+            if agent.partner_id:
+                agent.partner_id.write({"name": f"OpenRouter: {self.name}"})
+
+        return agent.open_agent_chat()

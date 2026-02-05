@@ -5,4 +5,7 @@ from odoo import fields, models
 class AIProvider(models.Model):
     _inherit = "ai.provider"
 
-    code = fields.Selection(selection_add=[("openrouter", "OpenRouter")])
+    code = fields.Selection(
+        selection_add=[("openrouter", "OpenRouter")],
+        ondelete={"openrouter": "cascade"},
+    )

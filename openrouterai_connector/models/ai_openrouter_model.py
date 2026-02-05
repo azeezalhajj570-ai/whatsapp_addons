@@ -9,6 +9,7 @@ class AIOpenRouterModel(models.Model):
 
     name = fields.Char(string="Name", required=True)
     external_id = fields.Char(string="External ID", required=True, index=True)
+    description = fields.Text(string="Description")
     provider_id = fields.Many2one(
         comodel_name="ai.openrouter.provider",
         string="Provider",
@@ -23,10 +24,21 @@ class AIOpenRouterModel(models.Model):
     context_length = fields.Integer(string="Context Length")
     prompt_price = fields.Float(string="Prompt Price", digits=(16, 6))
     completion_price = fields.Float(string="Completion Price", digits=(16, 6))
+    image_price = fields.Float(string="Image Price", digits=(16, 6))
+    request_price = fields.Float(string="Request Price", digits=(16, 6))
     provider_name = fields.Char(string="Provider Name")
     modality = fields.Char(string="Modality")
+    architecture_modality = fields.Char(string="Architecture Modality")
+    architecture_tokenizer = fields.Char(string="Architecture Tokenizer")
+    architecture_instruct_type = fields.Char(string="Architecture Instruct Type")
+    top_provider_context_length = fields.Integer(string="Top Provider Context Length")
+    top_provider_max_completion_tokens = fields.Integer(string="Top Provider Max Completion Tokens")
+    top_provider_is_moderated = fields.Boolean(string="Top Provider Moderated")
+    per_request_prompt_tokens = fields.Char(string="Per-Request Prompt Tokens")
+    per_request_completion_tokens = fields.Char(string="Per-Request Completion Tokens")
     is_free = fields.Boolean(string="Free")
     active = fields.Boolean(default=True)
+    raw_payload = fields.Json(string="Raw Payload")
 
     _sql_constraints = [
         (

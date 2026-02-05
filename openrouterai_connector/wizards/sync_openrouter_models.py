@@ -58,6 +58,12 @@ class AIOpenRouterSyncWizard(models.TransientModel):
                 or item.get("owned_by")
             )
 
+            display_name = item.get("name") or ""
+            if not provider_name and ":" in display_name:
+                provider_name = display_name.split(":", 1)[0].strip()
+            if not provider_code and external_id and "/" in external_id:
+                provider_code = external_id.split("/", 1)[0].strip()
+
             company_provider = False
             if provider_name:
                 company_provider = OpenRouterCompany.search(

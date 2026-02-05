@@ -24,6 +24,7 @@
                     <group>
                         <field name="name"/>
                         <field name="active"/>
+                        <field name="code"/>
                         <field name="api_key" password="True"/>
                         <field name="base_url"/>
                         <field name="default_route"/>

@@ -1,13 +1,13 @@
 <odoo>
-    <record id="view_openrouter_company_tree" model="ir.ui.view">
-        <field name="name">ai.openrouter.company.tree</field>
+    <record id="view_openrouter_company_list" model="ir.ui.view">
+        <field name="name">ai.openrouter.company.list</field>
         <field name="model">ai.openrouter.company</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="external_code" optional="hide"/>
                 <field name="active"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -48,7 +48,7 @@
     <record id="action_openrouter_company" model="ir.actions.act_window">
         <field name="name">OpenRouter Providers</field>
         <field name="res_model">ai.openrouter.company</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
         <field name="search_view_id" ref="view_openrouter_company_search"/>
     </record>
 </odoo>

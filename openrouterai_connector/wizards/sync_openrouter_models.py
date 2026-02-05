@@ -28,6 +28,7 @@ class AIOpenRouterSyncWizard(models.TransientModel):
             raise UserError(_("Unexpected OpenRouter models response format"))
 
         OpenRouterModel = self.env["ai.openrouter.model"].sudo()
+        OpenRouterCompany = self.env["ai.openrouter.company"].sudo()
         seen_ids = set()
 
         for item in models_data:
@@ -50,11 +51,31 @@ class AIOpenRouterSyncWizard(models.TransientModel):
                 or top_provider.get("name")
                 or item.get("owned_by")
             )
+            provider_code = (
+                item.get("provider")
+                or item.get("provider_name")
+                or top_provider.get("id")
+                or item.get("owned_by")
+            )
+
+            company_provider = False
+            if provider_name:
+                company_provider = OpenRouterCompany.search(
+                    [("external_code", "=", provider_code or provider_name)],
+                    limit=1,
+                )
+                if not company_provider:
+                    company_provider = OpenRouterCompany.create({
+                        "name": provider_name,
+                        "external_code": provider_code or provider_name,
+                        "active": True,
+                    })
 
             vals = {
                 "name": item.get("name") or external_id,
                 "external_id": external_id,
                 "provider_id": provider.id,
+                "company_provider_id": company_provider.id if company_provider else False,
                 "context_length": item.get("context_length") or 0,
                 "prompt_price": prompt_price,
                 "completion_price": completion_price,

@@ -6,6 +6,7 @@
             <list>
                 <field name="name"/>
                 <field name="external_id"/>
+                <field name="company_provider_id"/>
                 <field name="provider_name"/>
                 <field name="context_length"/>
                 <field name="prompt_price"/>
@@ -27,6 +28,7 @@
                         <field name="name"/>
                         <field name="external_id"/>
                         <field name="provider_id"/>
+                        <field name="company_provider_id"/>
                         <field name="provider_name"/>
                         <field name="context_length"/>
                         <field name="prompt_price"/>
@@ -47,6 +49,7 @@
             <search>
                 <field name="name"/>
                 <field name="external_id"/>
+                <field name="company_provider_id"/>
                 <field name="provider_name"/>
                 <field name="modality"/>
                 <separator/>
@@ -59,7 +62,7 @@
                 <filter name="filter_ctx_32k" string="Context ≥ 32K" domain="[('context_length','>=',32768)]"/>
                 <separator/>
                 <group expand="0" string="Group By">
-                    <filter name="group_provider" string="Provider" context="{'group_by':'provider_id'}"/>
+                    <filter name="group_company_provider" string="Provider" context="{'group_by':'company_provider_id'}"/>
                     <filter name="group_provider_name" string="Provider Name" context="{'group_by':'provider_name'}"/>
                     <filter name="group_modality" string="Modality" context="{'group_by':'modality'}"/>
                     <filter name="group_free" string="Free" context="{'group_by':'is_free'}"/>

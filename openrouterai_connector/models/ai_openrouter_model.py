@@ -15,6 +15,11 @@ class AIOpenRouterModel(models.Model):
         required=True,
         ondelete="cascade",
     )
+    company_provider_id = fields.Many2one(
+        comodel_name="ai.openrouter.company",
+        string="Company Provider",
+        ondelete="set null",
+    )
     context_length = fields.Integer(string="Context Length")
     prompt_price = fields.Float(string="Prompt Price", digits=(16, 6))
     completion_price = fields.Float(string="Completion Price", digits=(16, 6))

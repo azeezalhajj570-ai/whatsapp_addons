@@ -52,6 +52,7 @@ class AIOpenRouterChatWizard(models.TransientModel):
         ], limit=1)
         if not agent:
             agent = self.env["ai.agent"].create({
+                "name": f"OpenRouter: {self.openrouter_model_id.name}",
                 "llm_model_id": ai_model.id,
                 "subtitle": "OpenRouter Chat",
             })

@@ -6,7 +6,7 @@
         <field name="inherit_id" ref="ai_server_actions.view_server_action_form_ai_server_actions"/>
         <field name="priority">60</field>
         <field name="arch" type="xml">
-            <xpath expr="//group[@invisible='state != \"ai\"']/field[@name='ai_tool_ids']" position="after">
+            <xpath expr="//group[@invisible='state != &quot;ai&quot;']/field[@name='ai_tool_ids']" position="after">
                 <field name="ai_provider_code" options="{'no_create': True, 'no_create_edit': True}"/>
                 <field name="ai_model_name" placeholder="e.g. gemini-robotics-er-1.5-preview"/>
             </xpath>

@@ -368,13 +368,27 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
                 self.action_reply_to_user(message, msg_body)
             return msg_body
 
+        if task_name or project_name:
+            task = tasks[0]
+            status = task.stage_id.name if task.stage_id else "In Progress"
+            project_title = task.project_id.display_name if task.project_id else "No Project"
+            updated_at = task.write_date or task.create_date
+            updated_text = fields.Datetime.to_string(updated_at) if updated_at else "N/A"
+            msg_body = (
+                f"Task '{task.name}' in project '{project_title}' is currently in '{status}'. "
+                f"Updated: {updated_text}."
+            )
+            if message.wa_account_id:
+                self.action_reply_to_user(message, msg_body)
+            return msg_body
+
         lines = ["Here are the latest task statuses:"]
         for task in tasks:
             status = task.stage_id.name if task.stage_id else "In Progress"
-            project_name = task.project_id.display_name if task.project_id else "No Project"
+            project_title = task.project_id.display_name if task.project_id else "No Project"
             updated_at = task.write_date or task.create_date
             updated_text = fields.Datetime.to_string(updated_at) if updated_at else "N/A"
-            lines.append(f"- {task.name} ({project_name}): {status}. Updated: {updated_text}")
+            lines.append(f"- {task.name} ({project_title}): {status}. Updated: {updated_text}")
 
         msg_body = "\n".join(lines)
         if message.wa_account_id:

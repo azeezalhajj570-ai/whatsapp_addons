@@ -189,6 +189,7 @@ for record in records:
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="state">code</field>
             <field name="use_in_ai">True</field>
+            <field name="ai_tool_allow_end_message">False</field>
             <field name="ai_tool_description">Checks the status of the user's current projects and sends a summary with recent task updates.</field>
             <field name="ai_tool_schema">{
                  "type": "object",
@@ -210,6 +211,7 @@ ai['result'] = "\n\n".join([r for r in results if r])
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="state">code</field>
             <field name="use_in_ai">True</field>
+            <field name="ai_tool_allow_end_message">False</field>
             <field name="ai_tool_description">Checks the status of the user's latest tasks and sends a summary.</field>
             <field name="ai_tool_schema">{
                  "type": "object",

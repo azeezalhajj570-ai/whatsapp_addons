@@ -48,7 +48,7 @@ Use this tool only immediately before calling the project creation tool.</field>
         <field name="name">AI Project: Follow Up Project</field>
         <field name="state">code</field>
         <field name="use_in_ai" eval="True"/>
-        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="False"/>
         <field name="code">ai['result'] = record.sudo()._ai_follow_up_project()</field>
         <field name="model_id" ref="project.model_project_project"/>
         <field name="ai_tool_description">## Tool: Follow up on a Project
@@ -110,7 +110,7 @@ Use this tool only immediately before calling the task creation tool.</field>
         <field name="name">AI Project: Follow Up Task</field>
         <field name="state">code</field>
         <field name="use_in_ai" eval="True"/>
-        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="False"/>
         <field name="code">ai['result'] = env['whatsapp.project.ai.orchestrator'].action_follow_up_task(record, task_name, project_name)</field>
         <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
         <field name="ai_tool_description">## Tool: Follow up on a Task

@@ -13,6 +13,7 @@
             <field name="name">WhatsApp: AI Agent Execute Inbound</field>
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="state">ai</field>
+            <field name="ai_model_id" ref="ai.model_gemini_2_5_flash"/>
             <field name="ai_action_prompt">
 You are a WhatsApp project management assistant.
 
@@ -29,12 +30,11 @@ Rules:
 7) Always answer in the same language used by the user.
             </field>
             <field name="ai_tool_ids" eval="[(6, 0, [
-                ref('ir_actions_server_ai_create_project'),
-                ref('ir_actions_server_ai_get_project_create_available_params'),
-                ref('ir_actions_server_ai_follow_up_project'),
-                ref('ir_actions_server_ai_create_task'),
-                ref('ir_actions_server_ai_get_task_create_available_params'),
-                ref('ir_actions_server_ai_follow_up_task')
+                ref('ir_actions_server_ai_msg_create_project'),
+                ref('ir_actions_server_ai_msg_create_task'),
+                ref('ir_actions_server_ai_msg_follow_up_project'),
+                ref('ir_actions_server_ai_follow_up_task'),
+                ref('ir_actions_server_ai_msg_reply_to_user')
             ])]"/>
             <field name="base_automation_id" ref="wa_ai_auto_agent_execute_inbound"/>
         </record>

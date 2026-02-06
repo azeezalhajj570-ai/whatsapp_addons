@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_actions_server_ai_msg_create_project" model="ir.actions.server">
+        <field name="name">AI WhatsApp: Create Project</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+        <field name="code">
+service_id = locals().get('service_id')
+rationale = locals().get('rationale')
+stage_names = locals().get('stage_names')
+
+product = env['product.template'].browse(service_id) if service_id else None
+ai_data = {'rationale': rationale, 'stage_names': stage_names}
+project = env['whatsapp.project.ai.orchestrator'].action_create_project(record, product=product, ai_data=ai_data)
+ai['result'] = f"Project created: {project.display_name}"
+        </field>
+        <field name="ai_tool_description">Create a project from the inbound WhatsApp conversation.</field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {
+                "service_id": {"type": "number", "description": "Optional service (product.template) id"},
+                "rationale": {"type": "string", "description": "Project title/reason from user input"},
+                "stage_names": {"type": "array", "items": {"type": "string"}, "description": "Optional task stage names"}
+            },
+            "required": [],
+            "type": "object"
+        }
+        </field>
+    </record>
+
+    <record id="ir_actions_server_ai_msg_create_task" model="ir.actions.server">
+        <field name="name">AI WhatsApp: Create Task</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+        <field name="code">
+service_id = locals().get('service_id')
+rationale = locals().get('rationale')
+deadline_days = locals().get('deadline_days')
+stage_names = locals().get('stage_names')
+
+product = env['product.template'].browse(service_id) if service_id else None
+ai_data = {'rationale': rationale, 'deadline_days': deadline_days, 'stage_names': stage_names}
+task = env['whatsapp.project.ai.orchestrator'].action_create_task(record, product=product, ai_data=ai_data)
+ai['result'] = f"Task created: {task.display_name}"
+        </field>
+        <field name="ai_tool_description">Create a task from the inbound WhatsApp conversation.</field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {
+                "service_id": {"type": "number", "description": "Optional service (product.template) id"},
+                "rationale": {"type": "string", "description": "Task content from user input"},
+                "deadline_days": {"type": "number", "description": "Optional deadline in days"},
+                "stage_names": {"type": "array", "items": {"type": "string"}, "description": "Optional project task stage names"}
+            },
+            "required": [],
+            "type": "object"
+        }
+        </field>
+    </record>
+
+    <record id="ir_actions_server_ai_msg_follow_up_project" model="ir.actions.server">
+        <field name="name">AI WhatsApp: Follow Up Project</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="False"/>
+        <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+        <field name="code">ai['result'] = env['whatsapp.project.ai.orchestrator'].action_follow_up_project(record)</field>
+        <field name="ai_tool_description">Return project follow-up for the inbound contact.</field>
+        <field name="ai_tool_schema">
+        {"properties": {}, "required": [], "type": "object"}
+        </field>
+    </record>
+
+    <record id="ir_actions_server_ai_msg_reply_to_user" model="ir.actions.server">
+        <field name="name">AI WhatsApp: Reply To User</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="False"/>
+        <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+        <field name="code">
+reply_text = locals().get('reply_text')
+ai['result'] = env['whatsapp.project.ai.orchestrator'].action_reply_to_user(record, reply_text)
+        </field>
+        <field name="ai_tool_description">Send a direct WhatsApp reply to the user for clarifications or fallback responses.</field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {
+                "reply_text": {"type": "string", "description": "Message to send to the user"}
+            },
+            "required": ["reply_text"],
+            "type": "object"
+        }
+        </field>
+    </record>
+</odoo>

@@ -51,8 +51,15 @@ class IrActionsServer(models.Model):
                 _logger.warning("AI: Failed to track the changes as AI partner")
 
         tool_calls_history = []
-        provider = self.ai_provider_code or self.AI_PROVIDER
-        model = self.ai_model_name or self.AI_MODEL
+        
+        # Determine model and provider
+        if self.ai_model_id:
+            model = self.ai_model_id.technical_name
+            provider = self.ai_model_id.provider_id.code
+        else:
+            model = self.ai_model_name or self.AI_MODEL
+            provider = self.ai_provider_code or self.AI_PROVIDER
+
         responses = LLMApiService(env=self.env, provider=provider).request_llm(
             model,
             ["""

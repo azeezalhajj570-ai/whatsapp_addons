@@ -26,6 +26,28 @@ Create a project when work is confirmed and needs to be tracked.
         ])]"/>
     </record>
 
+    <record id="whatsapp_project_ai.ai_topic_follow_up_project" model="ai.topic">
+        <field name="name">Follow Up Project</field>
+        <field name="description">Tools to report project status</field>
+        <field name="instructions"># Topic: Project follow-up
+
+## Purpose
+Provide the latest project status for the user.
+
+## When to activate
+- The user asks for project status, progress, or updates.
+
+## Flow
+1) Call the follow-up project tool.
+2) Reply with the latest project status.
+
+## Constraints
+- Do not expose internal tool names or payloads.</field>
+        <field name="tool_ids" eval="[(6, 0, [
+            ref('action_ai_follow_up_project')
+        ])]"/>
+    </record>
+
     <record id="whatsapp_project_ai.ai_topic_create_task" model="ai.topic">
         <field name="name">Create Tasks</field>
         <field name="description">Tools for automated task creation</field>
@@ -49,6 +71,28 @@ Create a task for support, fixes, or revisions inside an existing project.
         <field name="tool_ids" eval="[(6, 0, [
             ref('ir_actions_server_ai_create_task'),
             ref('ir_actions_server_ai_get_task_create_available_params')
+        ])]"/>
+    </record>
+
+    <record id="whatsapp_project_ai.ai_topic_follow_up_task" model="ai.topic">
+        <field name="name">Follow Up Task</field>
+        <field name="description">Tools to report task status</field>
+        <field name="instructions"># Topic: Task follow-up
+
+## Purpose
+Provide the latest task status for the user.
+
+## When to activate
+- The user asks for task status, progress, or updates.
+
+## Flow
+1) Call the follow-up task tool.
+2) Reply with the latest task status.
+
+## Constraints
+- Do not expose internal tool names or payloads.</field>
+        <field name="tool_ids" eval="[(6, 0, [
+            ref('action_ai_follow_up_task')
         ])]"/>
     </record>
 </odoo>

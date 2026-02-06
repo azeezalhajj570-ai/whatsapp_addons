@@ -5,7 +5,7 @@
         <field name="model">ir.actions.server</field>
         <field name="inherit_id" ref="ai.ir_actions_server_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='ai_action_prompt']/group/field[@name='ai_action_prompt']" position="before">
+            <xpath expr="//field[@name='ai_action_prompt']" position="before">
                 <group string="LLM Override">
                     <field name="ai_provider_code" options="{'no_create': True, 'no_create_edit': True}"/>
                     <field name="ai_model_name" placeholder="e.g. gemini-robotics-er-1.5-preview"/>

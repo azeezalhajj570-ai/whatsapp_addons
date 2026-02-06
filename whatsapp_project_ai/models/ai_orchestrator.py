@@ -315,34 +315,44 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             ])
             summary_lines.append(f"- *{p.name}*: {task_count} open tasks.")
 
-        self.action_reply_to_user(message, "\n".join(summary_lines))
+        msg_body = "\n".join(summary_lines)
+        if not message.wa_account_id:
+            return msg_body
+        return self.action_reply_to_user(message, msg_body)
 
     def action_follow_up_task(self, message):
-        if not message.partner_id:
-            return self.action_reply_to_user(
-                message,
-                "I couldn't find tasks without a linked contact. Please share the task name."
-            )
+        partner = message.partner_id or self._find_partner_from_message(message)
+        if not partner:
+            msg_body = "I couldn't find tasks without a linked contact. Please share the task name."
+            if not message.wa_account_id:
+                return msg_body
+            return self.action_reply_to_user(message, msg_body)
 
         tasks = self.env["project.task"].search([
-            ("partner_id", "=", message.partner_id.id),
+            ("partner_id", "=", partner.id),
         ], limit=5, order="write_date desc")
 
         if not tasks:
-            return self.action_reply_to_user(
-                message,
-                "I couldn't find recent tasks linked to this contact. Please share the task name."
-            )
+            msg_body = "I couldn't find recent tasks linked to this contact. Please share the task name."
+            if not message.wa_account_id:
+                return msg_body
+            return self.action_reply_to_user(message, msg_body)
 
         lines = ["Here are the latest task statuses:"]
         for task in tasks:
             status = task.stage_id.name if task.stage_id else "In Progress"
             lines.append(f"- {task.name}: {status}")
 
-        return self.action_reply_to_user(message, "\n".join(lines))
+        msg_body = "\n".join(lines)
+        if not message.wa_account_id:
+            return msg_body
+        return self.action_reply_to_user(message, msg_body)
 
     def action_reply_to_user(self, message, msg_body):
         """Send a WhatsApp reply for a given inbound message."""
+        if not message.wa_account_id:
+            return msg_body
+
         if message.ai_replied:
             message.write({"ai_reply_skipped_reason": "already_replied"})
             return False

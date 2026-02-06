@@ -88,4 +88,27 @@ class IrActionsServer(models.Model):
             )
             record._message_log(body=body, author_id=self._ai_partner().id)
 
+        # WhatsApp inbound safety fallback:
+        # if the AI returns plain text without tool calls, send it as a WhatsApp reply.
+        inbound_action = self.env.ref(
+            "whatsapp_project_ai.wa_ai_action_agent_execute_inbound",
+            raise_if_not_found=False,
+        )
+        if (
+            inbound_action
+            and self.id == inbound_action.id
+            and record._name == "whatsapp_evaluation.message"
+            and not tool_calls_history
+        ):
+            reply_text = False
+            if isinstance(responses, (list, tuple)) and responses:
+                reply_text = responses[0]
+            elif isinstance(responses, str):
+                reply_text = responses
+            if reply_text:
+                self.env["whatsapp.project.ai.orchestrator"].sudo().action_reply_to_user(
+                    record.sudo(),
+                    str(reply_text).strip(),
+                )
+
         return responses, tool_calls_history

@@ -32,6 +32,7 @@ Rules:
 7) Keep responses brief and user-facing; do not expose internal tool names or payloads.
 8) Always answer in the same language used by the user.
 9) Call at most one tool per inbound message. Do not loop or retry tools in the same run.
+10) You must call exactly one tool for each inbound message. If nothing else applies, call Reply To User.
             </field>
             <field name="ai_tool_ids" eval="[(6, 0, [
                 ref('ir_actions_server_ai_msg_create_project'),

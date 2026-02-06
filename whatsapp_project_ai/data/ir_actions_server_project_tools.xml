@@ -5,7 +5,7 @@
         <field name="state">code</field>
         <field name="use_in_ai" eval="True"/>
         <field name="ai_tool_allow_end_message" eval="True"/>
-        <field name="code">ai['result'] = record.sudo()._ai_create_project(name, description, user_id, partner_id, tag_ids)</field>
+        <field name="code">ai['result'] = record.sudo()._ai_create_project(name, description, user_id, partner_id, tag_ids, stage_names)</field>
         <field name="model_id" ref="project.model_project_project"/>
         <field name="ai_tool_description">## Tool: Create a Project
 Use when the user has confirmed the work and you should open a project.</field>
@@ -17,6 +17,8 @@ Use when the user has confirmed the work and you should open a project.</field>
                 "user_id": {"type": "number", "description": "Assigned user id"},
                 "partner_id": {"type": "number", "description": "Customer partner id"},
                 "tag_ids": {"type": "array", "items": {"type": "number"}, "description": "Project tag ids"}
+                ,
+                "stage_names": {"type": "array", "items": {"type": "string"}, "description": "Task stage names for this project (optional). If omitted, defaults are Todo, Doing, Review, Done."}
             },
             "required": ["name", "description"],
             "type": "object"
@@ -50,7 +52,7 @@ Use this tool only immediately before calling the project creation tool.</field>
         <field name="code">ai['result'] = record.sudo()._ai_follow_up_project()</field>
         <field name="model_id" ref="project.model_project_project"/>
         <field name="ai_tool_description">## Tool: Follow up on a Project
-Return the current status for the selected project.</field>
+Return the current status for the latest projects and their recent tasks.</field>
         <field name="ai_tool_schema">
         {
             "properties": {},
@@ -65,7 +67,7 @@ Return the current status for the selected project.</field>
         <field name="state">code</field>
         <field name="use_in_ai" eval="True"/>
         <field name="ai_tool_allow_end_message" eval="True"/>
-        <field name="code">ai['result'] = record.sudo()._ai_create_task(name, description, project_id, user_id, tag_ids, deadline_days)</field>
+        <field name="code">ai['result'] = record.sudo()._ai_create_task(name, description, project_id, user_id, tag_ids, deadline_days, stage_names)</field>
         <field name="model_id" ref="project.model_project_task"/>
         <field name="ai_tool_description">## Tool: Create a Task
 Use for support, fixes, or revisions inside an existing project.</field>
@@ -77,7 +79,8 @@ Use for support, fixes, or revisions inside an existing project.</field>
                 "project_id": {"type": "number", "description": "Target project id"},
                 "user_id": {"type": "number", "description": "Assigned user id"},
                 "tag_ids": {"type": "array", "items": {"type": "number"}, "description": "Task tag ids"},
-                "deadline_days": {"type": "number", "description": "Deadline in days"}
+                "deadline_days": {"type": "number", "description": "Deadline in days"},
+                "stage_names": {"type": "array", "items": {"type": "string"}, "description": "Task stage names to ensure on the project (optional). If omitted, defaults are Todo, Doing, Review, Done."}
             },
             "required": ["name", "description", "project_id"],
             "type": "object"

@@ -255,6 +255,11 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             "linked_model": "project.project",
             "linked_res_id": project.id,
         })
+
+        self.env["project.task"]._ai_ensure_project_task_stages(
+            project,
+            stage_names=ai_data.get("stage_names"),
+        )
         
         return project
 
@@ -273,12 +278,19 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             # Fallback: create a new project if none exists
             project = self.action_create_project(message, product, ai_data)
 
+        stages = self.env["project.task"]._ai_ensure_project_task_stages(
+            project,
+            stage_names=ai_data.get("stage_names"),
+        )
+        deadline_days = int(ai_data.get("deadline_days") or 3)
+
         task = self.env["project.task"].create({
             "name": ai_data.get("rationale") or f"Task from {partner.name if partner else 'Customer'}",
             "project_id": project.id,
             "partner_id": partner.id if partner else False,
+            "stage_id": stages[:1].id if stages else False,
             "description": message.body,
-            "date_deadline": fields.Date.today() + timedelta(days=ai_data.get("deadline_days", 3)),
+            "date_deadline": fields.Date.today() + timedelta(days=deadline_days),
         })
         
         # Link back
@@ -297,11 +309,13 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         ], limit=1)
 
     def action_follow_up_project(self, message):
-        # Find user's projects
-        projects = self.env["project.project"].search([
-            ("partner_id", "=", message.partner_id.id),
-            ("stage_id.fold", "=", False) # Assuming stage logic, or just open projects
-        ], limit=5, order="write_date desc")
+        partner = message.partner_id or self._find_partner_from_message(message)
+        domain = []
+        if partner:
+            domain = [("partner_id", "=", partner.id)]
+
+        # Find latest projects for this contact; fall back to latest global records if no partner is linked.
+        projects = self.env["project.project"].search(domain, limit=5, order="write_date desc")
         
         if not projects:
             self.action_reply_to_user(message, "I couldn't find any active projects under your name.")
@@ -309,11 +323,19 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
         summary_lines = ["Here is the status of your projects:"]
         for p in projects:
-            task_count = self.env["project.task"].search_count([
+            open_task_count = self.env["project.task"].search_count([
                 ("project_id", "=", p.id),
                 ("is_closed", "=", False)
             ])
-            summary_lines.append(f"- *{p.name}*: {task_count} open tasks.")
+            latest_tasks = self.env["project.task"].search([("project_id", "=", p.id)], limit=3, order="write_date desc")
+            if latest_tasks:
+                latest_summary = ", ".join(
+                    f"{t.name} ({t.stage_id.name if t.stage_id else 'In Progress'})"
+                    for t in latest_tasks
+                )
+            else:
+                latest_summary = "No tasks yet"
+            summary_lines.append(f"- {p.name}: {open_task_count} open tasks. Latest: {latest_summary}.")
 
         msg_body = "\n".join(summary_lines)
         if not message.wa_account_id:
@@ -341,7 +363,8 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         lines = ["Here are the latest task statuses:"]
         for task in tasks:
             status = task.stage_id.name if task.stage_id else "In Progress"
-            lines.append(f"- {task.name}: {status}")
+            project_name = task.project_id.display_name if task.project_id else "No Project"
+            lines.append(f"- {task.name} ({project_name}): {status}")
 
         msg_body = "\n".join(lines)
         if not message.wa_account_id:

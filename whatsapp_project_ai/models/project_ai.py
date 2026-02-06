@@ -10,7 +10,7 @@ class ProjectProject(models.Model):
     _inherit = "project.project"
 
     @api.model
-    def _ai_create_project(self, name, description, user_id=False, partner_id=False, tag_ids=None):
+    def _ai_create_project(self, name, description, user_id=False, partner_id=False, tag_ids=None, stage_names=None):
         values = {
             "name": name,
             "description": html_sanitize(description or ""),
@@ -21,7 +21,8 @@ class ProjectProject(models.Model):
             values["partner_id"] = partner_id
         if tag_ids:
             values["tag_ids"] = [(6, 0, tag_ids)]
-        self.create(values)
+        project = self.create(values)
+        self.env["project.task"]._ai_ensure_project_task_stages(project, stage_names=stage_names)
         return "Success"
 
     @api.model
@@ -46,12 +47,16 @@ class ProjectProject(models.Model):
         if partner:
             domain.append(("partner_id", "=", partner.id))
 
-        project = self.search(domain, order="write_date desc", limit=1)
-        if not project:
+        projects = self.search(domain, order="write_date desc", limit=5)
+        if not projects:
             return "No recent projects found for this contact."
-        status = project.stage_id.name if project.stage_id else "In Progress"
-        task_count = self.env["project.task"].search_count([
-            ("project_id", "=", project.id),
-            ("is_closed", "=", False),
-        ])
-        return f"Project '{project.name}' status: {status}. Open tasks: {task_count}."
+
+        lines = ["Latest projects:"]
+        for project in projects:
+            status = project.stage_id.name if project.stage_id else "In Progress"
+            task_count = self.env["project.task"].search_count([
+                ("project_id", "=", project.id),
+                ("is_closed", "=", False),
+            ])
+            lines.append(f"- {project.name}: {status}. Open tasks: {task_count}")
+        return "\n".join(lines)

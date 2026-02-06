@@ -14,8 +14,10 @@ Create a project when work is confirmed and needs to be tracked.
 
 ## Flow
 1) Ask for missing essentials (project name, short description) if not available.
-2) Call the project creation tool exactly once.
-3) Reply briefly that the project is set up.
+2) If the user provides task stages, pass them as stage names.
+3) If the user does not provide stages, use default stages: Todo, Doing, Review, Done.
+4) Call the project creation tool exactly once.
+5) Reply briefly that the project is set up.
 
 ## Constraints
 - Do not expose internal tool names or payloads.
@@ -39,7 +41,7 @@ Provide the latest project status for the user.
 
 ## Flow
 1) Call the follow-up project tool.
-2) Reply with the latest project status.
+2) Reply with current project status and include recent task updates from the tool output.
 
 ## Constraints
 - Do not expose internal tool names or payloads.</field>
@@ -62,8 +64,10 @@ Create a task for support, fixes, or revisions inside an existing project.
 
 ## Flow
 1) Ask for missing essentials (task name, short description, target project) if not available.
-2) Call the task creation tool exactly once.
-3) Reply briefly that the task is queued.
+2) If the user provides stages, pass them as stage names.
+3) If the user does not provide stages, use default stages: Todo, Doing, Review, Done.
+4) Call the task creation tool exactly once.
+5) Reply briefly that the task is queued.
 
 ## Constraints
 - Do not expose internal tool names or payloads.
@@ -87,7 +91,7 @@ Provide the latest task status for the user.
 
 ## Flow
 1) Call the follow-up task tool.
-2) Reply with the latest task status.
+2) Reply with current task statuses from the tool output.
 
 ## Constraints
 - Do not expose internal tool names or payloads.</field>

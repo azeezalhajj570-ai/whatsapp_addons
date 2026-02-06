@@ -20,6 +20,19 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             _logger.info("AI: Message %s already processed, skipping", message.id)
             return
 
+        body = (message.body or "").strip()
+        if not body or body.lower() in {"false", "none", "null", "undefined"}:
+            _logger.info(
+                "AI: Message %s has empty/invalid body (%r), skipping",
+                message.id,
+                body,
+            )
+            message.write({
+                "is_ai_processed": True,
+                "ai_rationale": "Skipped: empty/invalid inbound body",
+            })
+            return
+
         agent = self._get_agent()
         if not agent:
             return
@@ -402,7 +415,7 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
         if message.ai_replied:
             message.write({"ai_reply_skipped_reason": "already_replied"})
-            return False
+            return "Skipped reply: already replied for this inbound message."
 
         if self._reply_throttled(message, minutes=2):
             _logger.info(
@@ -411,7 +424,7 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
                 message.id,
             )
             message.write({"ai_reply_skipped_reason": "sender_throttle_2m"})
-            return False
+            return "Skipped reply: sender throttle window active."
 
         if not msg_body:
             msg_body = "Thanks for your message! Could you share a few more details?"

@@ -31,6 +31,7 @@ Rules:
 6) Create Project and Create Task tools already send the confirmation message. Do not call Reply To User after those tools unless extra clarification is needed.
 7) Keep responses brief and user-facing; do not expose internal tool names or payloads.
 8) Always answer in the same language used by the user.
+9) Call at most one tool per inbound message. Do not loop or retry tools in the same run.
             </field>
             <field name="ai_tool_ids" eval="[(6, 0, [
                 ref('ir_actions_server_ai_msg_create_project'),

@@ -3,13 +3,12 @@
     <record id="ir_actions_server_view_form_inherit_whatsapp_ai" model="ir.ui.view">
         <field name="name">ir.actions.server.view.form.inherit.whatsapp.ai</field>
         <field name="model">ir.actions.server</field>
-        <field name="inherit_id" ref="ai.ir_actions_server_view_form"/>
+        <field name="inherit_id" ref="ai_server_actions.view_server_action_form_ai_server_actions"/>
+        <field name="priority">60</field>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='ai_tool_ids']" position="after">
-                <group string="LLM Override">
-                    <field name="ai_provider_code" options="{'no_create': True, 'no_create_edit': True}"/>
-                    <field name="ai_model_name" placeholder="e.g. gemini-robotics-er-1.5-preview"/>
-                </group>
+            <xpath expr="//group[@invisible='state != \"ai\"']/field[@name='ai_tool_ids']" position="after">
+                <field name="ai_provider_code" options="{'no_create': True, 'no_create_edit': True}"/>
+                <field name="ai_model_name" placeholder="e.g. gemini-robotics-er-1.5-preview"/>
             </xpath>
         </field>
     </record>

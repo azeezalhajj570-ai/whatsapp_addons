@@ -230,10 +230,10 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
     def action_create_project(self, message, product=None, ai_data=None):
         ai_data = ai_data or {}
-        
+        partner = message.partner_id or self._find_partner_from_message(message)
         project_vals = {
-            "name": ai_data.get("rationale") or f"Project for {message.partner_id.name}",
-            "partner_id": message.partner_id.id,
+            "name": ai_data.get("rationale") or f"Project for {partner.name if partner else 'Customer'}",
+            "partner_id": partner.id if partner else False,
             "description": message.body,
         }
         
@@ -247,7 +247,7 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         # Post message to project
         project.message_post(
             body=f"Created from WhatsApp Message: {message.body}",
-            partner_ids=[message.partner_id.id]
+            partner_ids=[partner.id] if partner else []
         )
         
         # Link back
@@ -260,9 +260,9 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
     def action_create_task(self, message, product=None, ai_data=None):
         ai_data = ai_data or {}
-        
+        partner = message.partner_id or self._find_partner_from_message(message)
         # Find a relevant project
-        domain = [("partner_id", "=", message.partner_id.id)]
+        domain = [("partner_id", "=", partner.id)] if partner else []
         if product:
              # Try to find a project related to this service/product if possible
              pass
@@ -274,9 +274,9 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             project = self.action_create_project(message, product, ai_data)
 
         task = self.env["project.task"].create({
-            "name": ai_data.get("rationale") or f"Task from {message.partner_id.name}",
+            "name": ai_data.get("rationale") or f"Task from {partner.name if partner else 'Customer'}",
             "project_id": project.id,
-            "partner_id": message.partner_id.id,
+            "partner_id": partner.id if partner else False,
             "description": message.body,
             "date_deadline": fields.Date.today() + timedelta(days=ai_data.get("deadline_days", 3)),
         })
@@ -288,6 +288,13 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         })
         
         return task
+
+    def _find_partner_from_message(self, message):
+        if not message.mobile_number:
+            return False
+        return self.env["res.partner"].search([
+            "|", ("mobile", "=", message.mobile_number), ("phone", "=", message.mobile_number)
+        ], limit=1)
 
     def action_follow_up_project(self, message):
         # Find user's projects

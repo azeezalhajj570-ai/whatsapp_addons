@@ -203,5 +203,37 @@ for record in records:
     env['whatsapp.project.ai.orchestrator'].action_follow_up_task(record)
             </field>
         </record>
+
+        <!-- Action: Reply Task Status Unavailable -->
+        <record id="action_ai_reply_task_status_unavailable" model="ir.actions.server">
+            <field name="name">AI: Reply Task Status Unavailable</field>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="state">code</field>
+            <field name="use_in_ai">True</field>
+            <field name="ai_tool_description">Replies that task status and workflow updates require checking the project system directly.</field>
+            <field name="ai_tool_schema">{
+                "type": "object",
+                "required": [],
+                "properties": {}
+            }</field>
+            <field name="code">
+msg_body = (
+    "I don't have access to real-time project management tools to check the current "
+    "status of your tasks or move them between columns. The task creation system I "
+    "used doesn't provide visibility into the workflow status after creation. "
+    "Typically, newly created tasks would start in a \"To Do\" or \"Backlog\" column, "
+    "but I can't confirm their current status or move them between workflow stages. "
+    "If you need to check the status of your tasks or move them to specific columns, "
+    "I recommend: - Logging into your project management system directly - Contacting "
+    "your project manager at +1 555-555-5555 - Checking the project dashboard for "
+    "real-time updates Is there anything else I can help you with regarding your "
+    "website load issue project?"
+)
+
+for record in records:
+    env['whatsapp.project.ai.orchestrator'].action_reply_to_user(record, msg_body)
+            </field>
+        </record>
     </data>
 </odoo>

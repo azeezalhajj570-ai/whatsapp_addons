@@ -28,18 +28,17 @@ Rules:
 3) If the user asks for status/progress, use follow-up tools.
 4) Before creating project/task, ask for missing essential info.
 5) Avoid duplicates. If the same request was already fulfilled, reply with status instead of creating again.
-6) Create Project and Create Task tools already send the confirmation message. Do not call Reply To User after those tools unless extra clarification is needed.
+6) Create Project and Create Task tools already send the confirmation message.
 7) Keep responses brief and user-facing; do not expose internal tool names or payloads.
-8) Always answer in the same language used by the user.
+8) Always respond in English.
 9) Call at most one tool per inbound message. Do not loop or retry tools in the same run.
-10) You must call exactly one tool for each inbound message. If nothing else applies, call Reply To User.
+10) If no create/task/follow-up tool applies, return a short plain English reply text (do not call tools repeatedly).
             </field>
             <field name="ai_tool_ids" eval="[(6, 0, [
                 ref('ir_actions_server_ai_msg_create_project'),
                 ref('ir_actions_server_ai_msg_create_task'),
                 ref('ir_actions_server_ai_msg_follow_up_project'),
-                ref('ir_actions_server_ai_follow_up_task'),
-                ref('ir_actions_server_ai_msg_reply_to_user')
+                ref('ir_actions_server_ai_follow_up_task')
             ])]"/>
             <field name="base_automation_id" ref="wa_ai_auto_agent_execute_inbound"/>
         </record>

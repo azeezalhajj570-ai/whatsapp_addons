@@ -3,7 +3,9 @@
 import logging
 import json
 import base64
+from datetime import timedelta
 from odoo import http
+from odoo import fields
 from odoo.http import request, Response
 from odoo.addons.whatsapp_evaluation.tools.whatsapp_api import WhatsAppApi
 
@@ -115,6 +117,24 @@ class WebhookEvaluation(http.Controller):
             if not body and not file_content:
                 _logger.info("WhatsApp Upsert: No body and no base64. Skipping.")
                 continue
+
+            # Guard against provider echoes: if an inbound payload matches a very recent outbound
+            # message body for the same number, skip it.
+            if body:
+                since = fields.Datetime.now() - timedelta(minutes=2)
+                echo_count = request.env['whatsapp_evaluation.message'].sudo().search_count([
+                    ('mobile_number', '=', mobile_number),
+                    ('message_type', '=', 'outbound'),
+                    ('create_date', '>=', since),
+                    ('body', '=', body),
+                ])
+                if echo_count:
+                    _logger.info(
+                        "WhatsApp Upsert: Skipping likely outbound echo for %s (msg_uid=%s)",
+                        mobile_number,
+                        msg_uid,
+                    )
+                    continue
             
             # Find or create channel
             _logger.info("WhatsApp Inbound: Finding Channel for %s", mobile_number)

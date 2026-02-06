@@ -4,7 +4,7 @@
         <field name="name">AI WhatsApp: Create Project</field>
         <field name="state">code</field>
         <field name="use_in_ai" eval="True"/>
-        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="False"/>
         <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
         <field name="code">
 try:
@@ -19,18 +19,34 @@ try:
     stage_names
 except NameError:
     stage_names = False
+try:
+    name
+except NameError:
+    name = False
+try:
+    description
+except NameError:
+    description = False
 
 product = env['product.template'].sudo().browse(service_id) if service_id else None
-ai_data = {'rationale': rationale, 'stage_names': stage_names}
+project_title = name or rationale
+project_desc = description or record.body or ""
+ai_data = {'rationale': project_title, 'stage_names': stage_names}
 project = env['whatsapp.project.ai.orchestrator'].sudo().action_create_project(record.sudo(), product=product, ai_data=ai_data)
-ai['result'] = f"Project created: {project.display_name}"
+if project_desc and not project.description:
+    project.sudo().write({'description': project_desc})
+msg = f"Project '{project.display_name}' has been created successfully."
+env['whatsapp.project.ai.orchestrator'].sudo().action_reply_to_user(record.sudo(), msg)
+ai['result'] = msg
         </field>
         <field name="ai_tool_description">Create a project from the inbound WhatsApp conversation.</field>
         <field name="ai_tool_schema">
         {
             "properties": {
                 "service_id": {"type": "number", "description": "Optional service (product.template) id"},
-                "rationale": {"type": "string", "description": "Project title/reason from user input"},
+                "name": {"type": "string", "description": "Project name"},
+                "description": {"type": "string", "description": "Project description"},
+                "rationale": {"type": "string", "description": "Fallback project title/reason from user input"},
                 "stage_names": {"type": "array", "items": {"type": "string"}, "description": "Optional task stage names"}
             },
             "required": [],
@@ -43,7 +59,7 @@ ai['result'] = f"Project created: {project.display_name}"
         <field name="name">AI WhatsApp: Create Task</field>
         <field name="state">code</field>
         <field name="use_in_ai" eval="True"/>
-        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="False"/>
         <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
         <field name="code">
 try:
@@ -62,18 +78,35 @@ try:
     stage_names
 except NameError:
     stage_names = False
+try:
+    name
+except NameError:
+    name = False
+try:
+    description
+except NameError:
+    description = False
 
 product = env['product.template'].sudo().browse(service_id) if service_id else None
-ai_data = {'rationale': rationale, 'deadline_days': deadline_days, 'stage_names': stage_names}
+task_title = name or rationale
+task_desc = description or record.body or ""
+ai_data = {'rationale': task_title, 'deadline_days': deadline_days, 'stage_names': stage_names}
 task = env['whatsapp.project.ai.orchestrator'].sudo().action_create_task(record.sudo(), product=product, ai_data=ai_data)
-ai['result'] = f"Task created: {task.display_name}"
+if task_desc and not task.description:
+    task.sudo().write({'description': task_desc})
+project_title = task.project_id.display_name if task.project_id else "No Project"
+msg = f"Task '{task.display_name}' has been created in project '{project_title}'."
+env['whatsapp.project.ai.orchestrator'].sudo().action_reply_to_user(record.sudo(), msg)
+ai['result'] = msg
         </field>
         <field name="ai_tool_description">Create a task from the inbound WhatsApp conversation.</field>
         <field name="ai_tool_schema">
         {
             "properties": {
                 "service_id": {"type": "number", "description": "Optional service (product.template) id"},
-                "rationale": {"type": "string", "description": "Task content from user input"},
+                "name": {"type": "string", "description": "Task name"},
+                "description": {"type": "string", "description": "Task description"},
+                "rationale": {"type": "string", "description": "Fallback task title/content from user input"},
                 "deadline_days": {"type": "number", "description": "Optional deadline in days"},
                 "stage_names": {"type": "array", "items": {"type": "string"}, "description": "Optional project task stage names"}
             },

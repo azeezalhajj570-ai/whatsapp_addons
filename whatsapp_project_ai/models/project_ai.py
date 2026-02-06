@@ -36,8 +36,9 @@ class ProjectProject(models.Model):
     @api.model
     def _ai_follow_up_project(self):
         partner = False
-        if self.env.context.get("discuss_channel"):
-            partner = self.env.context["discuss_channel"].partner_id
+        channel = self.env.context.get("discuss_channel")
+        if channel:
+            partner = getattr(channel, "partner_id", False) or False
         if not partner and self.env.user:
             partner = self.env.user.partner_id
 

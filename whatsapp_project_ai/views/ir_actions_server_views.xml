@@ -1,13 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <record id="ir_actions_server_view_form_inherit_whatsapp_ai" model="ir.ui.view">
         <field name="name">ir.actions.server.view.form.inherit.whatsapp.ai</field>
         <field name="model">ir.actions.server</field>
         <field name="inherit_id" ref="ai.ir_actions_server_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='ai_model_id']" position="after">
-                <field name="ai_provider_code"/>
-                <field name="ai_model_name"/>
+            <xpath expr="//page[@name='ai_action_prompt']/group/field[@name='ai_action_prompt']" position="before">
+                <group string="LLM Override">
+                    <field name="ai_provider_code" options="{'no_create': True, 'no_create_edit': True}"/>
+                    <field name="ai_model_name" placeholder="e.g. gemini-robotics-er-1.5-preview"/>
+                </group>
             </xpath>
         </field>
     </record>

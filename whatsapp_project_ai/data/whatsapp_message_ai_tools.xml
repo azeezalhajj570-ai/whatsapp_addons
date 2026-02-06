@@ -28,9 +28,36 @@ try:
 except NameError:
     description = False
 
+raw_body = (record.body or "").strip()
+parsed_name = False
+parsed_desc = False
+if raw_body:
+    lines = [line.strip() for line in raw_body.splitlines() if line.strip()]
+    for line in lines:
+        lower_line = line.lower()
+        if lower_line.startswith("name:"):
+            parsed_name = line.split(":", 1)[1].strip() or parsed_name
+        elif lower_line.startswith("desc:") or lower_line.startswith("description:"):
+            parsed_desc = line.split(":", 1)[1].strip() or parsed_desc
+    lower_body = raw_body.lower()
+    if not parsed_name and "name:" in lower_body:
+        tail = raw_body[lower_body.index("name:") + 5:].strip()
+        tail_lower = tail.lower()
+        if " desc:" in tail_lower:
+            parsed_name = tail[:tail_lower.index(" desc:")].strip() or parsed_name
+        elif " description:" in tail_lower:
+            parsed_name = tail[:tail_lower.index(" description:")].strip() or parsed_name
+        else:
+            parsed_name = tail.strip() or parsed_name
+    if not parsed_desc:
+        if " desc:" in lower_body:
+            parsed_desc = raw_body[lower_body.index(" desc:") + 6:].strip() or parsed_desc
+        elif " description:" in lower_body:
+            parsed_desc = raw_body[lower_body.index(" description:") + 13:].strip() or parsed_desc
+
 product = env['product.template'].sudo().browse(service_id) if service_id else None
-project_title = name or rationale
-project_desc = description or record.body or ""
+project_title = name or parsed_name or rationale or "New Project"
+project_desc = description or parsed_desc or raw_body or ""
 ai_data = {'rationale': project_title, 'stage_names': stage_names}
 project = env['whatsapp.project.ai.orchestrator'].sudo().action_create_project(record.sudo(), product=product, ai_data=ai_data)
 if project_desc and not project.description:
@@ -87,9 +114,21 @@ try:
 except NameError:
     description = False
 
+raw_body = (record.body or "").strip()
+parsed_name = False
+parsed_desc = False
+if raw_body:
+    lines = [line.strip() for line in raw_body.splitlines() if line.strip()]
+    for line in lines:
+        lower_line = line.lower()
+        if lower_line.startswith("name:"):
+            parsed_name = line.split(":", 1)[1].strip() or parsed_name
+        elif lower_line.startswith("desc:") or lower_line.startswith("description:"):
+            parsed_desc = line.split(":", 1)[1].strip() or parsed_desc
+
 product = env['product.template'].sudo().browse(service_id) if service_id else None
-task_title = name or rationale
-task_desc = description or record.body or ""
+task_title = name or parsed_name or rationale or "New Task"
+task_desc = description or parsed_desc or raw_body or ""
 ai_data = {'rationale': task_title, 'deadline_days': deadline_days, 'stage_names': stage_names}
 task = env['whatsapp.project.ai.orchestrator'].sudo().action_create_task(record.sudo(), product=product, ai_data=ai_data)
 if task_desc and not task.description:

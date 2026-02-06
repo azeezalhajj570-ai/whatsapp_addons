@@ -318,8 +318,10 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         projects = self.env["project.project"].search(domain, limit=5, order="write_date desc")
         
         if not projects:
-            self.action_reply_to_user(message, "I couldn't find any active projects under your name.")
-            return
+            msg_body = "I couldn't find any active projects under your name."
+            if message.wa_account_id:
+                self.action_reply_to_user(message, msg_body)
+            return msg_body
 
         summary_lines = ["Here is the status of your projects:"]
         for p in projects:
@@ -338,17 +340,17 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             summary_lines.append(f"- {p.name}: {open_task_count} open tasks. Latest: {latest_summary}.")
 
         msg_body = "\n".join(summary_lines)
-        if not message.wa_account_id:
-            return msg_body
-        return self.action_reply_to_user(message, msg_body)
+        if message.wa_account_id:
+            self.action_reply_to_user(message, msg_body)
+        return msg_body
 
     def action_follow_up_task(self, message):
         partner = message.partner_id or self._find_partner_from_message(message)
         if not partner:
             msg_body = "I couldn't find tasks without a linked contact. Please share the task name."
-            if not message.wa_account_id:
-                return msg_body
-            return self.action_reply_to_user(message, msg_body)
+            if message.wa_account_id:
+                self.action_reply_to_user(message, msg_body)
+            return msg_body
 
         tasks = self.env["project.task"].search([
             ("partner_id", "=", partner.id),
@@ -356,9 +358,9 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
         if not tasks:
             msg_body = "I couldn't find recent tasks linked to this contact. Please share the task name."
-            if not message.wa_account_id:
-                return msg_body
-            return self.action_reply_to_user(message, msg_body)
+            if message.wa_account_id:
+                self.action_reply_to_user(message, msg_body)
+            return msg_body
 
         lines = ["Here are the latest task statuses:"]
         for task in tasks:
@@ -367,9 +369,9 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             lines.append(f"- {task.name} ({project_name}): {status}")
 
         msg_body = "\n".join(lines)
-        if not message.wa_account_id:
-            return msg_body
-        return self.action_reply_to_user(message, msg_body)
+        if message.wa_account_id:
+            self.action_reply_to_user(message, msg_body)
+        return msg_body
 
     def action_reply_to_user(self, message, msg_body):
         """Send a WhatsApp reply for a given inbound message."""

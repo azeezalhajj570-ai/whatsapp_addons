@@ -38,6 +38,9 @@ class ProjectTask(models.Model):
         return response
 
     def _ai_follow_up_task(self):
-        self.ensure_one()
+        if not self:
+            return "No task selected to follow up."
+        if len(self) > 1:
+            self = self[:1]
         status = self.stage_id.name if self.stage_id else "In Progress"
         return f"Task '{self.name}' status: {status}."

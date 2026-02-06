@@ -34,7 +34,10 @@ class ProjectProject(models.Model):
         return response
 
     def _ai_follow_up_project(self):
-        self.ensure_one()
+        if not self:
+            return "No project selected to follow up."
+        if len(self) > 1:
+            self = self[:1]
         status = self.stage_id.name if self.stage_id else "In Progress"
         task_count = self.env["project.task"].search_count([
             ("project_id", "=", self.id),

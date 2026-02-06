@@ -20,9 +20,9 @@ try:
 except NameError:
     stage_names = False
 
-product = env['product.template'].browse(service_id) if service_id else None
+product = env['product.template'].sudo().browse(service_id) if service_id else None
 ai_data = {'rationale': rationale, 'stage_names': stage_names}
-project = env['whatsapp.project.ai.orchestrator'].action_create_project(record, product=product, ai_data=ai_data)
+project = env['whatsapp.project.ai.orchestrator'].sudo().action_create_project(record.sudo(), product=product, ai_data=ai_data)
 ai['result'] = f"Project created: {project.display_name}"
         </field>
         <field name="ai_tool_description">Create a project from the inbound WhatsApp conversation.</field>
@@ -63,9 +63,9 @@ try:
 except NameError:
     stage_names = False
 
-product = env['product.template'].browse(service_id) if service_id else None
+product = env['product.template'].sudo().browse(service_id) if service_id else None
 ai_data = {'rationale': rationale, 'deadline_days': deadline_days, 'stage_names': stage_names}
-task = env['whatsapp.project.ai.orchestrator'].action_create_task(record, product=product, ai_data=ai_data)
+task = env['whatsapp.project.ai.orchestrator'].sudo().action_create_task(record.sudo(), product=product, ai_data=ai_data)
 ai['result'] = f"Task created: {task.display_name}"
         </field>
         <field name="ai_tool_description">Create a task from the inbound WhatsApp conversation.</field>
@@ -89,7 +89,7 @@ ai['result'] = f"Task created: {task.display_name}"
         <field name="use_in_ai" eval="True"/>
         <field name="ai_tool_allow_end_message" eval="False"/>
         <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
-        <field name="code">ai['result'] = env['whatsapp.project.ai.orchestrator'].action_follow_up_project(record)</field>
+        <field name="code">ai['result'] = env['whatsapp.project.ai.orchestrator'].sudo().action_follow_up_project(record.sudo())</field>
         <field name="ai_tool_description">Return project follow-up for the inbound contact.</field>
         <field name="ai_tool_schema">
         {"properties": {}, "required": [], "type": "object"}
@@ -107,7 +107,7 @@ try:
     reply_text
 except NameError:
     reply_text = False
-ai['result'] = env['whatsapp.project.ai.orchestrator'].action_reply_to_user(record, reply_text)
+ai['result'] = env['whatsapp.project.ai.orchestrator'].sudo().action_reply_to_user(record.sudo(), reply_text)
         </field>
         <field name="ai_tool_description">Send a direct WhatsApp reply to the user for clarifications or fallback responses.</field>
         <field name="ai_tool_schema">

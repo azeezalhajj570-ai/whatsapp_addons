@@ -111,7 +111,7 @@ Use this tool only immediately before calling the task creation tool.</field>
         <field name="state">code</field>
         <field name="use_in_ai" eval="True"/>
         <field name="ai_tool_allow_end_message" eval="False"/>
-        <field name="code">ai['result'] = env['whatsapp.project.ai.orchestrator'].action_follow_up_task(record, task_name, project_name)</field>
+        <field name="code">ai['result'] = env['whatsapp.project.ai.orchestrator'].sudo().action_follow_up_task(record.sudo(), task_name, project_name)</field>
         <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
         <field name="ai_tool_description">## Tool: Follow up on a Task
 Return the current status for the latest tasks linked to the contact.</field>

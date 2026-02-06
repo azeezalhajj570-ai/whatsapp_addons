@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import json
+from datetime import timedelta
 
 from odoo import api, fields, models
 from odoo.tools import html_sanitize
@@ -17,11 +18,11 @@ class ProjectTask(models.Model):
             "project_id": project_id,
         }
         if user_id:
-            values["user_id"] = user_id
+            values["user_ids"] = [(6, 0, [user_id])]
         if tag_ids:
             values["tag_ids"] = [(6, 0, tag_ids)]
         if deadline_days:
-            values["date_deadline"] = fields.Date.context_today(self) + fields.Date.to_timedelta(deadline_days)
+            values["date_deadline"] = fields.Date.context_today(self) + timedelta(days=int(deadline_days))
         self.create(values)
         return "Success"
 

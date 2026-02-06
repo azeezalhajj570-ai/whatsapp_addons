@@ -7,9 +7,18 @@
         <field name="ai_tool_allow_end_message" eval="True"/>
         <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
         <field name="code">
-service_id = locals().get('service_id')
-rationale = locals().get('rationale')
-stage_names = locals().get('stage_names')
+try:
+    service_id
+except NameError:
+    service_id = False
+try:
+    rationale
+except NameError:
+    rationale = False
+try:
+    stage_names
+except NameError:
+    stage_names = False
 
 product = env['product.template'].browse(service_id) if service_id else None
 ai_data = {'rationale': rationale, 'stage_names': stage_names}
@@ -37,10 +46,22 @@ ai['result'] = f"Project created: {project.display_name}"
         <field name="ai_tool_allow_end_message" eval="True"/>
         <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
         <field name="code">
-service_id = locals().get('service_id')
-rationale = locals().get('rationale')
-deadline_days = locals().get('deadline_days')
-stage_names = locals().get('stage_names')
+try:
+    service_id
+except NameError:
+    service_id = False
+try:
+    rationale
+except NameError:
+    rationale = False
+try:
+    deadline_days
+except NameError:
+    deadline_days = False
+try:
+    stage_names
+except NameError:
+    stage_names = False
 
 product = env['product.template'].browse(service_id) if service_id else None
 ai_data = {'rationale': rationale, 'deadline_days': deadline_days, 'stage_names': stage_names}
@@ -82,7 +103,10 @@ ai['result'] = f"Task created: {task.display_name}"
         <field name="ai_tool_allow_end_message" eval="False"/>
         <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
         <field name="code">
-reply_text = locals().get('reply_text')
+try:
+    reply_text
+except NameError:
+    reply_text = False
 ai['result'] = env['whatsapp.project.ai.orchestrator'].action_reply_to_user(record, reply_text)
         </field>
         <field name="ai_tool_description">Send a direct WhatsApp reply to the user for clarifications or fallback responses.</field>

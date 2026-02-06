@@ -28,6 +28,7 @@
         'data/product_data.xml',
         'views/whatsapp_message_views.xml',
         'views/whatsapp_ai_menus.xml',
+        'views/ir_actions_server_views.xml',
     ],
     'application': True,
     'installable': True,

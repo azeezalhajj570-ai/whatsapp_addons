@@ -6,6 +6,7 @@
             <field name="name">AI: Create Lead</field>
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_view_types">form</field>
             <field name="state">code</field>
             <field name="use_in_ai">True</field>
             <field name="ai_tool_description">Creates a new CRM Lead/Opportunity from the message. Use this when the user expresses interest in a service or product.</field>
@@ -60,6 +61,7 @@ for record in records:
             <field name="name">AI: Create Project</field>
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_view_types">form</field>
             <field name="state">code</field>
             <field name="use_in_ai">True</field>
             <field name="ai_tool_description">Creates a new Project or converts an existing Lead to a Project. Use this when the work is confirmed or a deposit is made.</field>
@@ -106,6 +108,7 @@ for record in records:
             <field name="name">AI: Create Task</field>
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_view_types">form</field>
             <field name="state">code</field>
             <field name="use_in_ai">True</field>
             <field name="ai_tool_description">Creates a Task in an existing Project. Use this for support requests, bug reports, or new requirements on ongoing work.</field>
@@ -158,6 +161,7 @@ for record in records:
             <field name="name">AI: Reply to User</field>
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_view_types">form</field>
             <field name="state">code</field>
             <field name="use_in_ai">True</field>
             <field name="ai_tool_description">Sends a WhatsApp reply to the user. Use this when no other specific action (Lead/Project/Task) is needed, or to ask clarifying questions.</field>
@@ -187,6 +191,7 @@ for record in records:
             <field name="name">AI: Follow Up Project</field>
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_view_types">form</field>
             <field name="state">code</field>
             <field name="use_in_ai">True</field>
             <field name="ai_tool_allow_end_message">False</field>
@@ -209,6 +214,7 @@ ai['result'] = "\n\n".join([r for r in results if r])
             <field name="name">AI: Follow Up Task</field>
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_view_types">form</field>
             <field name="state">code</field>
             <field name="use_in_ai">True</field>
             <field name="ai_tool_allow_end_message">False</field>
@@ -242,6 +248,7 @@ ai['result'] = "\n\n".join([r for r in results if r])
             <field name="name">AI: Reply Task Status Unavailable</field>
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="binding_view_types">form</field>
             <field name="state">code</field>
             <field name="use_in_ai">True</field>
             <field name="ai_tool_description">Replies that task status and workflow updates require checking the project system directly.</field>

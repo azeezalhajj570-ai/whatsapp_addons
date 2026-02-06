@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Legacy AI server actions on whatsapp_evaluation.message -->
+        <delete id="action_ai_create_lead" model="ir.actions.server"/>
+        <delete id="action_ai_create_project" model="ir.actions.server"/>
+        <delete id="action_ai_create_task" model="ir.actions.server"/>
+        <delete id="action_ai_reply_to_user" model="ir.actions.server"/>
+        <delete id="action_ai_follow_up_project" model="ir.actions.server"/>
+        <delete id="action_ai_follow_up_task" model="ir.actions.server"/>
+        <delete id="action_ai_reply_task_status_unavailable" model="ir.actions.server"/>
+        <delete id="action_ai_execute_decision" model="ir.actions.server"/>
+
+        <!-- Legacy automations -->
+        <delete id="wa_ai_auto_reply_low_confidence" model="base.automation"/>
+        <delete id="wa_ai_auto_classify_inbound" model="base.automation"/>
+        <delete id="wa_ai_auto_execute_decision" model="base.automation"/>
+        <delete id="wa_ai_action_classify_inbound" model="ir.actions.server"/>
+        <delete id="wa_ai_action_reply_low_confidence" model="ir.actions.server"/>
+        <delete id="wa_ai_action_execute_decision" model="ir.actions.server"/>
+    </data>
+</odoo>

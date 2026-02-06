@@ -22,9 +22,7 @@
     'data': [
         'data/ai_agent_data.xml',
         'data/ir_actions_server_data.xml',
-        'data/ai_actions.xml',
-        'data/ai_master_action.xml',
-        'data/ai_automation.xml',
+        'data/cleanup_unused_ai_actions.xml',
         'data/ir_actions_server_project_tools.xml',
         'data/ai_topic_project_task.xml',
         'data/product_data.xml',

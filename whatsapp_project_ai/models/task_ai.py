@@ -37,10 +37,20 @@ class ProjectTask(models.Model):
         response += f"# Task Tags:\n{json.dumps(tags)}\n"
         return response
 
+    @api.model
     def _ai_follow_up_task(self):
-        if not self:
-            return "No task selected to follow up."
-        if len(self) > 1:
-            self = self[:1]
-        status = self.stage_id.name if self.stage_id else "In Progress"
-        return f"Task '{self.name}' status: {status}."
+        partner = False
+        if self.env.context.get("discuss_channel"):
+            partner = self.env.context["discuss_channel"].partner_id
+        if not partner and self.env.user:
+            partner = self.env.user.partner_id
+
+        domain = []
+        if partner:
+            domain.append(("partner_id", "=", partner.id))
+
+        task = self.search(domain, order="write_date desc", limit=1)
+        if not task:
+            return "No recent tasks found for this contact."
+        status = task.stage_id.name if task.stage_id else "In Progress"
+        return f"Task '{task.name}' status: {status}."

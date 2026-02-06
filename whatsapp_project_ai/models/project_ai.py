@@ -33,14 +33,24 @@ class ProjectProject(models.Model):
         response += f"# Project Tags:\n{json.dumps(tags)}\n"
         return response
 
+    @api.model
     def _ai_follow_up_project(self):
-        if not self:
-            return "No project selected to follow up."
-        if len(self) > 1:
-            self = self[:1]
-        status = self.stage_id.name if self.stage_id else "In Progress"
+        partner = False
+        if self.env.context.get("discuss_channel"):
+            partner = self.env.context["discuss_channel"].partner_id
+        if not partner and self.env.user:
+            partner = self.env.user.partner_id
+
+        domain = []
+        if partner:
+            domain.append(("partner_id", "=", partner.id))
+
+        project = self.search(domain, order="write_date desc", limit=1)
+        if not project:
+            return "No recent projects found for this contact."
+        status = project.stage_id.name if project.stage_id else "In Progress"
         task_count = self.env["project.task"].search_count([
-            ("project_id", "=", self.id),
+            ("project_id", "=", project.id),
             ("is_closed", "=", False),
         ])
-        return f"Project '{self.name}' status: {status}. Open tasks: {task_count}."
+        return f"Project '{project.name}' status: {status}. Open tasks: {task_count}."

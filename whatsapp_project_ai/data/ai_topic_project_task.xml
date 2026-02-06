@@ -44,7 +44,7 @@ Provide the latest project status for the user.
 ## Constraints
 - Do not expose internal tool names or payloads.</field>
         <field name="tool_ids" eval="[(6, 0, [
-            ref('action_ai_follow_up_project')
+            ref('ir_actions_server_ai_follow_up_project')
         ])]"/>
     </record>
 
@@ -92,7 +92,7 @@ Provide the latest task status for the user.
 ## Constraints
 - Do not expose internal tool names or payloads.</field>
         <field name="tool_ids" eval="[(6, 0, [
-            ref('action_ai_follow_up_task')
+            ref('ir_actions_server_ai_follow_up_task')
         ])]"/>
     </record>
 </odoo>

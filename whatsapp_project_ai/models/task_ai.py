@@ -36,3 +36,8 @@ class ProjectTask(models.Model):
         response += f"# Users:\n{json.dumps(users)}\n"
         response += f"# Task Tags:\n{json.dumps(tags)}\n"
         return response
+
+    def _ai_follow_up_task(self):
+        self.ensure_one()
+        status = self.stage_id.name if self.stage_id else "In Progress"
+        return f"Task '{self.name}' status: {status}."

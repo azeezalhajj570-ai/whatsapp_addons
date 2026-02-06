@@ -42,6 +42,24 @@ Use this tool only immediately before calling the project creation tool.</field>
         </field>
     </record>
 
+    <record id="ir_actions_server_ai_follow_up_project" model="ir.actions.server">
+        <field name="name">AI Project: Follow Up Project</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="code">ai['result'] = record.sudo()._ai_follow_up_project()</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ai_tool_description">## Tool: Follow up on a Project
+Return the current status for the selected project.</field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {},
+            "required": [],
+            "type": "object"
+        }
+        </field>
+    </record>
+
     <record id="ir_actions_server_ai_create_task" model="ir.actions.server">
         <field name="name">AI Project: Create Task</field>
         <field name="state">code</field>
@@ -76,6 +94,24 @@ Use for support, fixes, or revisions inside an existing project.</field>
         <field name="ai_tool_description">## Tool: Get Task Creation Parameters
 Retrieves available projects, users and tags for task creation.
 Use this tool only immediately before calling the task creation tool.</field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {},
+            "required": [],
+            "type": "object"
+        }
+        </field>
+    </record>
+
+    <record id="ir_actions_server_ai_follow_up_task" model="ir.actions.server">
+        <field name="name">AI Project: Follow Up Task</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="code">ai['result'] = record.sudo()._ai_follow_up_task()</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ai_tool_description">## Tool: Follow up on a Task
+Return the current status for the selected task.</field>
         <field name="ai_tool_schema">
         {
             "properties": {},

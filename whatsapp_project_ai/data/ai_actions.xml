@@ -196,8 +196,10 @@ for record in records:
                  "properties": {}
             }</field>
             <field name="code">
+results = []
 for record in records:
-    env['whatsapp.project.ai.orchestrator'].action_follow_up_project(record)
+    results.append(env['whatsapp.project.ai.orchestrator'].action_follow_up_project(record))
+ai['result'] = "\n\n".join([r for r in results if r])
             </field>
         </record>
 
@@ -226,8 +228,10 @@ for record in records:
             <field name="code">
 task_name = locals().get('task_name')
 project_name = locals().get('project_name')
+results = []
 for record in records:
-    env['whatsapp.project.ai.orchestrator'].action_follow_up_task(record, task_name=task_name, project_name=project_name)
+    results.append(env['whatsapp.project.ai.orchestrator'].action_follow_up_task(record, task_name=task_name, project_name=project_name))
+ai['result'] = "\n\n".join([r for r in results if r])
             </field>
         </record>
 

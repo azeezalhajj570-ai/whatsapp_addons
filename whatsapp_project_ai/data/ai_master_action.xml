@@ -7,7 +7,7 @@
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="binding_model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="state">ai</field>
-            <field name="ai_tool_ids" eval="[(6, 0, [ref('action_ai_create_lead'), ref('action_ai_create_project'), ref('action_ai_create_task'), ref('action_ai_reply_to_user'), ref('action_ai_follow_up_project')])]"/>
+            <field name="ai_tool_ids" eval="[(6, 0, [ref('action_ai_create_lead'), ref('action_ai_create_project'), ref('action_ai_create_task'), ref('action_ai_reply_to_user'), ref('action_ai_follow_up_project'), ref('action_ai_follow_up_task'), ref('action_ai_reply_task_status_unavailable')])]"/>
             <field name="ai_action_prompt">
 You are an Action Executor for a WhatsApp Project Management AI.
 

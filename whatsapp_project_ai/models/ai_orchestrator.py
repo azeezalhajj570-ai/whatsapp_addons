@@ -417,13 +417,15 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             message.write({"ai_reply_skipped_reason": "already_replied"})
             return "Skipped reply: already replied for this inbound message."
 
-        if self._reply_throttled(message, minutes=2):
+        throttle_seconds = self._get_reply_throttle_seconds()
+        if self._reply_throttled(message, seconds=throttle_seconds):
             _logger.info(
-                "AI: Reply throttled for %s (message %s)",
+                "AI: Reply throttled for %s (message %s, window=%ss)",
                 message.mobile_number,
                 message.id,
+                throttle_seconds,
             )
-            message.write({"ai_reply_skipped_reason": "sender_throttle_2m"})
+            message.write({"ai_reply_skipped_reason": "sender_throttle"})
             return "Skipped reply: sender throttle window active."
 
         if not msg_body:
@@ -443,11 +445,22 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         })
         return wa_msg
 
-    def _reply_throttled(self, message, minutes=2):
+    def _get_reply_throttle_seconds(self):
+        value = self.env["ir.config_parameter"].sudo().get_param(
+            "whatsapp_project_ai.reply_throttle_seconds",
+            default="20",
+        )
+        try:
+            seconds = int(value)
+        except Exception:
+            seconds = 20
+        return max(0, seconds)
+
+    def _reply_throttled(self, message, seconds=20):
         if not message.mobile_number:
             return False
 
-        since = fields.Datetime.now() - timedelta(minutes=minutes)
+        since = fields.Datetime.now() - timedelta(seconds=seconds)
         recent = self.env["whatsapp_evaluation.message"].search_count([
             ("message_type", "=", "outbound"),
             ("mobile_number", "=", message.mobile_number),

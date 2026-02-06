@@ -310,6 +310,30 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
 
         self.action_reply_to_user(message, "\n".join(summary_lines))
 
+    def action_follow_up_task(self, message):
+        if not message.partner_id:
+            return self.action_reply_to_user(
+                message,
+                "I couldn't find tasks without a linked contact. Please share the task name."
+            )
+
+        tasks = self.env["project.task"].search([
+            ("partner_id", "=", message.partner_id.id),
+        ], limit=5, order="write_date desc")
+
+        if not tasks:
+            return self.action_reply_to_user(
+                message,
+                "I couldn't find recent tasks linked to this contact. Please share the task name."
+            )
+
+        lines = ["Here are the latest task statuses:"]
+        for task in tasks:
+            status = task.stage_id.name if task.stage_id else "In Progress"
+            lines.append(f"- {task.name}: {status}")
+
+        return self.action_reply_to_user(message, "\n".join(lines))
+
     def action_reply_to_user(self, message, msg_body):
         """Send a WhatsApp reply for a given inbound message."""
         if message.ai_replied:

@@ -344,17 +344,23 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
             self.action_reply_to_user(message, msg_body)
         return msg_body
 
-    def action_follow_up_task(self, message):
+    def action_follow_up_task(self, message, task_name=None, project_name=None):
         partner = message.partner_id or self._find_partner_from_message(message)
-        if not partner:
+        domain = []
+        if partner:
+            domain.append(("partner_id", "=", partner.id))
+        if task_name:
+            domain.append(("name", "ilike", task_name))
+        if project_name:
+            domain.append(("project_id.name", "ilike", project_name))
+
+        if not partner and not task_name and not project_name:
             msg_body = "I couldn't find tasks without a linked contact. Please share the task name."
             if message.wa_account_id:
                 self.action_reply_to_user(message, msg_body)
             return msg_body
 
-        tasks = self.env["project.task"].search([
-            ("partner_id", "=", partner.id),
-        ], limit=5, order="write_date desc")
+        tasks = self.env["project.task"].search(domain, limit=5, order="write_date desc")
 
         if not tasks:
             msg_body = "I couldn't find recent tasks linked to this contact. Please share the task name."
@@ -366,7 +372,9 @@ class WhatsAppProjectAIOrchestrator(models.AbstractModel):
         for task in tasks:
             status = task.stage_id.name if task.stage_id else "In Progress"
             project_name = task.project_id.display_name if task.project_id else "No Project"
-            lines.append(f"- {task.name} ({project_name}): {status}")
+            updated_at = task.write_date or task.create_date
+            updated_text = fields.Datetime.to_string(updated_at) if updated_at else "N/A"
+            lines.append(f"- {task.name} ({project_name}): {status}. Updated: {updated_text}")
 
         msg_body = "\n".join(lines)
         if message.wa_account_id:

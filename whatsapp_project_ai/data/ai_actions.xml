@@ -212,11 +212,22 @@ for record in records:
             <field name="ai_tool_schema">{
                  "type": "object",
                  "required": [],
-                 "properties": {}
+                 "properties": {
+                    "task_name": {
+                        "type": "string",
+                        "description": "Optional task name filter from the user message (example: frontend)."
+                    },
+                    "project_name": {
+                        "type": "string",
+                        "description": "Optional project name filter from the user message."
+                    }
+                 }
             }</field>
             <field name="code">
+task_name = locals().get('task_name')
+project_name = locals().get('project_name')
 for record in records:
-    env['whatsapp.project.ai.orchestrator'].action_follow_up_task(record)
+    env['whatsapp.project.ai.orchestrator'].action_follow_up_task(record, task_name=task_name, project_name=project_name)
             </field>
         </record>
 

@@ -90,8 +90,9 @@ Provide the latest task status for the user.
 - The user asks for task status, progress, or updates.
 
 ## Flow
-1) Call the follow-up task tool.
-2) Reply with current task statuses from the tool output.
+1) If the user mentions a task or project name, pass it to the follow-up task tool as filters.
+2) Call the follow-up task tool.
+3) Reply with the exact status lines returned by the tool (do not send generic "checked" text).
 
 ## Constraints
 - Do not expose internal tool names or payloads.</field>

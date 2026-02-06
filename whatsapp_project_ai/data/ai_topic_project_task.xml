@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="whatsapp_project_ai.ai_topic_create_project" model="ai.topic">
+        <field name="name">Create Projects</field>
+        <field name="description">Tools for automated project creation</field>
+        <field name="instructions"># Topic: Project creation
+
+## Purpose
+Create a project when work is confirmed and needs to be tracked.
+
+## When to activate
+- The user explicitly approves or confirms starting work.
+- The user mentions a deposit or green-lights the project.
+
+## Flow
+1) Ask for missing essentials (project name, short description) if not available.
+2) Call the project creation tool exactly once.
+3) Reply briefly that the project is set up.
+
+## Constraints
+- Do not expose internal tool names or payloads.
+- Avoid duplicate project creation.</field>
+        <field name="tool_ids" eval="[(6, 0, [
+            ref('ir_actions_server_ai_create_project'),
+            ref('ir_actions_server_ai_get_project_create_available_params')
+        ])]"/>
+    </record>
+
+    <record id="whatsapp_project_ai.ai_topic_create_task" model="ai.topic">
+        <field name="name">Create Tasks</field>
+        <field name="description">Tools for automated task creation</field>
+        <field name="instructions"># Topic: Task creation
+
+## Purpose
+Create a task for support, fixes, or revisions inside an existing project.
+
+## When to activate
+- The user reports a problem, bug, or change request.
+- The user asks for a specific fix or update.
+
+## Flow
+1) Ask for missing essentials (task name, short description, target project) if not available.
+2) Call the task creation tool exactly once.
+3) Reply briefly that the task is queued.
+
+## Constraints
+- Do not expose internal tool names or payloads.
+- Avoid duplicate task creation.</field>
+        <field name="tool_ids" eval="[(6, 0, [
+            ref('ir_actions_server_ai_create_task'),
+            ref('ir_actions_server_ai_get_task_create_available_params')
+        ])]"/>
+    </record>
+</odoo>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_actions_server_ai_create_project" model="ir.actions.server">
+        <field name="name">AI Project: Create Project</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="code">ai['result'] = record.sudo()._ai_create_project(name, description, user_id, partner_id, tag_ids)</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ai_tool_description">## Tool: Create a Project
+Use when the user has confirmed the work and you should open a project.</field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {
+                "name": {"type": "string", "description": "Project name"},
+                "description": {"type": "string", "description": "Project description"},
+                "user_id": {"type": "number", "description": "Assigned user id"},
+                "partner_id": {"type": "number", "description": "Customer partner id"},
+                "tag_ids": {"type": "array", "items": {"type": "number"}, "description": "Project tag ids"}
+            },
+            "required": ["name", "description"],
+            "type": "object"
+        }
+        </field>
+    </record>
+
+    <record id="ir_actions_server_ai_get_project_create_available_params" model="ir.actions.server">
+        <field name="name">AI Project: Get Project creation parameters</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="code">ai['result'] = record.sudo()._ai_get_project_create_available_params()</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ai_tool_description">## Tool: Get Project Creation Parameters
+Retrieves available users and tags for project creation.
+Use this tool only immediately before calling the project creation tool.</field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {},
+            "required": [],
+            "type": "object"
+        }
+        </field>
+    </record>
+
+    <record id="ir_actions_server_ai_create_task" model="ir.actions.server">
+        <field name="name">AI Project: Create Task</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="True"/>
+        <field name="code">ai['result'] = record.sudo()._ai_create_task(name, description, project_id, user_id, tag_ids, deadline_days)</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ai_tool_description">## Tool: Create a Task
+Use for support, fixes, or revisions inside an existing project.</field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {
+                "name": {"type": "string", "description": "Task name"},
+                "description": {"type": "string", "description": "Task description"},
+                "project_id": {"type": "number", "description": "Target project id"},
+                "user_id": {"type": "number", "description": "Assigned user id"},
+                "tag_ids": {"type": "array", "items": {"type": "number"}, "description": "Task tag ids"},
+                "deadline_days": {"type": "number", "description": "Deadline in days"}
+            },
+            "required": ["name", "description", "project_id"],
+            "type": "object"
+        }
+        </field>
+    </record>
+
+    <record id="ir_actions_server_ai_get_task_create_available_params" model="ir.actions.server">
+        <field name="name">AI Project: Get Task creation parameters</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="code">ai['result'] = record.sudo()._ai_get_task_create_available_params()</field>
+        <field name="model_id" ref="project.model_project_task"/>
+        <field name="ai_tool_description">## Tool: Get Task Creation Parameters
+Retrieves available projects, users and tags for task creation.
+Use this tool only immediately before calling the task creation tool.</field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {},
+            "required": [],
+            "type": "object"
+        }
+        </field>
+    </record>
+</odoo>

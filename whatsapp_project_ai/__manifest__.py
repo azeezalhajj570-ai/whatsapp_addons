@@ -25,6 +25,8 @@
         'data/ai_actions.xml',
         'data/ai_master_action.xml',
         'data/ai_automation.xml',
+        'data/ir_actions_server_project_tools.xml',
+        'data/ai_topic_project_task.xml',
         'data/product_data.xml',
         'views/whatsapp_message_views.xml',
         'views/whatsapp_ai_menus.xml',

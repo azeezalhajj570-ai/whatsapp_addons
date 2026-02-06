@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="wa_ai_auto_agent_execute_inbound" model="base.automation">
+            <field name="name">WhatsApp: AI Agent Execute Inbound</field>
+            <field name="active" eval="True"/>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="trigger">on_create</field>
+            <field name="filter_domain">[('message_type','=','inbound')]</field>
+        </record>
+
+        <record id="wa_ai_action_agent_execute_inbound" model="ir.actions.server">
+            <field name="name">WhatsApp: AI Agent Execute Inbound</field>
+            <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
+            <field name="state">ai</field>
+            <field name="ai_action_prompt">
+You are a WhatsApp project management assistant.
+
+Goal:
+- Process the inbound WhatsApp message and decide the right project/task action.
+
+Rules:
+1) If the user confirms new work, calls out starting a project, or mentions payment confirmation, create a project.
+2) If the user requests a fix/change/support item inside existing work, create a task.
+3) If the user asks for status/progress, use follow-up tools.
+4) Before creating project/task, ask for missing essential info.
+5) Avoid duplicates. If the same request was already fulfilled, reply with status instead of creating again.
+6) Keep responses brief and user-facing; do not expose internal tool names or payloads.
+7) Always answer in the same language used by the user.
+            </field>
+            <field name="ai_tool_ids" eval="[(6, 0, [
+                ref('ir_actions_server_ai_create_project'),
+                ref('ir_actions_server_ai_get_project_create_available_params'),
+                ref('ir_actions_server_ai_follow_up_project'),
+                ref('ir_actions_server_ai_create_task'),
+                ref('ir_actions_server_ai_get_task_create_available_params'),
+                ref('ir_actions_server_ai_follow_up_task')
+            ])]"/>
+            <field name="base_automation_id" ref="wa_ai_auto_agent_execute_inbound"/>
+        </record>
+    </data>
+</odoo>

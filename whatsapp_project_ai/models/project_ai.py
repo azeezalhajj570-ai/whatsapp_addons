@@ -40,14 +40,28 @@ class ProjectProject(models.Model):
         channel = self.env.context.get("discuss_channel")
         if channel:
             partner = getattr(channel, "partner_id", False) or False
-        if not partner and self.env.user:
-            partner = self.env.user.partner_id
-
-        domain = []
+        user = self.env.user
+        domain = [("active", "=", True)]
         if partner:
-            domain.append(("partner_id", "=", partner.id))
+            domain = [
+                ("active", "=", True),
+                "|",
+                ("partner_id", "=", partner.id),
+                "|",
+                ("user_id", "=", user.id),
+                ("create_uid", "=", user.id),
+            ]
+        else:
+            domain = [
+                ("active", "=", True),
+                "|",
+                ("user_id", "=", user.id),
+                ("create_uid", "=", user.id),
+            ]
 
         projects = self.search(domain, order="write_date desc", limit=5)
+        if not projects:
+            projects = self.search([("active", "=", True)], order="write_date desc", limit=5)
         if not projects:
             return "No recent projects found for this contact."
 
@@ -63,21 +77,36 @@ class ProjectProject(models.Model):
 
     @api.model
     def _ai_list_active_projects(self, partner_id=False, limit=10):
-        domain = [("active", "=", True)]
-
+        user = self.env.user
+        partner = False
         if partner_id:
-            domain.append(("partner_id", "=", partner_id))
-        else:
-            partner = False
+            partner = self.env["res.partner"].browse(partner_id).exists()
+        if not partner:
             channel = self.env.context.get("discuss_channel")
             if channel:
                 partner = getattr(channel, "partner_id", False) or False
-            if not partner and self.env.user:
-                partner = self.env.user.partner_id
-            if partner:
-                domain.append(("partner_id", "=", partner.id))
+
+        domain = [("active", "=", True)]
+        if partner:
+            domain = [
+                ("active", "=", True),
+                "|",
+                ("partner_id", "=", partner.id),
+                "|",
+                ("user_id", "=", user.id),
+                ("create_uid", "=", user.id),
+            ]
+        else:
+            domain = [
+                ("active", "=", True),
+                "|",
+                ("user_id", "=", user.id),
+                ("create_uid", "=", user.id),
+            ]
 
         projects = self.search(domain, order="write_date desc", limit=int(limit or 10))
+        if not projects:
+            projects = self.search([("active", "=", True)], order="write_date desc", limit=int(limit or 10))
         if not projects:
             return "No active projects found."
 

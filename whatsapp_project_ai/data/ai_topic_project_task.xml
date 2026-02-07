@@ -41,12 +41,14 @@ Provide the latest project status for the user.
 
 ## Flow
 1) Call the follow-up project tool.
-2) Reply with current project status and include recent task updates from the tool output.
+2) If the user asks to list active/current projects, call the active-projects listing tool.
+3) Reply with current project status and include recent task updates from the tool output.
 
 ## Constraints
 - Do not expose internal tool names or payloads.</field>
         <field name="tool_ids" eval="[(6, 0, [
-            ref('ir_actions_server_ai_follow_up_project')
+            ref('ir_actions_server_ai_follow_up_project'),
+            ref('ir_actions_server_ai_list_active_projects')
         ])]"/>
     </record>
 

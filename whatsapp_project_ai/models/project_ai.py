@@ -60,3 +60,32 @@ class ProjectProject(models.Model):
             ])
             lines.append(f"- {project.name}: {status}. Open tasks: {task_count}")
         return "\n".join(lines)
+
+    @api.model
+    def _ai_list_active_projects(self, partner_id=False, limit=10):
+        domain = [("active", "=", True)]
+
+        if partner_id:
+            domain.append(("partner_id", "=", partner_id))
+        else:
+            partner = False
+            channel = self.env.context.get("discuss_channel")
+            if channel:
+                partner = getattr(channel, "partner_id", False) or False
+            if not partner and self.env.user:
+                partner = self.env.user.partner_id
+            if partner:
+                domain.append(("partner_id", "=", partner.id))
+
+        projects = self.search(domain, order="write_date desc", limit=int(limit or 10))
+        if not projects:
+            return "No active projects found."
+
+        lines = ["Active projects:"]
+        for project in projects:
+            open_tasks = self.env["project.task"].search_count([
+                ("project_id", "=", project.id),
+                ("is_closed", "=", False),
+            ])
+            lines.append(f"- {project.display_name}: {open_tasks} open tasks")
+        return "\n".join(lines)

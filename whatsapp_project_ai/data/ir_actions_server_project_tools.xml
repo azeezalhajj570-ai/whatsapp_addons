@@ -62,6 +62,27 @@ Return the current status for the latest projects and their recent tasks.</field
         </field>
     </record>
 
+    <record id="ir_actions_server_ai_list_active_projects" model="ir.actions.server">
+        <field name="name">AI Project: List Active Projects</field>
+        <field name="state">code</field>
+        <field name="use_in_ai" eval="True"/>
+        <field name="ai_tool_allow_end_message" eval="False"/>
+        <field name="code">ai['result'] = record.sudo()._ai_list_active_projects(partner_id, limit)</field>
+        <field name="model_id" ref="project.model_project_project"/>
+        <field name="ai_tool_description">## Tool: List Active Projects
+Return active projects, optionally filtered by customer partner.</field>
+        <field name="ai_tool_schema">
+        {
+            "properties": {
+                "partner_id": {"type": "number", "description": "Optional customer partner id filter"},
+                "limit": {"type": "number", "description": "Maximum projects to return (default 10)"}
+            },
+            "required": [],
+            "type": "object"
+        }
+        </field>
+    </record>
+
     <record id="ir_actions_server_ai_create_task" model="ir.actions.server">
         <field name="name">AI Project: Create Task</field>
         <field name="state">code</field>

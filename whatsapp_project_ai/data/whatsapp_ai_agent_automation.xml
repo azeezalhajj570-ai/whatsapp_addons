@@ -3,7 +3,7 @@
     <data>
         <record id="wa_ai_auto_agent_execute_inbound" model="base.automation">
             <field name="name">WhatsApp: AI Agent Execute Inbound</field>
-            <field name="active" eval="True"/>
+            <field name="active" eval="False"/>
             <field name="model_id" ref="whatsapp_evaluation.model_whatsapp_evaluation_message"/>
             <field name="trigger">on_create</field>
             <field name="filter_domain">[('message_type','=','inbound')]</field>

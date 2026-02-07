@@ -14,6 +14,7 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+        'data/openrouter_cron_data.xml',
         'views/openrouter_provider_views.xml',
         'views/openrouter_company_views.xml',
         'views/openrouter_model_views.xml',

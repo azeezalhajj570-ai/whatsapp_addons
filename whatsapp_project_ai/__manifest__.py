@@ -11,6 +11,7 @@
     'depends': [
         'whatsapp_evaluation',
         'ai',
+        'openrouterai_connector',
         'crm',
         'project',
         'mail',

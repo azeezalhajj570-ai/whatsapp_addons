@@ -6,7 +6,7 @@
         <field name="user_id" ref="base.user_root"/>
         <field name="interval_number">10</field>
         <field name="interval_type">minutes</field>
-        <field name="numbercall">-1</field>
+        <!-- <field name="numbercall">-1</field> -->
         <field name="doall" eval="False"/>
         <field name="model_id" ref="model_ai_openrouter_request_log"/>
         <field name="state">code</field>

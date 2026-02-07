@@ -9,6 +9,7 @@ from odoo import _
 from odoo.exceptions import UserError
 
 from odoo.addons.ai.utils import llm_api_service
+from ..services.openrouter_client import OpenRouterClient
 
 
 LLMApiService = llm_api_service.LLMApiService
@@ -18,6 +19,38 @@ _original_init = LLMApiService.__init__
 _original_get_api_token = LLMApiService._get_api_token
 _original_request_llm = LLMApiService._request_llm
 _original_build_tool_call_response = LLMApiService._build_tool_call_response
+
+
+def _log_openrouter_request(env, llm_model, request_body, response_json=None, error_message=None):
+    provider = env["ai.openrouter.provider"].sudo().search([("active", "=", True)], limit=1)
+    model = env["ai.openrouter.model"].sudo().search([("external_id", "=", llm_model)], limit=1)
+    usage = OpenRouterClient.extract_usage(response_json or {})
+
+    response_text = None
+    if isinstance(response_json, dict):
+        choices = response_json.get("choices") or []
+        if choices:
+            response_text = (choices[0].get("message") or {}).get("content")
+
+    env["ai.openrouter.request.log"].sudo().create({
+        "provider_id": provider.id if provider else False,
+        "model_id": model.id if model else False,
+        "generation_id": (response_json or {}).get("id"),
+        "prompt_tokens": usage.get("prompt_tokens"),
+        "completion_tokens": usage.get("completion_tokens"),
+        "total_tokens": usage.get("total_tokens"),
+        "reasoning_tokens": usage.get("reasoning_tokens"),
+        "cached_tokens": usage.get("cached_tokens"),
+        "cache_write_tokens": usage.get("cache_write_tokens"),
+        "audio_tokens": usage.get("audio_tokens"),
+        "total_cost": usage.get("cost") or 0.0,
+        "upstream_inference_cost": usage.get("upstream_inference_cost") or 0.0,
+        "usage_payload": usage.get("usage_payload"),
+        "response_text": response_text if not error_message else error_message,
+        "request_payload": json.dumps(request_body, ensure_ascii=False),
+        "response_payload": json.dumps(response_json, ensure_ascii=False) if response_json else False,
+        "state": "error" if error_message else "success",
+    })
 
 
 def _init(self, env, provider="openai"):
@@ -92,12 +125,25 @@ def _request_llm_openrouter(
             },
         } for tool_name, (tool_description, __, __, tool_parameter_schema) in tools.items()]
 
-    llm_response = self._request(
-        "post",
-        "/chat/completions",
-        self._get_base_headers(),
-        body,
-    )
+    try:
+        llm_response = self._request(
+            "post",
+            "/chat/completions",
+            self._get_base_headers(),
+            body,
+        )
+    except Exception as exc:
+        try:
+            _log_openrouter_request(
+                self.env,
+                llm_model,
+                body,
+                response_json={},
+                error_message=str(exc),
+            )
+        except Exception:
+            llm_api_service._logger.exception("OpenRouter: failed to log error request")
+        raise
 
     to_call = []
     response = []
@@ -118,6 +164,11 @@ def _request_llm_openrouter(
             next_inputs.append({"role": "assistant", "tool_calls": tool_calls})
         if content := message.get("content"):
             response.append(content)
+
+    try:
+        _log_openrouter_request(self.env, llm_model, body, response_json=llm_response)
+    except Exception:
+        llm_api_service._logger.exception("OpenRouter: failed to log successful request")
 
     return response, to_call, next_inputs
 

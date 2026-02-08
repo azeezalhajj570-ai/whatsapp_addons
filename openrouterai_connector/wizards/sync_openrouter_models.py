@@ -29,6 +29,7 @@ class AIOpenRouterSyncWizard(models.TransientModel):
 
         OpenRouterModel = self.env["ai.openrouter.model"].sudo()
         OpenRouterCompany = self.env["ai.openrouter.company"].sudo()
+        OpenRouterModality = self.env["ai.openrouter.modality"].sudo()
         seen_ids = set()
 
         for item in models_data:
@@ -48,6 +49,40 @@ class AIOpenRouterSyncWizard(models.TransientModel):
                 modality = ", ".join(modality)
             elif isinstance(modality, dict):
                 modality = ", ".join([str(value) for value in modality.values()])
+
+
+            input_modality_ids = []
+            output_modality_ids = []
+            
+            # Helper to get/create modality ID
+            def get_modality_id(name):
+                name = name.strip()
+                if not name:
+                    return False
+                mod = OpenRouterModality.search([("name", "=ilike", name)], limit=1)
+                if not mod:
+                    mod = OpenRouterModality.create({"name": name})
+                return mod.id
+
+            if modality and "->" in modality:
+                parts = modality.split("->")
+                if len(parts) == 2:
+                    inputs = parts[0].split("+")
+                    outputs = parts[1].split("+")
+                    for inp in inputs:
+                        if mid := get_modality_id(inp):
+                            input_modality_ids.append(mid)
+                    for out in outputs:
+                        if mid := get_modality_id(out):
+                            output_modality_ids.append(mid)
+            elif modality:
+                # If no arrow, assume it applies to both or just general capability?
+                # Usually architecture.modality is mostly reliable. 
+                # If it's a list, we might want to treat all as input/output or checks docs.
+                # For now, let's treat comma separated strings as tags for both?
+                # Or just ignore if not in input->output format which is cleaner.
+                # However, user example `text+image` implies combined capability.
+                pass
 
             top_provider = item.get("top_provider") or {}
             provider_name = (
@@ -95,6 +130,8 @@ class AIOpenRouterSyncWizard(models.TransientModel):
                 "request_price": request_price,
                 "provider_name": provider_name,
                 "modality": modality,
+                "input_modality_ids": [(6, 0, input_modality_ids)],
+                "output_modality_ids": [(6, 0, output_modality_ids)],
                 "architecture_modality": architecture.get("modality"),
                 "architecture_tokenizer": architecture.get("tokenizer"),
                 "architecture_instruct_type": architecture.get("instruct_type"),

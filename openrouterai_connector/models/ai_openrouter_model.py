@@ -28,6 +28,18 @@ class AIOpenRouterModel(models.Model):
     request_price = fields.Float(string="Request Price", digits=(16, 6))
     provider_name = fields.Char(string="Provider Name")
     modality = fields.Char(string="Modality")
+    input_modality_ids = fields.Many2many(
+        "ai.openrouter.modality",
+        "ai_openrouter_model_input_modality_rel",
+        "model_id", "modality_id",
+        string="Input Modalities",
+    )
+    output_modality_ids = fields.Many2many(
+        "ai.openrouter.modality",
+        "ai_openrouter_model_output_modality_rel",
+        "model_id", "modality_id",
+        string="Output Modalities",
+    )
     architecture_modality = fields.Char(string="Architecture Modality")
     architecture_tokenizer = fields.Char(string="Architecture Tokenizer")
     architecture_instruct_type = fields.Char(string="Architecture Instruct Type")

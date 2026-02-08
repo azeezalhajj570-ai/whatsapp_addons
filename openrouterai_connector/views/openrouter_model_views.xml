@@ -14,6 +14,8 @@
                 <field name="image_price" optional="hide"/>
                 <field name="request_price" optional="hide"/>
                 <field name="modality" optional="hide"/>
+                <field name="input_modality_ids" widget="many2many_tags" optional="show"/>
+                <field name="output_modality_ids" widget="many2many_tags" optional="show"/>
                 <field name="architecture_modality" optional="hide"/>
                 <field name="architecture_tokenizer" optional="hide"/>
                 <field name="architecture_instruct_type" optional="hide"/>
@@ -50,6 +52,8 @@
                         <field name="image_price"/>
                         <field name="request_price"/>
                         <field name="modality"/>
+                        <field name="input_modality_ids" widget="many2many_tags"/>
+                        <field name="output_modality_ids" widget="many2many_tags"/>
                         <field name="architecture_modality"/>
                         <field name="architecture_tokenizer"/>
                         <field name="architecture_instruct_type"/>
@@ -77,6 +81,8 @@
                 <field name="company_provider_id"/>
                 <field name="provider_name"/>
                 <field name="modality"/>
+                <field name="input_modality_ids"/>
+                <field name="output_modality_ids"/>
                 <separator/>
                 <filter name="filter_active" string="Active" domain="[('active','=',True)]"/>
                 <filter name="filter_inactive" string="Archived" domain="[('active','=',False)]"/>
@@ -90,6 +96,10 @@
                     <filter name="group_company_provider" string="Provider" context="{'group_by':'company_provider_id'}"/>
                     <filter name="group_provider_name" string="Provider Name" context="{'group_by':'provider_name'}"/>
                     <filter name="group_modality" string="Modality" context="{'group_by':'modality'}"/>
+                    <!-- M2M keys are not groupable by default in search view without stored related or specialized handling usually, 
+                         but let's keep them if Odoo supports it or removing if it fails. 
+                         Actually M2M grouping is not supported. removing group by for M2M. -->
+
                     <filter name="group_architecture_modality" string="Architecture Modality" context="{'group_by':'architecture_modality'}"/>
                     <filter name="group_architecture_tokenizer" string="Tokenizer" context="{'group_by':'architecture_tokenizer'}"/>
                     <filter name="group_architecture_instruct_type" string="Instruct Type" context="{'group_by':'architecture_instruct_type'}"/>

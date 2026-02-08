@@ -21,6 +21,14 @@ _original_request_llm = LLMApiService._request_llm
 _original_build_tool_call_response = LLMApiService._build_tool_call_response
 
 
+class ImageString(str):
+    def __new__(cls, content, image_data):
+        obj = str.__new__(cls, content)
+        obj.image_data = image_data
+        obj.type = 'image'
+        return obj
+
+
 def _log_openrouter_request(env, llm_model, request_body, response_json=None, error_message=None):
     provider = env["ai.openrouter.provider"].sudo().search([("active", "=", True)], limit=1)
     model = env["ai.openrouter.model"].sudo().search([("external_id", "=", llm_model)], limit=1)
@@ -162,8 +170,24 @@ def _request_llm_openrouter(
                     continue
                 to_call.append((func.get("name"), call.get("id"), arguments))
             next_inputs.append({"role": "assistant", "tool_calls": tool_calls})
-        if content := message.get("content"):
-            response.append(content)
+        msg_content = message.get("content")
+        if msg_content:
+            if isinstance(msg_content, str):
+                response.append(msg_content)
+            elif isinstance(msg_content, list):
+                for part in msg_content:
+                    if isinstance(part, dict):
+                        if part.get("type") == "text":
+                            response.append(part.get("text"))
+                            url = part.get("image_url", {}).get("url", "")
+                            if url.startswith("data:image"):
+                                try:
+                                    base64_data = url.split(",", 1)[1]
+                                    response.append(ImageString("[IMAGE GENERATED]", base64_data))
+                                except IndexError:
+                                    pass
+                            else:
+                                response.append(f"![Image]({url})")
 
     try:
         _log_openrouter_request(self.env, llm_model, body, response_json=llm_response)

@@ -15,6 +15,10 @@ class AIOpenRouterRequestLog(models.Model):
     _description = "OpenRouter Request Log"
     _order = "request_ts desc"
 
+    provider_id = fields.Many2one("ai.openrouter.provider", string="Provider", index=True)
+    model_id = fields.Many2one("ai.openrouter.model", string="Model", index=True)
+    generation_id = fields.Char(string="Generation ID", index=True)
+
     response_attachment_id = fields.Many2one(
         "ir.attachment",
         string="Response Payload (File)",

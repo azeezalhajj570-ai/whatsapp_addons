@@ -3,7 +3,7 @@
         <field name="name">ai.openrouter.request.log.list</field>
         <field name="model">ai.openrouter.request.log</field>
         <field name="arch" type="xml">
-            <list>
+            <list load="false">
                 <field name="request_ts"/>
                 <field name="provider_id"/>
                 <field name="model_id"/>
@@ -34,6 +34,8 @@
                         <field name="model_id"/>
                         <field name="generation_id"/>
                         <field name="state"/>
+                        <field name="response_attachment_id" invisible="not response_attachment_id"/>
+                        <field name="request_attachment_id" invisible="not request_attachment_id"/>
                     </group>
                     <group>
                         <field name="prompt_tokens"/>
@@ -50,8 +52,13 @@
                         <field name="response_text"/>
                     </group>
                     <group>
-                        <field name="request_payload" widget="text"/>
-                        <field name="response_payload" widget="text"/>
+                        <field name="request_payload_preview" widget="text" invisible="not request_payload_preview"/>
+                        <field name="response_payload_preview" widget="text" invisible="not response_payload_preview"/>
+                        
+                         <!-- Full Payloads (System only) -->
+                        <field name="request_payload" widget="text" groups="base.group_system" invisible="not request_payload"/>
+                        <field name="response_payload" widget="text" groups="base.group_system" invisible="not response_payload"/>
+                        
                         <field name="usage_payload" widget="json"/>
                     </group>
                 </sheet>

@@ -3,7 +3,7 @@
         <field name="name">ai.openrouter.request.log.list</field>
         <field name="model">ai.openrouter.request.log</field>
         <field name="arch" type="xml">
-            <list load="false">
+            <list create="false" edit="false" delete="false">
                 <field name="request_ts"/>
                 <field name="provider_id"/>
                 <field name="model_id"/>

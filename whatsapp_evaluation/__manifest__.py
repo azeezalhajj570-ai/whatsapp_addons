@@ -41,7 +41,6 @@ Fully integrated with Odoo’s messaging and contact management system.
         'security/whatsapp_security.xml',
         'security/ir.model.access.csv',
         'security/ir_rules.xml',
-        'security/ir_rules.xml',
         'views/whatsapp_menus.xml',
         'views/whatsapp_account_views.xml',
         'views/whatsapp_message_views.xml',

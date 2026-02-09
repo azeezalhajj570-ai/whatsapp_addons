@@ -85,7 +85,8 @@ class DiscussChannel(models.Model):
             # Ensure notify users are members (in case they were removed or channel existed before fix)
             if wa_account_id.notify_user_ids:
                 # We use add_members which handles duplication safely (only creates missing members)
-                channel.add_members(wa_account_id.notify_user_ids.ids)
+                # FIX: Must pass partner_ids, not user_ids
+                channel.add_members(wa_account_id.notify_user_ids.mapped('partner_id').ids)
                 
                 # FORCE PIN for these users so it appears in specific sidebar category (or All)
                 members = channel.channel_member_ids.filtered(

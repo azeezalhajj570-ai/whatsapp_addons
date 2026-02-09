@@ -53,7 +53,7 @@ class DiscussChannel(models.Model):
 
     
     @api.model
-    def _get_whatsapp_channel(self, whatsapp_number, wa_account_id, create_if_not_found=False):
+    def _get_whatsapp_channel(self, whatsapp_number, wa_account_id, partner=None, create_if_not_found=False):
         """ Find or create a WhatsApp channel for the given number """
         domain = [
             ('channel_type', '=', 'whatsapp'),
@@ -63,7 +63,6 @@ class DiscussChannel(models.Model):
         channel = self.sudo().search(domain, limit=1)
         
         if not channel and create_if_not_found:
-            partner = self.env['res.partner'].sudo().search([('mobile', '=', whatsapp_number)], limit=1)
             name = whatsapp_number
             if partner:
                 name = partner.name
@@ -73,20 +72,26 @@ class DiscussChannel(models.Model):
                 'name': name,
                 'whatsapp_number': whatsapp_number,
                 'wa_account_id': wa_account_id.id,
+                'whatsapp_partner_id': partner.id if partner else False,
             })
+            
+        if channel:
+            # Ensure partner is a member
             if partner:
                  channel.add_members(partner.ids)
+                 if not channel.whatsapp_partner_id:
+                     channel.whatsapp_partner_id = partner
             
-        # Ensure notify users are members (in case they were removed or channel existed before fix)
-        if channel and wa_account_id.notify_user_ids:
-            # We use add_members which handles duplication safely (only creates missing members)
-            channel.add_members(wa_account_id.notify_user_ids.ids)
-            
-            # FORCE PIN for these users so it appears in specific sidebar category (or All)
-            members = channel.channel_member_ids.filtered(
-                lambda m: m.partner_id.id in wa_account_id.notify_user_ids.partner_id.ids
-            )
-            members.sudo().write({'unpin_dt': False, 'fold_state': 'open'})
+            # Ensure notify users are members (in case they were removed or channel existed before fix)
+            if wa_account_id.notify_user_ids:
+                # We use add_members which handles duplication safely (only creates missing members)
+                channel.add_members(wa_account_id.notify_user_ids.ids)
+                
+                # FORCE PIN for these users so it appears in specific sidebar category (or All)
+                members = channel.channel_member_ids.filtered(
+                    lambda m: m.partner_id.id in wa_account_id.notify_user_ids.partner_id.ids
+                )
+                members.sudo().write({'unpin_dt': False, 'fold_state': 'open'})
             
         return channel
 

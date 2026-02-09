@@ -136,11 +136,29 @@ class WebhookEvaluation(http.Controller):
                     )
                     continue
             
+            # Determine Author (Partner) early for channel creation
+            # Try to find partner by mobile or phone, with or without '+' prefix
+            domain = ['|', '|', '|',
+                ('mobile', '=', mobile_number),
+                ('mobile', '=', '+' + mobile_number),
+                ('phone', '=', mobile_number),
+                ('phone', '=', '+' + mobile_number)
+            ]
+            author_partner = request.env['res.partner'].sudo().search(domain, limit=1)
+            if not author_partner:
+                author_partner = request.env['res.partner'].sudo().create({
+                    'name': mobile_number,
+                    'mobile': '+' + mobile_number if not mobile_number.startswith('+') else mobile_number,
+                })
+                _logger.info("WhatsApp Inbound: Created new partner for %s", mobile_number)
+            
+            author_id = author_partner.id
+
             # Find or create channel
             _logger.info("WhatsApp Inbound: Finding Channel for %s", mobile_number)
             
             channel = request.env['discuss.channel'].sudo()._get_whatsapp_channel(
-                mobile_number, account, create_if_not_found=True
+                mobile_number, account, partner=author_partner, create_if_not_found=True
             )
             
             if not channel:
@@ -190,20 +208,6 @@ class WebhookEvaluation(http.Controller):
             
             # Determine Author (Partner)
             # Try to find partner by mobile or phone, with or without '+' prefix
-            domain = ['|', '|', '|',
-                ('mobile', '=', mobile_number),
-                ('mobile', '=', '+' + mobile_number),
-                ('phone', '=', mobile_number),
-                ('phone', '=', '+' + mobile_number)
-            ]
-            author_partner = request.env['res.partner'].sudo().search(domain, limit=1)
-            author_id = author_partner.id if author_partner else None
-
-            # Format body (Convert *Bold*, _Italic_, Newlines to HTML)
-            from markupsafe import Markup
-            formatted_body = Markup(WhatsAppApi.format_whatsapp_to_html(body))
-            
-            # Create the Odoo message
             # Use message_type='comment' to ensure it appears in Discuss and creating notifications/unread counts.
             # Enterprise Pattern: Pass attachments as list of tuples (name, content, mimetype)
             new_msg = channel.with_context(whatsapp_inbound_msg_uid=key.get('id')).message_post(

@@ -210,6 +210,10 @@ class WebhookEvaluation(http.Controller):
             # Try to find partner by mobile or phone, with or without '+' prefix
             # Use message_type='comment' to ensure it appears in Discuss and creating notifications/unread counts.
             # Enterprise Pattern: Pass attachments as list of tuples (name, content, mimetype)
+            # Format body (Convert *Bold*, _Italic_, Newlines to HTML)
+            from markupsafe import Markup
+            formatted_body = Markup(WhatsAppApi.format_whatsapp_to_html(body))
+            
             new_msg = channel.with_context(whatsapp_inbound_msg_uid=key.get('id')).message_post(
                 body=formatted_body,
                 author_id=author_id,

@@ -117,17 +117,6 @@ class WhatsAppApi:
     def _send_whatsapp(self, number, message_body):
         """ Send a text message """
         endpoint = f"/message/sendText/{self.instance_name}"
-        payload = {
-            "number": number,
-            "text": message_body, # Simplified for some instances
-            "textMessage": {
-               "text": message_body
-            }
-        }
-        # Note: Some versions use "textMessage": {"text": ...}, others might flatten it.
-        # Sending both to be safe based on "sendText" docs usually expecting specific schema.
-        # Strict schema from OpenAPI v1 was:
-        # { "number": ..., "textMessage": { "text": ... } }
         
         payload = {
             "number": number,

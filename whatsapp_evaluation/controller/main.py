@@ -3,7 +3,9 @@
 import logging
 import json
 import base64
+from datetime import timedelta
 from odoo import http
+from odoo import fields
 from odoo.http import request, Response
 from odoo.addons.whatsapp_evaluation.tools.whatsapp_api import WhatsAppApi
 
@@ -115,12 +117,48 @@ class WebhookEvaluation(http.Controller):
             if not body and not file_content:
                 _logger.info("WhatsApp Upsert: No body and no base64. Skipping.")
                 continue
+
+            # Guard against provider echoes: if an inbound payload matches a very recent outbound
+            # message body for the same number, skip it.
+            if body:
+                since = fields.Datetime.now() - timedelta(minutes=2)
+                echo_count = request.env['whatsapp_evaluation.message'].sudo().search_count([
+                    ('mobile_number', '=', mobile_number),
+                    ('message_type', '=', 'outbound'),
+                    ('create_date', '>=', since),
+                    ('body', '=', body),
+                ])
+                if echo_count:
+                    _logger.info(
+                        "WhatsApp Upsert: Skipping likely outbound echo for %s (msg_uid=%s)",
+                        mobile_number,
+                        msg_uid,
+                    )
+                    continue
             
+            # Determine Author (Partner) early for channel creation
+            # Try to find partner by mobile or phone, with or without '+' prefix
+            domain = ['|', '|', '|',
+                ('mobile', '=', mobile_number),
+                ('mobile', '=', '+' + mobile_number),
+                ('phone', '=', mobile_number),
+                ('phone', '=', '+' + mobile_number)
+            ]
+            author_partner = request.env['res.partner'].sudo().search(domain, limit=1)
+            if not author_partner:
+                author_partner = request.env['res.partner'].sudo().create({
+                    'name': mobile_number,
+                    'mobile': '+' + mobile_number if not mobile_number.startswith('+') else mobile_number,
+                })
+                _logger.info("WhatsApp Inbound: Created new partner for %s", mobile_number)
+            
+            author_id = author_partner.id
+
             # Find or create channel
             _logger.info("WhatsApp Inbound: Finding Channel for %s", mobile_number)
             
             channel = request.env['discuss.channel'].sudo()._get_whatsapp_channel(
-                mobile_number, account, create_if_not_found=True
+                mobile_number, account, partner=author_partner, create_if_not_found=True
             )
             
             if not channel:
@@ -169,18 +207,13 @@ class WebhookEvaluation(http.Controller):
             # though our logic checks 'whatsapp_inbound_msg_uid' or similar.
             
             # Determine Author (Partner)
-            author_partner = request.env['res.partner'].sudo().search([
-                ('mobile', '=', mobile_number)
-            ], limit=1)
-            author_id = author_partner.id if author_partner else None
-
+            # Try to find partner by mobile or phone, with or without '+' prefix
+            # Use message_type='comment' to ensure it appears in Discuss and creating notifications/unread counts.
+            # Enterprise Pattern: Pass attachments as list of tuples (name, content, mimetype)
             # Format body (Convert *Bold*, _Italic_, Newlines to HTML)
             from markupsafe import Markup
             formatted_body = Markup(WhatsAppApi.format_whatsapp_to_html(body))
             
-            # Create the Odoo message
-            # Use message_type='comment' to ensure it appears in Discuss and creating notifications/unread counts.
-            # Enterprise Pattern: Pass attachments as list of tuples (name, content, mimetype)
             new_msg = channel.with_context(whatsapp_inbound_msg_uid=key.get('id')).message_post(
                 body=formatted_body,
                 author_id=author_id,

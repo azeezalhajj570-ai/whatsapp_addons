@@ -128,3 +128,8 @@ class EvolutionClient(models.AbstractModel):
         # Docs: DELETE /instance/delete/{instance}
         instance = quote(instance_name, safe='')
         return self._request('DELETE', '/instance/delete/%s' % instance)
+
+    def logout_instance(self, instance_name):
+        # Docs: DELETE /instance/logout/{instance}
+        instance = quote(instance_name, safe='')
+        return self._request('DELETE', '/instance/logout/%s' % instance)

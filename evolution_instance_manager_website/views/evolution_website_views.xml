@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="evolution_instances_website_page" name="Evolution Instances Website Page">
+        <t t-call="website.layout">
+            <div class="container my-5">
+                <h1 class="mb-4">Evolution Instances</h1>
+                <div t-if="success" class="alert alert-success" role="alert">
+                    <t t-esc="success"/>
+                </div>
+                <div t-if="error" class="alert alert-danger" role="alert">
+                    <t t-esc="error"/>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Create New Instance</h5>
+                        <form action="/evolution/instances/create" method="post" class="row g-3">
+                            <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                            <div class="col-md-5">
+                                <label class="form-label">Name</label>
+                                <input class="form-control" type="text" name="name" required="required"/>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Pairing Phone</label>
+                                <input class="form-control" type="text" name="pairing_phone" placeholder="+15551234567" required="required"/>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Create</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Status</th>
+                                <th>Last Sync</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="records" t-as="rec">
+                                <tr>
+                                    <td><t t-esc="rec.name"/></td>
+                                    <td><t t-esc="rec.status or '-'"/></td>
+                                    <td><t t-esc="rec.last_status_sync_at or '-'"/></td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-secondary me-1" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">
+                                            ID/Key
+                                        </button>
+                                        <form t-attf-action="/evolution/instances/qr/{{ rec.id }}" method="post" class="d-inline">
+                                            <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                                            <button type="submit" class="btn btn-sm btn-info me-1">Get QR</button>
+                                        </form>
+                                        <form t-attf-action="/evolution/instances/disconnect/{{ rec.id }}" method="post" class="d-inline">
+                                            <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                                            <button type="submit" class="btn btn-sm btn-warning me-1">Disconnect</button>
+                                        </form>
+                                        <a t-attf-href="/web#id={{ rec.id }}&amp;model=evolution.instance.account&amp;view_type=form" class="btn btn-sm btn-primary">
+                                            Open in Backend
+                                        </a>
+                                    </td>
+                                </tr>
+                            </t>
+                            <tr t-if="not records">
+                                <td colspan="4" class="text-center text-muted">No records found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <t t-foreach="records" t-as="rec">
+                    <div class="modal fade" t-att-id="'qrModal%s' % rec.id" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Scan QR Code</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+                                </div>
+                                <div class="modal-body text-center">
+                                    <img t-if="rec.qr_code_image" t-att-src="'data:image/png;base64,%s' % rec.qr_code_image" style="max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
+                                    <p t-if="not rec.qr_code_image" class="text-muted mb-0">No QR available. Click Get QR first.</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal fade" t-att-id="'credModal%s' % rec.id" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Instance Credentials</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Instance ID</label>
+                                        <input class="form-control" type="text" t-att-value="rec.evo_instance_id or ''" readonly="readonly"/>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label">Instance Key</label>
+                                        <input class="form-control" type="text" t-att-value="rec.evo_instance_key or ''" readonly="readonly"/>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+
+                <t t-if="show_qr_id">
+                    <script type="text/javascript">
+                        document.addEventListener('DOMContentLoaded', function () {
+                            var modalEl = document.getElementById('qrModal' + "<t t-esc='show_qr_id'/>");
+                            if (modalEl &amp;&amp; window.bootstrap &amp;&amp; window.bootstrap.Modal) {
+                                window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                            }
+                        });
+                    </script>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <record id="evolution_website_menu_instances" model="website.menu">
+        <field name="name">Evolution Instances</field>
+        <field name="url">/evolution/instances</field>
+        <field name="parent_id" ref="website.main_menu"/>
+        <field name="sequence" eval="85"/>
+    </record>
+</odoo>

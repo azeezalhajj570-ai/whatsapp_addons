@@ -28,7 +28,6 @@ Features:
         'base',
         'web',
         'mail',
-        'website',
     ],
     'data': [
         'security/ir.model.access.csv',
@@ -36,7 +35,6 @@ Features:
         'views/res_config_settings_views.xml',
         'views/evolution_instance_account_views.xml',
         'views/evolution_instance_qr_wizard_views.xml',
-        'views/evolution_website_views.xml',
         'data/ir_cron.xml',
     ],
     'images': ['static/description/main_screenshot.png'],

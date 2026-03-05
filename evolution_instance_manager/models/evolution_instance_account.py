@@ -172,49 +172,51 @@ class EvolutionInstanceAccount(models.Model):
         return digits
 
     def action_create_evolution_instance(self):
+        self.ensure_one()
         client = self.env['evolution.instance.client']
-        for account in self:
-            payload = {
-                'instanceName': account.evo_instance_name,
-                'integration': account.integration or 'WHATSAPP-BAILEYS',
-                'qrcode': True,
-                'number': self._normalize_phone_for_evolution(account.pairing_phone),
-            }
+        account = self
+        payload = {
+            'instanceName': account.evo_instance_name,
+            'integration': account.integration or 'WHATSAPP-BAILEYS',
+            'qrcode': True,
+            'number': self._normalize_phone_for_evolution(account.pairing_phone),
+        }
 
+        try:
+            response = client.create_instance(payload)
+            data = self._as_dict(response)
+            instance_data = self._as_dict(data.get('instance'))
+            instance_key = self._extract_instance_key(data, instance_data)
+
+            account.write({
+                'evo_instance_id': instance_data.get('instanceId') or instance_data.get('id') or account.evo_instance_id,
+                'evo_instance_key': instance_key or account.evo_instance_key,
+                'status': instance_data.get('status') or instance_data.get('state') or account.status,
+                'evo_remote_exists': True,
+                'last_error': False,
+            })
+            # Ensure pairing is initialized with the provided phone on fresh create.
+            # Some Evolution setups only bind/display the phone after connect call with `number`.
             try:
-                response = client.create_instance(payload)
-                data = self._as_dict(response)
-                instance_data = self._as_dict(data.get('instance'))
-                instance_key = self._extract_instance_key(data, instance_data)
-
-                account.write({
-                    'evo_instance_id': instance_data.get('instanceId') or instance_data.get('id') or account.evo_instance_id,
-                    'evo_instance_key': instance_key or account.evo_instance_key,
-                    'status': instance_data.get('status') or instance_data.get('state') or account.status,
-                    'evo_remote_exists': True,
-                    'last_error': False,
-                })
-                # Ensure pairing is initialized with the provided phone on fresh create.
-                # Some Evolution setups only bind/display the phone after connect call with `number`.
-                try:
-                    response_pair = client.fetch_pairing_code(
-                        account.evo_instance_name,
-                        self._normalize_phone_for_evolution(account.pairing_phone),
-                    )
-                    pairing_code = self._extract_pairing_code(response_pair)
-                    if pairing_code:
-                        account.write({'pairing_code': pairing_code})
-                except Exception:
-                    # Do not fail instance creation if pairing bootstrap fails.
-                    pass
-                account.message_post(body=_('Evolution instance created or confirmed successfully.'))
-            except Exception as exc:
-                values = {'last_error': str(exc)}
-                if self._is_already_exists_error(exc):
-                    values['evo_remote_exists'] = True
-                account.write(values)
-                account.message_post(body=_('Evolution instance creation failed: %s') % exc)
-                raise UserError(str(exc)) from exc
+                response_pair = client.fetch_pairing_code(
+                    account.evo_instance_name,
+                    self._normalize_phone_for_evolution(account.pairing_phone),
+                )
+                pairing_code = self._extract_pairing_code(response_pair)
+                if pairing_code:
+                    account.write({'pairing_code': pairing_code})
+            except Exception:
+                # Do not fail instance creation if pairing bootstrap fails.
+                pass
+            account.message_post(body=_('Evolution instance created or confirmed successfully.'))
+            return account.action_get_qr_code()
+        except Exception as exc:
+            values = {'last_error': str(exc)}
+            if self._is_already_exists_error(exc):
+                values['evo_remote_exists'] = True
+            account.write(values)
+            account.message_post(body=_('Evolution instance creation failed: %s') % exc)
+            raise UserError(str(exc)) from exc
 
     def action_refresh_evolution_status(self):
         client = self.env['evolution.instance.client']

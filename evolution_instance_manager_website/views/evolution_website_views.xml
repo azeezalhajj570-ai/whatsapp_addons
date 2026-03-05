@@ -50,18 +50,36 @@
                                     <td><t t-esc="rec.status or '-'"/></td>
                                     <td><t t-esc="rec.last_status_sync_at or '-'"/></td>
                                     <td class="text-end">
-                                        <t t-if="rec.status == 'open'">
-                                            <button class="btn btn-sm btn-secondary me-1" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">
-                                                ID/Key
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                &#8942;
                                             </button>
-                                        </t>
-                                        <t t-if="rec.status != 'open'">
-                                            <button type="button" class="btn btn-sm btn-info me-1 js-evo-get-qr" t-att-data-record-id="rec.id" t-att-data-modal-id="'qrModal%s' % rec.id">Get QR</button>
-                                        </t>
-                                        <form t-attf-action="/evolution/instances/delete/{{ rec.id }}" method="post" class="d-inline">
-                                            <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
-                                            <button type="submit" class="btn btn-sm btn-danger me-1">Delete</button>
-                                        </form>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <t t-if="rec.status != 'open'">
+                                                    <li>
+                                                        <button type="button" class="dropdown-item js-evo-get-qr" t-att-data-record-id="rec.id" t-att-data-modal-id="'qrModal%s' % rec.id">Get QR</button>
+                                                    </li>
+                                                </t>
+                                                <t t-if="rec.status == 'open'">
+                                                    <li>
+                                                        <button class="dropdown-item" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">ID/Key</button>
+                                                    </li>
+                                                    <li>
+                                                        <form t-attf-action="/evolution/instances/test/{{ rec.id }}" method="post">
+                                                            <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                                                            <button type="submit" class="dropdown-item">Test Message</button>
+                                                        </form>
+                                                    </li>
+                                                </t>
+                                                <li><hr class="dropdown-divider"/></li>
+                                                <li>
+                                                    <form t-attf-action="/evolution/instances/delete/{{ rec.id }}" method="post">
+                                                        <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                                                        <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             </t>

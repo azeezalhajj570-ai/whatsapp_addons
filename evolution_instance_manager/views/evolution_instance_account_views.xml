@@ -25,6 +25,7 @@
                     <button name="action_logout_evolution_instance" type="object" string="Disconnect" confirm="Disconnect this instance from WhatsApp?" invisible="not (evo_instance_id or evo_remote_exists)"/>
                     <button name="action_get_qr_code" type="object" string="Get QR Code" invisible="not (evo_instance_id or evo_remote_exists) or status == 'open'"/>
                     <button name="action_get_pairing_code" type="object" string="Get Pairing Code" invisible="not (evo_instance_id or evo_remote_exists)"/>
+                    <button name="action_send_test_message" type="object" string="Test Message" invisible="status != 'open'"/>
                     <button name="action_delete_evolution_instance" type="object" string="Delete Instance" class="btn-danger" confirm="This will delete the instance on Evolution API. Continue?" invisible="not (evo_instance_id or evo_remote_exists)"/>
                 </header>
                 <sheet>

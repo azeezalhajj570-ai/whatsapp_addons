@@ -1,0 +1,95 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* evolution_instance_manager_website
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"POT-Creation-Date: 2026-03-06 00:00+0000\n"
+"PO-Revision-Date: 2026-03-06 00:00+0000\n"
+"Last-Translator: Azeez\n"
+"Language-Team: Arabic\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Evolution Instances"
+msgstr "مثيلات Evolution"
+
+msgid "Create New Instance"
+msgstr "إنشاء مثيل جديد"
+
+msgid "Name"
+msgstr "الاسم"
+
+msgid "Phone"
+msgstr "الهاتف"
+
+msgid "Create"
+msgstr "إنشاء"
+
+msgid "Status"
+msgstr "الحالة"
+
+msgid "Last Sync"
+msgstr "آخر مزامنة"
+
+msgid "Actions"
+msgstr "الإجراءات"
+
+msgid "ID/Key"
+msgstr "المعرف/المفتاح"
+
+msgid "Get QR"
+msgstr "جلب QR"
+
+msgid "Delete"
+msgstr "حذف"
+
+msgid "No records found."
+msgstr "لا توجد سجلات."
+
+msgid "Scan QR Code"
+msgstr "مسح رمز QR"
+
+msgid "No QR available. Click Get QR first."
+msgstr "لا يوجد QR متاح. اضغط جلب QR أولاً."
+
+msgid "Instance Credentials"
+msgstr "بيانات اعتماد المثيل"
+
+msgid "Instance ID"
+msgstr "معرف المثيل"
+
+msgid "Instance Key"
+msgstr "مفتاح المثيل"
+
+msgid "Close"
+msgstr "إغلاق"
+
+msgid "Loading..."
+msgstr "جارٍ التحميل..."
+
+msgid "Failed to fetch QR code."
+msgstr "فشل جلب رمز QR."
+
+msgid "No QR data returned by Evolution API for this instance."
+msgstr "لم يتم إرجاع بيانات QR من Evolution API لهذا المثيل."
+
+msgid "Please fill all required fields."
+msgstr "يرجى تعبئة جميع الحقول المطلوبة."
+
+msgid "Instance created successfully."
+msgstr "تم إنشاء المثيل بنجاح."
+
+msgid "Failed to create instance."
+msgstr "فشل إنشاء المثيل."
+
+msgid "Instance not found."
+msgstr "المثيل غير موجود."
+
+msgid "Instance deleted successfully."
+msgstr "تم حذف المثيل بنجاح."
+
+msgid "Failed to delete instance."
+msgstr "فشل حذف المثيل."

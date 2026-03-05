@@ -77,6 +77,19 @@ class EvolutionWebsiteController(http.Controller):
             msg = str(exc) or 'Failed to delete instance.'
             return request.redirect('/evolution/instances?error=%s' % msg)
 
+    @http.route('/evolution/instances/test/<int:record_id>', type='http', auth='user', website=True, methods=['POST'])
+    def evolution_instances_test(self, record_id, **post):
+        self._check_internal_user()
+        try:
+            account = request.env['evolution.instance.account'].browse(record_id)
+            if not account.exists():
+                return request.redirect('/evolution/instances?error=Instance not found.')
+            account.action_send_test_message()
+            return request.redirect('/evolution/instances?success=Test message sent successfully.')
+        except (UserError, AccessError) as exc:
+            msg = str(exc) or 'Failed to send test message.'
+            return request.redirect('/evolution/instances?error=%s' % msg)
+
     @http.route('/evolution/instances/qr/<int:record_id>', type='http', auth='user', website=True, methods=['POST'])
     def evolution_instances_qr(self, record_id, **post):
         self._check_internal_user()

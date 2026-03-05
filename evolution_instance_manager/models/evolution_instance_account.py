@@ -177,6 +177,7 @@ class EvolutionInstanceAccount(models.Model):
             payload = {
                 'instanceName': account.evo_instance_name,
                 'integration': account.integration or 'WHATSAPP-BAILEYS',
+                'qrcode': True,
                 'number': self._normalize_phone_for_evolution(account.pairing_phone),
             }
 
@@ -193,6 +194,19 @@ class EvolutionInstanceAccount(models.Model):
                     'evo_remote_exists': True,
                     'last_error': False,
                 })
+                # Ensure pairing is initialized with the provided phone on fresh create.
+                # Some Evolution setups only bind/display the phone after connect call with `number`.
+                try:
+                    response_pair = client.fetch_pairing_code(
+                        account.evo_instance_name,
+                        self._normalize_phone_for_evolution(account.pairing_phone),
+                    )
+                    pairing_code = self._extract_pairing_code(response_pair)
+                    if pairing_code:
+                        account.write({'pairing_code': pairing_code})
+                except Exception:
+                    # Do not fail instance creation if pairing bootstrap fails.
+                    pass
                 account.message_post(body=_('Evolution instance created or confirmed successfully.'))
             except Exception as exc:
                 values = {'last_error': str(exc)}
@@ -401,6 +415,32 @@ class EvolutionInstanceAccount(models.Model):
             except Exception as exc:
                 account.write({'last_error': str(exc)})
                 account.message_post(body=_('Evolution instance disconnect failed: %s') % exc)
+                raise UserError(str(exc)) from exc
+
+    def action_send_test_message(self):
+        client = self.env['evolution.instance.client']
+        for account in self:
+            if account.status != 'open':
+                raise UserError(_('Connection must be open to send a test message.'))
+            if not account.pairing_phone:
+                raise UserError(_('Set Phone first.'))
+            if not account.evo_instance_id or not account.evo_instance_key:
+                raise UserError(_('Instance ID and Instance Key are required to send test message.'))
+
+            number = self._normalize_phone_for_evolution(account.pairing_phone)
+            text = _('Test message from Odoo. Instance ID: %s') % account.evo_instance_id
+            try:
+                client.send_test_message(
+                    account.evo_instance_name,
+                    number,
+                    text,
+                    account.evo_instance_key,
+                )
+                account.write({'last_error': False})
+                account.message_post(body=_('Test message sent successfully.'))
+            except Exception as exc:
+                account.write({'last_error': str(exc)})
+                account.message_post(body=_('Test message failed: %s') % exc)
                 raise UserError(str(exc)) from exc
 
     @api.model

@@ -22,8 +22,8 @@ class EvolutionClient(models.AbstractModel):
             raise UserError(_('Please configure Evolution Base URL in Settings.'))
         return base_url.rstrip('/')
 
-    def _build_headers(self):
-        api_key = self.env['ir.config_parameter'].sudo().get_param('evolution_instance_manager.server_api_key')
+    def _build_headers(self, api_key_override=None):
+        api_key = api_key_override or self.env['ir.config_parameter'].sudo().get_param('evolution_instance_manager.server_api_key')
         if not api_key:
             raise UserError(_('Please configure Evolution Server API Key in Settings.'))
         return {
@@ -31,9 +31,9 @@ class EvolutionClient(models.AbstractModel):
             'Content-Type': 'application/json',
         }
 
-    def _request(self, method, endpoint, payload=None, timeout=(10, 30)):
+    def _request(self, method, endpoint, payload=None, timeout=(10, 30), api_key_override=None):
         url = '%s%s' % (self._build_base_url(), endpoint)
-        headers = self._build_headers()
+        headers = self._build_headers(api_key_override=api_key_override)
 
         safe_headers = dict(headers)
         safe_headers['apikey'] = '***'
@@ -133,3 +133,18 @@ class EvolutionClient(models.AbstractModel):
         # Docs: DELETE /instance/logout/{instance}
         instance = quote(instance_name, safe='')
         return self._request('DELETE', '/instance/logout/%s' % instance)
+
+    def send_test_message(self, instance_name, number, text, instance_key):
+        # Docs: POST /message/sendText/{instance}
+        # For this action we intentionally use the instance key.
+        instance = quote(instance_name, safe='')
+        payload = {
+            'number': number,
+            'text': text,
+        }
+        return self._request(
+            'POST',
+            '/message/sendText/%s' % instance,
+            payload=payload,
+            api_key_override=instance_key,
+        )

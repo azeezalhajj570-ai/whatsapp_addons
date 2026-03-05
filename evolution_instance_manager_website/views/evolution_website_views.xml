@@ -62,9 +62,6 @@
                                             <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
                                             <button type="submit" class="btn btn-sm btn-danger me-1">Delete</button>
                                         </form>
-                                        <a t-attf-href="/web#id={{ rec.id }}&amp;model=evolution.instance.account&amp;view_type=form" class="btn btn-sm btn-primary">
-                                            Open in Backend
-                                        </a>
                                     </td>
                                 </tr>
                             </t>
@@ -174,6 +171,10 @@
                                         }
                                     }
                                     var modalEl = document.getElementById(modalId);
+                                    var previewSrc = '';
+                                    if (img &amp;&amp; img.src) {
+                                        previewSrc = img.src;
+                                    }
                                     if (modalEl) {
                                         if (window.bootstrap &amp;&amp; window.bootstrap.Modal) {
                                             window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
@@ -185,6 +186,8 @@
                                             modalEl.removeAttribute('aria-hidden');
                                             modalEl.setAttribute('aria-modal', 'true');
                                         }
+                                    } else if (previewSrc) {
+                                        window.open(previewSrc, '_blank');
                                     }
                                 }).catch(function () {
                                     window.alert('Failed to fetch QR code.');

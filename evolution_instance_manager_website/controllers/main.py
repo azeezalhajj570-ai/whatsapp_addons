@@ -107,6 +107,8 @@ class EvolutionWebsiteController(http.Controller):
             qr_text = account.qr_code_text or ''
             if isinstance(qr_text, bytes):
                 qr_text = qr_text.decode('utf-8')
+            if not qr_value and not qr_text:
+                return {'ok': False, 'error': 'No QR data returned by Evolution API for this instance.'}
             return {
                 'ok': True,
                 'record_id': account.id,

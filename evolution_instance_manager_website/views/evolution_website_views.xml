@@ -125,6 +125,13 @@
                         var buttons = document.querySelectorAll('.js-evo-get-qr');
                         buttons.forEach(function (btn) {
                             btn.addEventListener('click', function () {
+                                if (btn.dataset.loading === '1') {
+                                    return;
+                                }
+                                btn.dataset.loading = '1';
+                                btn.disabled = true;
+                                var originalText = btn.textContent;
+                                btn.textContent = 'Loading...';
                                 var recordId = btn.getAttribute('data-record-id');
                                 var modalId = btn.getAttribute('data-modal-id');
                                 fetch('/evolution/instances/qr/fetch', {
@@ -167,11 +174,24 @@
                                         }
                                     }
                                     var modalEl = document.getElementById(modalId);
-                                    if (modalEl &amp;&amp; window.bootstrap &amp;&amp; window.bootstrap.Modal) {
-                                        window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                                    if (modalEl) {
+                                        if (window.bootstrap &amp;&amp; window.bootstrap.Modal) {
+                                            window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                                        } else if (window.jQuery &amp;&amp; window.jQuery.fn &amp;&amp; window.jQuery.fn.modal) {
+                                            window.jQuery(modalEl).modal('show');
+                                        } else {
+                                            modalEl.style.display = 'block';
+                                            modalEl.classList.add('show');
+                                            modalEl.removeAttribute('aria-hidden');
+                                            modalEl.setAttribute('aria-modal', 'true');
+                                        }
                                     }
                                 }).catch(function () {
                                     window.alert('Failed to fetch QR code.');
+                                }).finally(function () {
+                                    btn.dataset.loading = '0';
+                                    btn.disabled = false;
+                                    btn.textContent = originalText;
                                 });
                             });
                         });

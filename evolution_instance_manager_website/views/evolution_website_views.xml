@@ -4,6 +4,45 @@
         <t t-call="website.layout">
             <section class="o_we_section py-5">
                 <div class="container o_container_small">
+                    <style>
+                        @media (max-width: 767.98px) {
+                            .evo-table thead {
+                                display: none;
+                            }
+                            .evo-table,
+                            .evo-table tbody,
+                            .evo-table tr,
+                            .evo-table td {
+                                display: block;
+                                width: 100%;
+                            }
+                            .evo-table tr {
+                                border-bottom: 1px solid var(--border-color, #dee2e6);
+                                padding: 0.75rem 0;
+                            }
+                            .evo-table td {
+                                border: 0;
+                                padding: 0.25rem 0;
+                                text-align: left !important;
+                            }
+                            .evo-table td[data-label]::before {
+                                content: attr(data-label);
+                                display: block;
+                                font-size: 0.8rem;
+                                color: #6c757d;
+                                margin-bottom: 0.15rem;
+                            }
+                            .evo-actions {
+                                display: grid !important;
+                                grid-template-columns: 1fr;
+                                gap: 0.4rem;
+                                width: 100%;
+                            }
+                            .evo-actions .btn {
+                                width: 100%;
+                            }
+                        }
+                    </style>
                     <div class="mb-4">
                         <h2 class="fw-bold">Evolution Instances</h2>
                         <p class="text-muted mb-0">Manage your WhatsApp Evolution API connections</p>
@@ -38,7 +77,7 @@
 
                     <div class="o_card">
                         <div class="table-responsive">
-                            <table class="table o_table table-hover mb-0">
+                            <table class="table o_table table-hover mb-0 evo-table">
                                 <thead>
                                     <tr>
                                         <th>Name</th>
@@ -51,36 +90,47 @@
                                 <tbody>
                                     <t t-foreach="records" t-as="rec">
                                         <tr>
-                                            <td class="fw-semibold">
+                                            <td class="fw-semibold" data-label="Name">
                                                 <t t-esc="rec.name"/>
                                             </td>
-                                            <td>
+                                            <td data-label="Phone">
                                                 <t t-esc="rec.pairing_phone or '-'"/>
                                             </td>
-                                            <td>
+                                            <td data-label="Status">
                                                 <span t-att-class="'badge bg-success' if rec.status == 'open' else 'badge bg-warning text-dark' if rec.status == 'connecting' else 'badge bg-secondary'">
                                                     <t t-esc="rec.status or '-'"/>
                                                 </span>
                                             </td>
-                                            <td class="text-nowrap">
+                                            <td class="text-nowrap" data-label="Last Sync">
                                                 <t t-esc="rec.last_status_sync_at or '-'"/>
                                             </td>
-                                            <td class="text-end">
-                                                <div class="btn-group btn-group-sm">
-                                                    <t t-if="rec.status != 'open'">
-                                                        <button type="button" class="btn btn-outline-primary js-evo-get-qr" t-att-data-record-id="rec.id" t-att-data-modal-id="'qrModal%s' % rec.id">
-                                                            QR
-                                                        </button>
-                                                    </t>
-                                                    <t t-if="rec.status == 'open'">
-                                                        <button class="btn btn-outline-secondary" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">
-                                                            Credentials
-                                                        </button>
-                                                    </t>
-                                                    <form t-attf-action="/evolution/instances/delete/{{ rec.id }}" method="post" class="d-inline">
-                                                        <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
-                                                        <button type="submit" class="btn btn-outline-danger">Delete</button>
-                                                    </form>
+                                            <td class="text-end" data-label="Actions">
+                                                <div class="dropdown evo-actions">
+                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        Actions
+                                                    </button>
+                                                    <ul class="dropdown-menu dropdown-menu-end">
+                                                        <t t-if="rec.status != 'open'">
+                                                            <li>
+                                                                <button type="button" class="dropdown-item js-evo-get-qr" t-att-data-record-id="rec.id" t-att-data-modal-id="'qrModal%s' % rec.id">
+                                                                    Get QR
+                                                                </button>
+                                                            </li>
+                                                        </t>
+                                                        <t t-if="rec.status == 'open'">
+                                                            <li>
+                                                                <button class="dropdown-item" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">
+                                                                    Credentials
+                                                                </button>
+                                                            </li>
+                                                        </t>
+                                                        <li><hr class="dropdown-divider"/></li>
+                                                        <li>
+                                                            <button class="dropdown-item text-danger" type="button" t-att-data-bs-target="'#deleteModal%s' % rec.id" data-bs-toggle="modal">
+                                                                Delete
+                                                            </button>
+                                                        </li>
+                                                    </ul>
                                                 </div>
                                             </td>
                                         </tr>
@@ -95,7 +145,7 @@
 
                     <t t-foreach="records" t-as="rec">
                         <div class="modal fade" t-att-id="'qrModal%s' % rec.id" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Scan QR Code</h5>
@@ -109,7 +159,7 @@
                         </div>
 
                         <div class="modal fade" t-att-id="'credModal%s' % rec.id" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Instance Credentials</h5>
@@ -142,6 +192,27 @@
                                                 <button class="btn btn-outline-secondary" type="button" t-att-data-target="'key%s' % rec.id" onclick="copySecret(this)">Copy</button>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" t-att-id="'deleteModal%s' % rec.id" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Delete Instance</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"/>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="mb-0">Are you sure you want to delete <b><t t-esc="rec.name"/></b>?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form t-attf-action="/evolution/instances/delete/{{ rec.id }}" method="post" class="d-inline">
+                                            <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>

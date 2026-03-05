@@ -22,6 +22,7 @@
                 <header>
                     <button name="action_create_evolution_instance" type="object" string="Create Instance in Evolution" class="oe_highlight" invisible="evo_instance_id or evo_remote_exists"/>
                     <button name="action_refresh_evolution_status" type="object" string="Refresh Status" invisible="not (evo_instance_id or evo_remote_exists)"/>
+                    <button name="action_logout_evolution_instance" type="object" string="Disconnect" confirm="Disconnect this instance from WhatsApp?" invisible="not (evo_instance_id or evo_remote_exists)"/>
                     <button name="action_get_qr_code" type="object" string="Get QR Code" invisible="not (evo_instance_id or evo_remote_exists)"/>
                     <button name="action_get_pairing_code" type="object" string="Get Pairing Code" invisible="not (evo_instance_id or evo_remote_exists)"/>
                     <button name="action_delete_evolution_instance" type="object" string="Delete Instance" class="btn-danger" confirm="This will delete the instance on Evolution API. Continue?" invisible="not (evo_instance_id or evo_remote_exists)"/>
@@ -33,8 +34,6 @@
                             <field name="name"/>
                             <field name="active" invisible="1"/>
                             <field name="company_id" groups="base.group_multi_company"/>
-                            <field name="evo_instance_name"/>
-                            <field name="integration"/>
                         </group>
                         <group>
                             <field name="status" readonly="1" invisible="not (evo_instance_id or evo_remote_exists)"/>

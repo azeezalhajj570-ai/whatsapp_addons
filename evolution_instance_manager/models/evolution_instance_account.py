@@ -111,6 +111,19 @@ class EvolutionInstanceAccount(models.Model):
             if account.evo_instance_name and ' ' in account.evo_instance_name:
                 raise ValidationError(_('Evolution instance name must not contain spaces.'))
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name'):
+                vals['evo_instance_name'] = vals['name']
+            vals.setdefault('integration', 'WHATSAPP-BAILEYS')
+        return super().create(vals_list)
+
+    def write(self, vals):
+        if vals.get('name'):
+            vals['evo_instance_name'] = vals['name']
+        return super().write(vals)
+
     @staticmethod
     def _as_dict(value):
         return value if isinstance(value, dict) else {}
@@ -334,6 +347,28 @@ class EvolutionInstanceAccount(models.Model):
             except Exception as exc:
                 account.write({'last_error': str(exc)})
                 account.message_post(body=_('Evolution instance delete failed: %s') % exc)
+                raise UserError(str(exc)) from exc
+
+    def action_logout_evolution_instance(self):
+        client = self.env['evolution.instance.client']
+        for account in self:
+            if not account.evo_instance_name:
+                raise UserError(_('Set Evolution Instance Name first.'))
+            try:
+                client.logout_instance(account.evo_instance_name)
+                account.write({
+                    'status': 'close',
+                    'last_status_sync_at': fields.Datetime.now(),
+                    'pairing_code': False,
+                    'qr_code_text': False,
+                    'qr_code_image': False,
+                    'qr_last_fetched_at': False,
+                    'last_error': False,
+                })
+                account.message_post(body=_('Evolution instance disconnected successfully.'))
+            except Exception as exc:
+                account.write({'last_error': str(exc)})
+                account.message_post(body=_('Evolution instance disconnect failed: %s') % exc)
                 raise UserError(str(exc)) from exc
 
     @api.model

@@ -21,7 +21,7 @@
                                 <input class="form-control" type="text" name="name" required="required"/>
                             </div>
                             <div class="col-md-5">
-                                <label class="form-label">Pairing Phone</label>
+                                <label class="form-label">Phone</label>
                                 <input class="form-control" type="text" name="pairing_phone" placeholder="+15551234567" required="required"/>
                             </div>
                             <div class="col-md-2 d-flex align-items-end">
@@ -36,6 +36,7 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
+                                <th>Phone</th>
                                 <th>Status</th>
                                 <th>Last Sync</th>
                                 <th class="text-end">Actions</th>
@@ -45,16 +46,19 @@
                             <t t-foreach="records" t-as="rec">
                                 <tr>
                                     <td><t t-esc="rec.name"/></td>
+                                    <td><t t-esc="rec.pairing_phone or '-'"/></td>
                                     <td><t t-esc="rec.status or '-'"/></td>
                                     <td><t t-esc="rec.last_status_sync_at or '-'"/></td>
                                     <td class="text-end">
                                         <button class="btn btn-sm btn-secondary me-1" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">
                                             ID/Key
                                         </button>
-                                        <form t-attf-action="/evolution/instances/qr/{{ rec.id }}" method="post" class="d-inline">
-                                            <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
-                                            <button type="submit" class="btn btn-sm btn-info me-1">Get QR</button>
-                                        </form>
+                                        <t t-if="rec.status != 'open'">
+                                            <form t-attf-action="/evolution/instances/qr/{{ rec.id }}" method="post" class="d-inline">
+                                                <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                                                <button type="submit" class="btn btn-sm btn-info me-1">Get QR</button>
+                                            </form>
+                                        </t>
                                         <form t-attf-action="/evolution/instances/disconnect/{{ rec.id }}" method="post" class="d-inline">
                                             <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
                                             <button type="submit" class="btn btn-sm btn-warning me-1">Disconnect</button>
@@ -66,7 +70,7 @@
                                 </tr>
                             </t>
                             <tr t-if="not records">
-                                <td colspan="4" class="text-center text-muted">No records found.</td>
+                                <td colspan="5" class="text-center text-muted">No records found.</td>
                             </tr>
                         </tbody>
                     </table>

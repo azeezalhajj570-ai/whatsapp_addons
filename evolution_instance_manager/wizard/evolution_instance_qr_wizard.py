@@ -12,7 +12,7 @@ class EvolutionInstanceQRWizard(models.TransientModel):
     status = fields.Char(readonly=True)
     qr_code_image = fields.Binary(string='QR Code', readonly=True)
     qr_code_text = fields.Text(string='QR Payload', readonly=True)
-    pairing_phone = fields.Char(string='Pairing Phone')
+    pairing_phone = fields.Char(string='Phone')
     pairing_code = fields.Char(string='Pairing Code', readonly=True)
     fetched_at = fields.Datetime(string='Fetched At', readonly=True)
 
@@ -55,7 +55,7 @@ class EvolutionInstanceQRWizard(models.TransientModel):
     def action_get_pairing_code(self):
         self.ensure_one()
         if not self.pairing_phone:
-            raise UserError(_('Set Pairing Phone first.'))
+            raise UserError(_('Set Phone first.'))
 
         client = self.env['evolution.instance.client']
         account = self.account_id

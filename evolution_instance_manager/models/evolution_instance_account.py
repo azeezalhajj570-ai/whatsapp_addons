@@ -77,7 +77,7 @@ class EvolutionInstanceAccount(models.Model):
         attachment=True,
     )
     pairing_phone = fields.Char(
-        string='Pairing Phone',
+        string='Phone',
         required=True,
         help='Phone number used to request a pairing code (international format).',
     )
@@ -159,6 +159,7 @@ class EvolutionInstanceAccount(models.Model):
             payload = {
                 'instanceName': account.evo_instance_name,
                 'integration': account.integration or 'WHATSAPP-BAILEYS',
+                'number': account.pairing_phone,
             }
 
             try:
@@ -304,7 +305,7 @@ class EvolutionInstanceAccount(models.Model):
         now = fields.Datetime.now()
         for account in self:
             if not account.pairing_phone:
-                raise UserError(_('Set Pairing Phone first.'))
+                raise UserError(_('Set Phone first.'))
             try:
                 response = client.fetch_pairing_code(account.evo_instance_name, account.pairing_phone)
                 pairing_code = self._extract_pairing_code(response)

@@ -35,8 +35,9 @@ class EvolutionWebsiteController(http.Controller):
     def evolution_instances_create(self, **post):
         self._check_internal_user()
 
+        raw_name = (post.get('name') or '').strip()
         vals = {
-            'name': (post.get('name') or '').strip(),
+            'name': raw_name,
             'pairing_phone': (post.get('pairing_phone') or '').strip(),
         }
 
@@ -44,7 +45,19 @@ class EvolutionWebsiteController(http.Controller):
             return request.redirect('/evolution/instances?error=Please fill all required fields.')
 
         try:
-            account = request.env['evolution.instance.account'].create(vals)
+            model = request.env['evolution.instance.account'].with_context(active_test=False)
+            account = model.search([
+                ('company_id', '=', request.env.company.id),
+                ('evo_instance_name', '=', raw_name),
+            ], limit=1)
+            if account:
+                account.write({
+                    'active': True,
+                    'name': raw_name,
+                    'pairing_phone': vals['pairing_phone'],
+                })
+            else:
+                account = model.create(vals)
             account.action_create_evolution_instance()
             return request.redirect('/evolution/instances?success=Instance created successfully.')
         except (UserError, AccessError) as exc:

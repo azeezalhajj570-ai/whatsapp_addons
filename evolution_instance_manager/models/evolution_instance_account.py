@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import base64
+import re
 
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError, ValidationError
@@ -158,13 +159,25 @@ class EvolutionInstanceAccount(models.Model):
             or instance_data.get('apiKey')
         )
 
+    @staticmethod
+    def _normalize_phone_for_evolution(phone):
+        phone = (phone or '').strip()
+        if not phone:
+            return phone
+        # Evolution create endpoint validates against ^\d+[\.@\w-]+
+        # Strip leading '+' and non-digit separators for common phone input.
+        if '@' in phone:
+            return phone.lstrip('+')
+        digits = re.sub(r'\D+', '', phone)
+        return digits
+
     def action_create_evolution_instance(self):
         client = self.env['evolution.instance.client']
         for account in self:
             payload = {
                 'instanceName': account.evo_instance_name,
                 'integration': account.integration or 'WHATSAPP-BAILEYS',
-                'number': account.pairing_phone,
+                'number': self._normalize_phone_for_evolution(account.pairing_phone),
             }
 
             try:
@@ -312,7 +325,10 @@ class EvolutionInstanceAccount(models.Model):
             if not account.pairing_phone:
                 raise UserError(_('Set Phone first.'))
             try:
-                response = client.fetch_pairing_code(account.evo_instance_name, account.pairing_phone)
+                response = client.fetch_pairing_code(
+                    account.evo_instance_name,
+                    self._normalize_phone_for_evolution(account.pairing_phone),
+                )
                 pairing_code = self._extract_pairing_code(response)
                 if not pairing_code:
                     raise UserError(_('No pairing code returned by Evolution API.'))
@@ -335,8 +351,12 @@ class EvolutionInstanceAccount(models.Model):
         for account in self:
             if not account.evo_instance_name:
                 raise UserError(_('Set Evolution Instance Name first.'))
+            old_instance_name = account.evo_instance_name
             clear_vals = {
                 'active': False,
+                # Keep archived rows unique so same instance name can be recreated later.
+                'name': '%s__archived__%s' % (account.name or old_instance_name, account.id),
+                'evo_instance_name': '%s__archived__%s' % (old_instance_name, account.id),
                 'evo_instance_id': False,
                 'evo_remote_exists': False,
                 'evo_instance_key': False,

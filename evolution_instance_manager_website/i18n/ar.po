@@ -14,10 +14,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Evolution Instances"
-msgstr "مثيلات Evolution"
+msgstr "حسابات Evolution"
 
 msgid "Create New Instance"
-msgstr "إنشاء مثيل جديد"
+msgstr "إنشاء حساب جديد"
 
 msgid "Name"
 msgstr "الاسم"
@@ -56,13 +56,13 @@ msgid "No QR available. Click Get QR first."
 msgstr "لا يوجد QR متاح. اضغط جلب QR أولاً."
 
 msgid "Instance Credentials"
-msgstr "بيانات اعتماد المثيل"
+msgstr "بيانات اعتماد الحساب"
 
 msgid "Instance ID"
-msgstr "معرف المثيل"
+msgstr "معرف الحساب"
 
 msgid "Instance Key"
-msgstr "مفتاح المثيل"
+msgstr "مفتاح الحساب"
 
 msgid "Close"
 msgstr "إغلاق"
@@ -74,23 +74,23 @@ msgid "Failed to fetch QR code."
 msgstr "فشل جلب رمز QR."
 
 msgid "No QR data returned by Evolution API for this instance."
-msgstr "لم يتم إرجاع بيانات QR من Evolution API لهذا المثيل."
+msgstr "لم يتم إرجاع بيانات QR من Evolution API لهذا الحساب."
 
 msgid "Please fill all required fields."
 msgstr "يرجى تعبئة جميع الحقول المطلوبة."
 
 msgid "Instance created successfully."
-msgstr "تم إنشاء المثيل بنجاح."
+msgstr "تم إنشاء الحساب بنجاح."
 
 msgid "Failed to create instance."
-msgstr "فشل إنشاء المثيل."
+msgstr "فشل إنشاء الحساب."
 
 msgid "Instance not found."
-msgstr "المثيل غير موجود."
+msgstr "الحساب غير موجود."
 
 msgid "Instance deleted successfully."
-msgstr "تم حذف المثيل بنجاح."
+msgstr "تم حذف الحساب بنجاح."
 
 msgid "Failed to delete instance."
-msgstr "فشل حذف المثيل."
+msgstr "فشل حذف الحساب."
 

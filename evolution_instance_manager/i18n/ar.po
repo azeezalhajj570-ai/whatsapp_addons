@@ -27,28 +27,28 @@ msgid "Base URL for your Evolution API server, for example https://api.example.c
 msgstr "الرابط الأساسي لخادم Evolution API، مثال: https://api.example.com"
 
 msgid "Server-level apikey used for instance management endpoints."
-msgstr "مفتاح API على مستوى الخادم المستخدم لنقاط إدارة المثيلات."
+msgstr "مفتاح API على مستوى الخادم المستخدم لنقاط إدارة الحسابات."
 
 msgid "Evolution Instance Account"
-msgstr "حساب مثيل Evolution"
+msgstr "حساب حساب Evolution"
 
 msgid "Evolution Instances"
-msgstr "مثيلات Evolution"
+msgstr "حسابات Evolution"
 
 msgid "Evolution Instance Name"
-msgstr "اسم مثيل Evolution"
+msgstr "اسم حساب Evolution"
 
 msgid "Evolution Instance ID"
-msgstr "معرف مثيل Evolution"
+msgstr "معرف حساب Evolution"
 
 msgid "Evolution Instance Key"
-msgstr "مفتاح مثيل Evolution"
+msgstr "مفتاح حساب Evolution"
 
 msgid "Evolution Instance Exists"
-msgstr "المثيل موجود في Evolution"
+msgstr "الحساب موجود في Evolution"
 
 msgid "Evolution Status"
-msgstr "حالة Evolution"
+msgstr "حالة الإتصال"
 
 msgid "Integration"
 msgstr "التكامل"
@@ -93,7 +93,7 @@ msgid "Scan QR Code"
 msgstr "مسح رمز QR"
 
 msgid "Create Instance in Evolution"
-msgstr "إنشاء مثيل في Evolution"
+msgstr "إنشاء حساب في Evolution"
 
 msgid "Refresh Status"
 msgstr "تحديث الحالة"
@@ -105,7 +105,7 @@ msgid "Get Pairing Code"
 msgstr "جلب رمز الإقران"
 
 msgid "Delete Instance"
-msgstr "حذف المثيل"
+msgstr "حذف الحساب"
 
 msgid "Close"
 msgstr "إغلاق"
@@ -120,7 +120,7 @@ msgid "Status"
 msgstr "الحالة"
 
 msgid "Instances"
-msgstr "المثيلات"
+msgstr "الحسابات"
 
 msgid "Evolution API error (%s): %s"
 msgstr "خطأ Evolution API (%s): %s"
@@ -141,28 +141,28 @@ msgid "Unknown error"
 msgstr "خطأ غير معروف"
 
 msgid "Evolution instance name must be unique per company."
-msgstr "يجب أن يكون اسم مثيل Evolution فريدًا لكل شركة."
+msgstr "يجب أن يكون اسم حساب Evolution فريدًا لكل شركة."
 
 msgid "Evolution instance ID must be unique."
-msgstr "يجب أن يكون معرف مثيل Evolution فريدًا."
+msgstr "يجب أن يكون معرف حساب Evolution فريدًا."
 
 msgid "Evolution instance name must not contain spaces."
-msgstr "يجب ألا يحتوي اسم مثيل Evolution على مسافات."
+msgstr "يجب ألا يحتوي اسم حساب Evolution على مسافات."
 
 msgid "Evolution instance identifier used in API paths."
-msgstr "معرّف مثيل Evolution المستخدم في مسارات API."
+msgstr "معرّف حساب Evolution المستخدم في مسارات API."
 
 msgid "Integration value sent during instance creation."
-msgstr "قيمة التكامل المرسلة أثناء إنشاء المثيل."
+msgstr "قيمة التكامل المرسلة أثناء إنشاء الحساب."
 
 msgid "Phone number used to request a pairing code (international format)."
 msgstr "رقم الهاتف المستخدم لطلب رمز الإقران (بصيغة دولية)."
 
 msgid "Evolution instance created or confirmed successfully."
-msgstr "تم إنشاء مثيل Evolution أو تأكيده بنجاح."
+msgstr "تم إنشاء حساب Evolution أو تأكيده بنجاح."
 
 msgid "Evolution instance creation failed: %s"
-msgstr "فشل إنشاء مثيل Evolution: %s"
+msgstr "فشل إنشاء حساب Evolution: %s"
 
 msgid "Evolution status refreshed successfully."
 msgstr "تم تحديث حالة Evolution بنجاح."
@@ -189,25 +189,25 @@ msgid "Pairing code fetch failed: %s"
 msgstr "فشل جلب رمز الإقران: %s"
 
 msgid "Set Evolution Instance Name first."
-msgstr "يرجى إدخال اسم مثيل Evolution أولاً."
+msgstr "يرجى إدخال اسم حساب Evolution أولاً."
 
 msgid "Evolution instance deleted successfully."
-msgstr "تم حذف مثيل Evolution بنجاح."
+msgstr "تم حذف حساب Evolution بنجاح."
 
 msgid "Evolution instance delete failed: %s"
-msgstr "فشل حذف مثيل Evolution: %s"
+msgstr "فشل حذف حساب Evolution: %s"
 
 msgid "This will delete the instance on Evolution API. Continue?"
-msgstr "سيؤدي هذا إلى حذف المثيل من Evolution API. هل تريد المتابعة؟"
+msgstr "سيؤدي هذا إلى حذف الحساب من Evolution API. هل تريد المتابعة؟"
 
 msgid "Create your first Evolution API instance account."
-msgstr "أنشئ أول حساب مثيل Evolution API الخاص بك."
+msgstr "أنشئ أول حساب حساب Evolution API الخاص بك."
 
 msgid "Evolution Instance Status Sync"
-msgstr "مزامنة حالة مثيل Evolution"
+msgstr "مزامنة حالة حساب Evolution"
 
 msgid "Evolution Instance Account Company Isolation"
-msgstr "عزل الشركات لحساب مثيل Evolution"
+msgstr "عزل الشركات لحساب حساب Evolution"
 
 msgid "Phone"
 msgstr "الهاتف"
@@ -219,22 +219,22 @@ msgid "Disconnect"
 msgstr "قطع الاتصال"
 
 msgid "Disconnect this instance from WhatsApp?"
-msgstr "هل تريد قطع اتصال هذا المثيل من واتساب؟"
+msgstr "هل تريد قطع اتصال هذا الحساب من واتساب؟"
 
 msgid "Evolution instance disconnected successfully."
-msgstr "تم قطع اتصال مثيل Evolution بنجاح."
+msgstr "تم قطع اتصال حساب Evolution بنجاح."
 
 msgid "Evolution instance disconnect failed: %s"
-msgstr "فشل قطع اتصال مثيل Evolution: %s"
+msgstr "فشل قطع اتصال حساب Evolution: %s"
 
 msgid "Connection must be open to send a test message."
 msgstr "يجب أن تكون الحالة مفتوحة لإرسال رسالة اختبار."
 
 msgid "Instance ID and Instance Key are required to send test message."
-msgstr "معرّف المثيل ومفتاح المثيل مطلوبان لإرسال رسالة اختبار."
+msgstr "معرّف الحساب ومفتاح الحساب مطلوبان لإرسال رسالة اختبار."
 
 msgid "Test message from Odoo. Instance ID: %s"
-msgstr "رسالة اختبار من أودو. معرّف المثيل: %s"
+msgstr "رسالة اختبار من أودو. معرّف الحساب: %s"
 
 msgid "Test message sent successfully."
 msgstr "تم إرسال رسالة الاختبار بنجاح."
@@ -243,6 +243,6 @@ msgid "Test message failed: %s"
 msgstr "فشل إرسال رسالة الاختبار: %s"
 
 msgid "Evolution instance was already deleted remotely. Local data cleared."
-msgstr "تم حذف مثيل Evolution مسبقاً من الطرف البعيد. تم تنظيف البيانات المحلية."
+msgstr "تم حذف حساب Evolution مسبقاً من الطرف البعيد. تم تنظيف البيانات المحلية."
 
 

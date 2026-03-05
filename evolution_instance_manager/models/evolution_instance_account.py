@@ -33,6 +33,11 @@ class EvolutionInstanceAccount(models.Model):
         copy=False,
         readonly=True,
     )
+    evo_remote_exists = fields.Boolean(
+        string='Evolution Instance Exists',
+        copy=False,
+        readonly=True,
+    )
     evo_instance_key = fields.Char(
         string='Evolution Instance Key',
         groups='base.group_system',
@@ -109,6 +114,11 @@ class EvolutionInstanceAccount(models.Model):
     def _as_dict(value):
         return value if isinstance(value, dict) else {}
 
+    @staticmethod
+    def _is_already_exists_error(exc):
+        text = str(exc).lower()
+        return 'already in use' in text or 'already exists' in text
+
     def action_create_evolution_instance(self):
         client = self.env['evolution.instance.client']
         for account in self:
@@ -127,11 +137,15 @@ class EvolutionInstanceAccount(models.Model):
                     'evo_instance_id': instance_data.get('instanceId') or instance_data.get('id') or account.evo_instance_id,
                     'evo_instance_key': hash_data.get('apikey') or hash_data.get('apiKey') or account.evo_instance_key,
                     'status': instance_data.get('status') or instance_data.get('state') or account.status,
+                    'evo_remote_exists': True,
                     'last_error': False,
                 })
                 account.message_post(body=_('Evolution instance created or confirmed successfully.'))
             except Exception as exc:
-                account.write({'last_error': str(exc)})
+                values = {'last_error': str(exc)}
+                if self._is_already_exists_error(exc):
+                    values['evo_remote_exists'] = True
+                account.write(values)
                 account.message_post(body=_('Evolution instance creation failed: %s') % exc)
                 raise UserError(str(exc)) from exc
 
@@ -285,6 +299,7 @@ class EvolutionInstanceAccount(models.Model):
                 client.delete_instance(account.evo_instance_name)
                 account.write({
                     'evo_instance_id': False,
+                    'evo_remote_exists': False,
                     'evo_instance_key': False,
                     'status': False,
                     'last_status_sync_at': False,

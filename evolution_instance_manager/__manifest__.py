@@ -43,6 +43,6 @@ Features:
     },
     'installable': True,
     'application': True,
-    'price': 99.00,
+    'price': 15.00,
     'currency': 'EUR',
 }

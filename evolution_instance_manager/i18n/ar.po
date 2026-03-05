@@ -1,0 +1,210 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* evolution_instance_manager
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"POT-Creation-Date: 2026-03-05 00:00+0000\n"
+"PO-Revision-Date: 2026-03-05 00:00+0000\n"
+"Last-Translator: Azeez\n"
+"Language-Team: Arabic\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+
+msgid "Evolution API"
+msgstr "واجهة Evolution API"
+
+msgid "Evolution Base URL"
+msgstr "رابط Evolution الأساسي"
+
+msgid "Evolution Server API Key"
+msgstr "مفتاح API الخاص بخادم Evolution"
+
+msgid "Base URL for your Evolution API server, for example https://api.example.com"
+msgstr "الرابط الأساسي لخادم Evolution API، مثال: https://api.example.com"
+
+msgid "Server-level apikey used for instance management endpoints."
+msgstr "مفتاح API على مستوى الخادم المستخدم لنقاط إدارة المثيلات."
+
+msgid "Evolution Instance Account"
+msgstr "حساب مثيل Evolution"
+
+msgid "Evolution Instances"
+msgstr "مثيلات Evolution"
+
+msgid "Evolution Instance Name"
+msgstr "اسم مثيل Evolution"
+
+msgid "Evolution Instance ID"
+msgstr "معرف مثيل Evolution"
+
+msgid "Evolution Instance Key"
+msgstr "مفتاح مثيل Evolution"
+
+msgid "Evolution Instance Exists"
+msgstr "المثيل موجود في Evolution"
+
+msgid "Evolution Status"
+msgstr "حالة Evolution"
+
+msgid "Integration"
+msgstr "التكامل"
+
+msgid "Company"
+msgstr "الشركة"
+
+msgid "Name"
+msgstr "الاسم"
+
+msgid "Last Status Sync At"
+msgstr "آخر وقت مزامنة للحالة"
+
+msgid "Last Error"
+msgstr "آخر خطأ"
+
+msgid "Pairing"
+msgstr "الإقران"
+
+msgid "Pairing Phone"
+msgstr "هاتف الإقران"
+
+msgid "Pairing Code"
+msgstr "رمز الإقران"
+
+msgid "Last QR/Pairing Fetch At"
+msgstr "آخر وقت لجلب QR/الإقران"
+
+msgid "QR Payload"
+msgstr "بيانات QR"
+
+msgid "QR Code Image"
+msgstr "صورة رمز QR"
+
+msgid "QR Code"
+msgstr "رمز QR"
+
+msgid "Fetched At"
+msgstr "وقت الجلب"
+
+msgid "Scan QR Code"
+msgstr "مسح رمز QR"
+
+msgid "Create Instance in Evolution"
+msgstr "إنشاء مثيل في Evolution"
+
+msgid "Refresh Status"
+msgstr "تحديث الحالة"
+
+msgid "Get QR Code"
+msgstr "جلب رمز QR"
+
+msgid "Get Pairing Code"
+msgstr "جلب رمز الإقران"
+
+msgid "Delete Instance"
+msgstr "حذف المثيل"
+
+msgid "Close"
+msgstr "إغلاق"
+
+msgid "Archived"
+msgstr "مؤرشف"
+
+msgid "Group By"
+msgstr "تجميع حسب"
+
+msgid "Status"
+msgstr "الحالة"
+
+msgid "Instances"
+msgstr "المثيلات"
+
+msgid "Evolution API error (%s): %s"
+msgstr "خطأ Evolution API (%s): %s"
+
+msgid "Please configure Evolution Base URL in Settings."
+msgstr "يرجى ضبط رابط Evolution الأساسي في الإعدادات."
+
+msgid "Please configure Evolution Server API Key in Settings."
+msgstr "يرجى ضبط مفتاح API لخادم Evolution في الإعدادات."
+
+msgid "Evolution API request timed out."
+msgstr "انتهت مهلة طلب Evolution API."
+
+msgid "Could not reach Evolution API server: %s"
+msgstr "تعذر الوصول إلى خادم Evolution API: %s"
+
+msgid "Unknown error"
+msgstr "خطأ غير معروف"
+
+msgid "Evolution instance name must be unique per company."
+msgstr "يجب أن يكون اسم مثيل Evolution فريدًا لكل شركة."
+
+msgid "Evolution instance ID must be unique."
+msgstr "يجب أن يكون معرف مثيل Evolution فريدًا."
+
+msgid "Evolution instance name must not contain spaces."
+msgstr "يجب ألا يحتوي اسم مثيل Evolution على مسافات."
+
+msgid "Evolution instance identifier used in API paths."
+msgstr "معرّف مثيل Evolution المستخدم في مسارات API."
+
+msgid "Integration value sent during instance creation."
+msgstr "قيمة التكامل المرسلة أثناء إنشاء المثيل."
+
+msgid "Phone number used to request a pairing code (international format)."
+msgstr "رقم الهاتف المستخدم لطلب رمز الإقران (بصيغة دولية)."
+
+msgid "Evolution instance created or confirmed successfully."
+msgstr "تم إنشاء مثيل Evolution أو تأكيده بنجاح."
+
+msgid "Evolution instance creation failed: %s"
+msgstr "فشل إنشاء مثيل Evolution: %s"
+
+msgid "Evolution status refreshed successfully."
+msgstr "تم تحديث حالة Evolution بنجاح."
+
+msgid "Evolution status refresh failed: %s"
+msgstr "فشل تحديث حالة Evolution: %s"
+
+msgid "QR code fetched successfully."
+msgstr "تم جلب رمز QR بنجاح."
+
+msgid "QR code fetch failed: %s"
+msgstr "فشل جلب رمز QR: %s"
+
+msgid "Set Pairing Phone first."
+msgstr "يرجى إدخال رقم هاتف الإقران أولاً."
+
+msgid "No pairing code returned by Evolution API."
+msgstr "لم يتم إرجاع رمز إقران من Evolution API."
+
+msgid "Pairing code fetched successfully."
+msgstr "تم جلب رمز الإقران بنجاح."
+
+msgid "Pairing code fetch failed: %s"
+msgstr "فشل جلب رمز الإقران: %s"
+
+msgid "Set Evolution Instance Name first."
+msgstr "يرجى إدخال اسم مثيل Evolution أولاً."
+
+msgid "Evolution instance deleted successfully."
+msgstr "تم حذف مثيل Evolution بنجاح."
+
+msgid "Evolution instance delete failed: %s"
+msgstr "فشل حذف مثيل Evolution: %s"
+
+msgid "This will delete the instance on Evolution API. Continue?"
+msgstr "سيؤدي هذا إلى حذف المثيل من Evolution API. هل تريد المتابعة؟"
+
+msgid "Create your first Evolution API instance account."
+msgstr "أنشئ أول حساب مثيل Evolution API الخاص بك."
+
+msgid "Evolution Instance Status Sync"
+msgstr "مزامنة حالة مثيل Evolution"
+
+msgid "Evolution Instance Account Company Isolation"
+msgstr "عزل الشركات لحساب مثيل Evolution"

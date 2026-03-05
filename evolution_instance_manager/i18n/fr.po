@@ -1,0 +1,209 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* evolution_instance_manager
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 18.0\n"
+"POT-Creation-Date: 2026-03-05 00:00+0000\n"
+"PO-Revision-Date: 2026-03-05 00:00+0000\n"
+"Last-Translator: Azeez\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Evolution API"
+msgstr "API Evolution"
+
+msgid "Evolution Base URL"
+msgstr "URL de base Evolution"
+
+msgid "Evolution Server API Key"
+msgstr "Clé API serveur Evolution"
+
+msgid "Base URL for your Evolution API server, for example https://api.example.com"
+msgstr "URL de base de votre serveur Evolution API, par exemple https://api.example.com"
+
+msgid "Server-level apikey used for instance management endpoints."
+msgstr "Clé API au niveau serveur utilisée pour les points de terminaison de gestion des instances."
+
+msgid "Evolution Instance Account"
+msgstr "Compte d'instance Evolution"
+
+msgid "Evolution Instances"
+msgstr "Instances Evolution"
+
+msgid "Evolution Instance Name"
+msgstr "Nom de l'instance Evolution"
+
+msgid "Evolution Instance ID"
+msgstr "ID de l'instance Evolution"
+
+msgid "Evolution Instance Key"
+msgstr "Clé de l'instance Evolution"
+
+msgid "Evolution Instance Exists"
+msgstr "L'instance Evolution existe"
+
+msgid "Evolution Status"
+msgstr "Statut Evolution"
+
+msgid "Integration"
+msgstr "Intégration"
+
+msgid "Company"
+msgstr "Société"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Last Status Sync At"
+msgstr "Dernière synchronisation du statut"
+
+msgid "Last Error"
+msgstr "Dernière erreur"
+
+msgid "Pairing"
+msgstr "Appairage"
+
+msgid "Pairing Phone"
+msgstr "Téléphone d'appairage"
+
+msgid "Pairing Code"
+msgstr "Code d'appairage"
+
+msgid "Last QR/Pairing Fetch At"
+msgstr "Dernière récupération QR/Appairage"
+
+msgid "QR Payload"
+msgstr "Charge utile QR"
+
+msgid "QR Code Image"
+msgstr "Image du code QR"
+
+msgid "QR Code"
+msgstr "Code QR"
+
+msgid "Fetched At"
+msgstr "Récupéré le"
+
+msgid "Scan QR Code"
+msgstr "Scanner le code QR"
+
+msgid "Create Instance in Evolution"
+msgstr "Créer une instance dans Evolution"
+
+msgid "Refresh Status"
+msgstr "Actualiser le statut"
+
+msgid "Get QR Code"
+msgstr "Obtenir le code QR"
+
+msgid "Get Pairing Code"
+msgstr "Obtenir le code d'appairage"
+
+msgid "Delete Instance"
+msgstr "Supprimer l'instance"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Archived"
+msgstr "Archivé"
+
+msgid "Group By"
+msgstr "Grouper par"
+
+msgid "Status"
+msgstr "Statut"
+
+msgid "Instances"
+msgstr "Instances"
+
+msgid "Evolution API error (%s): %s"
+msgstr "Erreur Evolution API (%s) : %s"
+
+msgid "Please configure Evolution Base URL in Settings."
+msgstr "Veuillez configurer l'URL de base Evolution dans les paramètres."
+
+msgid "Please configure Evolution Server API Key in Settings."
+msgstr "Veuillez configurer la clé API serveur Evolution dans les paramètres."
+
+msgid "Evolution API request timed out."
+msgstr "La requête Evolution API a expiré."
+
+msgid "Could not reach Evolution API server: %s"
+msgstr "Impossible d'atteindre le serveur Evolution API : %s"
+
+msgid "Unknown error"
+msgstr "Erreur inconnue"
+
+msgid "Evolution instance name must be unique per company."
+msgstr "Le nom de l'instance Evolution doit être unique par société."
+
+msgid "Evolution instance ID must be unique."
+msgstr "L'ID de l'instance Evolution doit être unique."
+
+msgid "Evolution instance name must not contain spaces."
+msgstr "Le nom de l'instance Evolution ne doit pas contenir d'espaces."
+
+msgid "Evolution instance identifier used in API paths."
+msgstr "Identifiant d'instance Evolution utilisé dans les chemins API."
+
+msgid "Integration value sent during instance creation."
+msgstr "Valeur d'intégration envoyée lors de la création de l'instance."
+
+msgid "Phone number used to request a pairing code (international format)."
+msgstr "Numéro de téléphone utilisé pour demander un code d'appairage (format international)."
+
+msgid "Evolution instance created or confirmed successfully."
+msgstr "Instance Evolution créée ou confirmée avec succès."
+
+msgid "Evolution instance creation failed: %s"
+msgstr "Echec de la création de l'instance Evolution : %s"
+
+msgid "Evolution status refreshed successfully."
+msgstr "Statut Evolution actualisé avec succès."
+
+msgid "Evolution status refresh failed: %s"
+msgstr "Echec de l'actualisation du statut Evolution : %s"
+
+msgid "QR code fetched successfully."
+msgstr "Code QR récupéré avec succès."
+
+msgid "QR code fetch failed: %s"
+msgstr "Echec de récupération du code QR : %s"
+
+msgid "Set Pairing Phone first."
+msgstr "Définissez d'abord le téléphone d'appairage."
+
+msgid "No pairing code returned by Evolution API."
+msgstr "Aucun code d'appairage renvoyé par Evolution API."
+
+msgid "Pairing code fetched successfully."
+msgstr "Code d'appairage récupéré avec succès."
+
+msgid "Pairing code fetch failed: %s"
+msgstr "Echec de récupération du code d'appairage : %s"
+
+msgid "Set Evolution Instance Name first."
+msgstr "Définissez d'abord le nom de l'instance Evolution."
+
+msgid "Evolution instance deleted successfully."
+msgstr "Instance Evolution supprimée avec succès."
+
+msgid "Evolution instance delete failed: %s"
+msgstr "Echec de suppression de l'instance Evolution : %s"
+
+msgid "This will delete the instance on Evolution API. Continue?"
+msgstr "Cela supprimera l'instance sur Evolution API. Continuer ?"
+
+msgid "Create your first Evolution API instance account."
+msgstr "Créez votre premier compte d'instance Evolution API."
+
+msgid "Evolution Instance Status Sync"
+msgstr "Synchronisation du statut des instances Evolution"
+
+msgid "Evolution Instance Account Company Isolation"
+msgstr "Isolation par société du compte d'instance Evolution"

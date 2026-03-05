@@ -54,14 +54,11 @@
                                             ID/Key
                                         </button>
                                         <t t-if="rec.status != 'open'">
-                                            <form t-attf-action="/evolution/instances/qr/{{ rec.id }}" method="post" class="d-inline">
-                                                <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
-                                                <button type="submit" class="btn btn-sm btn-info me-1">Get QR</button>
-                                            </form>
+                                            <button type="button" class="btn btn-sm btn-info me-1 js-evo-get-qr" t-att-data-record-id="rec.id" t-att-data-modal-id="'qrModal%s' % rec.id">Get QR</button>
                                         </t>
-                                        <form t-attf-action="/evolution/instances/disconnect/{{ rec.id }}" method="post" class="d-inline">
+                                        <form t-attf-action="/evolution/instances/delete/{{ rec.id }}" method="post" class="d-inline">
                                             <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
-                                            <button type="submit" class="btn btn-sm btn-warning me-1">Disconnect</button>
+                                            <button type="submit" class="btn btn-sm btn-danger me-1">Delete</button>
                                         </form>
                                         <a t-attf-href="/web#id={{ rec.id }}&amp;model=evolution.instance.account&amp;view_type=form" class="btn btn-sm btn-primary">
                                             Open in Backend
@@ -85,7 +82,8 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
                                 </div>
                                 <div class="modal-body text-center">
-                                    <img t-if="rec.qr_code_image" t-att-src="'data:image/png;base64,%s' % rec.qr_code_image" style="max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
+                                    <img t-att-id="'qrImg%s' % rec.id" t-if="rec.qr_code_image" t-att-src="'data:image/png;base64,%s' % rec.qr_code_image" style="max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
+                                    <img t-att-id="'qrImg%s' % rec.id" t-if="not rec.qr_code_image" style="display:none; max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
                                     <p t-if="not rec.qr_code_image" class="text-muted mb-0">No QR available. Click Get QR first.</p>
                                 </div>
                                 <div class="modal-footer">
@@ -120,16 +118,48 @@
                     </div>
                 </t>
 
-                <t t-if="show_qr_id">
-                    <script type="text/javascript">
-                        document.addEventListener('DOMContentLoaded', function () {
-                            var modalEl = document.getElementById('qrModal' + "<t t-esc='show_qr_id'/>");
-                            if (modalEl &amp;&amp; window.bootstrap &amp;&amp; window.bootstrap.Modal) {
-                                window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
-                            }
+                <script type="text/javascript">
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var buttons = document.querySelectorAll('.js-evo-get-qr');
+                        buttons.forEach(function (btn) {
+                            btn.addEventListener('click', function () {
+                                var recordId = btn.getAttribute('data-record-id');
+                                var modalId = btn.getAttribute('data-modal-id');
+                                fetch('/evolution/instances/qr/fetch', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        jsonrpc: '2.0',
+                                        method: 'call',
+                                        params: { record_id: parseInt(recordId, 10) },
+                                        id: parseInt(recordId, 10)
+                                    })
+                                }).then(function (r) { return r.json(); }).then(function (payload) {
+                                    var result = payload.result || {};
+                                    if (!result.ok) {
+                                        window.alert(result.error || 'Failed to fetch QR code.');
+                                        return;
+                                    }
+                                    var qrImage = result.qr_code_image || '';
+                                    if (qrImage.startsWith(\"b'\") &amp;&amp; qrImage.endsWith(\"'\")) {
+                                        qrImage = qrImage.slice(2, -1);
+                                    }
+                                    var img = document.getElementById('qrImg' + recordId);
+                                    if (img) {
+                                        img.src = 'data:image/png;base64,' + qrImage;
+                                        img.style.display = '';
+                                    }
+                                    var modalEl = document.getElementById(modalId);
+                                    if (modalEl &amp;&amp; window.bootstrap &amp;&amp; window.bootstrap.Modal) {
+                                        window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                                    }
+                                }).catch(function () {
+                                    window.alert('Failed to fetch QR code.');
+                                });
+                            });
                         });
-                    </script>
-                </t>
+                    });
+                </script>
             </div>
         </t>
     </template>

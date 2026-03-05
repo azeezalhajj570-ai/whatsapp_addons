@@ -51,17 +51,17 @@ class EvolutionWebsiteController(http.Controller):
             msg = str(exc) or 'Failed to create instance.'
             return request.redirect('/evolution/instances?error=%s' % msg)
 
-    @http.route('/evolution/instances/disconnect/<int:record_id>', type='http', auth='user', website=True, methods=['POST'])
-    def evolution_instances_disconnect(self, record_id, **post):
+    @http.route('/evolution/instances/delete/<int:record_id>', type='http', auth='user', website=True, methods=['POST'])
+    def evolution_instances_delete(self, record_id, **post):
         self._check_internal_user()
         try:
             account = request.env['evolution.instance.account'].browse(record_id)
             if not account.exists():
                 return request.redirect('/evolution/instances?error=Instance not found.')
-            account.action_logout_evolution_instance()
-            return request.redirect('/evolution/instances?success=Instance disconnected successfully.')
+            account.action_delete_evolution_instance()
+            return request.redirect('/evolution/instances?success=Instance deleted successfully.')
         except (UserError, AccessError) as exc:
-            msg = str(exc) or 'Failed to disconnect instance.'
+            msg = str(exc) or 'Failed to delete instance.'
             return request.redirect('/evolution/instances?error=%s' % msg)
 
     @http.route('/evolution/instances/qr/<int:record_id>', type='http', auth='user', website=True, methods=['POST'])
@@ -76,3 +76,21 @@ class EvolutionWebsiteController(http.Controller):
         except (UserError, AccessError) as exc:
             msg = str(exc) or 'Failed to fetch QR code.'
             return request.redirect('/evolution/instances?error=%s' % msg)
+
+    @http.route('/evolution/instances/qr/fetch', type='json', auth='user', website=True, methods=['POST'])
+    def evolution_instances_qr_fetch(self, record_id):
+        self._check_internal_user()
+        account = request.env['evolution.instance.account'].browse(int(record_id))
+        if not account.exists():
+            return {'ok': False, 'error': 'Instance not found.'}
+        try:
+            account.action_get_qr_code()
+            qr_value = account.qr_code_image or ''
+            if isinstance(qr_value, bytes):
+                qr_value = qr_value.decode('utf-8')
+            # Defensive cleanup for values serialized as b'...'
+            if isinstance(qr_value, str) and qr_value.startswith("b'") and qr_value.endswith("'"):
+                qr_value = qr_value[2:-1]
+            return {'ok': True, 'record_id': account.id, 'qr_code_image': qr_value}
+        except (UserError, AccessError) as exc:
+            return {'ok': False, 'error': str(exc) or 'Failed to fetch QR code.'}

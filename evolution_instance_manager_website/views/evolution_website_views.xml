@@ -141,7 +141,7 @@
                                         return;
                                     }
                                     var qrImage = result.qr_code_image || '';
-                                    if (qrImage.startsWith(\"b'\") &amp;&amp; qrImage.endsWith(\"'\")) {
+                                    if (qrImage.slice(0, 2) === "b'" &amp;&amp; qrImage.slice(-1) === "'") {
                                         qrImage = qrImage.slice(2, -1);
                                     }
                                     var img = document.getElementById('qrImg' + recordId);

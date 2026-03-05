@@ -2,347 +2,231 @@
 <odoo>
     <template id="evolution_instances_website_page" name="Evolution Instances Website Page">
         <t t-call="website.layout">
-            <section class="o_we_section py-5">
-                <div class="container o_container_small">
-                    <style>
-                        .evo-table-wrap {
-                            overflow: visible;
-                        }
-                        .evo-create-card {
-                            position: relative;
-                            z-index: 1;
-                        }
-                        .evo-list-card {
-                            position: relative;
-                            z-index: 20;
-                            overflow: visible;
-                        }
-                        .evo-table .dropdown-menu {
-                            z-index: 1080;
-                        }
-                        @media (max-width: 767.98px) {
-                            .evo-table-wrap {
-                                overflow-x: auto;
-                            }
-                            .evo-table thead {
-                                display: none;
-                            }
-                            .evo-table,
-                            .evo-table tbody,
-                            .evo-table tr,
-                            .evo-table td {
-                                display: block;
-                                width: 100%;
-                            }
-                            .evo-table tr {
-                                border-bottom: 1px solid var(--border-color, #dee2e6);
-                                padding: 0.75rem 0;
-                            }
-                            .evo-table td {
-                                border: 0;
-                                padding: 0.25rem 0;
-                                text-align: left !important;
-                            }
-                            .evo-table td[data-label]::before {
-                                content: attr(data-label);
-                                display: block;
-                                font-size: 0.8rem;
-                                color: #6c757d;
-                                margin-bottom: 0.15rem;
-                            }
-                            .evo-actions {
-                                display: grid !important;
-                                grid-template-columns: 1fr;
-                                gap: 0.4rem;
-                                width: 100%;
-                            }
-                            .evo-actions .btn {
-                                width: 100%;
-                            }
-                        }
-                    </style>
-                    <div class="mb-4">
-                        <h2 class="fw-bold">Evolution Instances</h2>
-                        <p class="text-muted mb-0">Manage your WhatsApp Evolution API connections</p>
+            <div class="container my-5">
+                <h1 class="mb-4">Evolution Instances</h1>
+                <div t-if="success" class="alert alert-success" role="alert">
+                    <t t-esc="success"/>
+                </div>
+                <div t-if="error" class="alert alert-danger" role="alert">
+                    <t t-esc="error"/>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">Create New Instance</h5>
+                        <form action="/evolution/instances/create" method="post" class="row g-3">
+                            <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                            <div class="col-md-5">
+                                <label class="form-label">Name</label>
+                                <input class="form-control" type="text" name="name" required="required"/>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label">Phone</label>
+                                <input class="form-control" type="text" name="pairing_phone" placeholder="+15551234567" required="required"/>
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary w-100">Create</button>
+                            </div>
+                        </form>
                     </div>
+                </div>
 
-                    <div id="evo_flash_data" class="d-none" t-att-data-success="success or ''" t-att-data-error="error or ''"/>
-                    <div id="evo_toast_container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"/>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Status</th>
+                                <th>Last Sync</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="records" t-as="rec">
+                                <tr>
+                                    <td><t t-esc="rec.name"/></td>
+                                    <td><t t-esc="rec.pairing_phone or '-'"/></td>
+                                    <td><t t-esc="rec.status or '-'"/></td>
+                                    <td><t t-esc="rec.last_status_sync_at or '-'"/></td>
+                                    <td class="text-end">
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                &#8942;
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <t t-if="rec.status != 'open'">
+                                                    <li>
+                                                        <button type="button" class="dropdown-item js-evo-get-qr" t-att-data-record-id="rec.id" t-att-data-modal-id="'qrModal%s' % rec.id">Get QR</button>
+                                                    </li>
+                                                </t>
+                                                <t t-if="rec.status == 'open'">
+                                                    <li>
+                                                        <button class="dropdown-item" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">Connection Credentials</button>
+                                                    </li>
+                                                    <li>
+                                                        <form t-attf-action="/evolution/instances/test/{{ rec.id }}" method="post">
+                                                            <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                                                            <button type="submit" class="dropdown-item">Test Message</button>
+                                                        </form>
+                                                    </li>
+                                                </t>
+                                                <li><hr class="dropdown-divider"/></li>
+                                                <li>
+                                                    <form t-attf-action="/evolution/instances/delete/{{ rec.id }}" method="post">
+                                                        <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                                                        <button type="submit" class="dropdown-item text-danger">Delete</button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </t>
+                            <tr t-if="not records">
+                                <td colspan="5" class="text-center text-muted">No records found.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                    <div class="o_card mb-4 evo-create-card">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">Create Instance</h5>
-                            <form action="/evolution/instances/create" method="post" class="row g-3">
-                                <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
-                                <div class="col-12 col-md-5">
-                                    <label class="form-label">Name</label>
-                                    <input class="form-control" type="text" name="name" required="required"/>
+                <t t-foreach="records" t-as="rec">
+                    <div class="modal fade" t-att-id="'qrModal%s' % rec.id" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Scan QR Code</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
                                 </div>
-                                <div class="col-12 col-md-5">
-                                    <label class="form-label">Phone</label>
-                                    <input class="form-control" type="tel" name="pairing_phone" placeholder="+15551234567" required="required"/>
+                                <div class="modal-body text-center">
+                                    <img t-att-id="'qrImg%s' % rec.id" t-if="rec.qr_code_image" t-att-src="'data:image/png;base64,%s' % rec.qr_code_image" style="max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
+                                    <img t-att-id="'qrImg%s' % rec.id" t-if="not rec.qr_code_image" style="display:none; max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
+                                    <p t-att-id="'qrInfo%s' % rec.id" t-if="not rec.qr_code_image" class="text-muted mb-0">No QR available. Click Get QR first.</p>
                                 </div>
-                                <div class="col-12 col-md-2 d-grid">
-                                    <button type="submit" class="btn btn-primary">Create</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <div class="o_card evo-list-card">
-                        <div class="table-responsive evo-table-wrap">
-                            <table class="table o_table table-hover mb-0 evo-table">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Phone</th>
-                                        <th>Status</th>
-                                        <th>Last Sync</th>
-                                        <th class="text-end">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <t t-foreach="records" t-as="rec">
-                                        <tr>
-                                            <td class="fw-semibold" data-label="Name">
-                                                <t t-esc="rec.name"/>
-                                            </td>
-                                            <td data-label="Phone">
-                                                <t t-esc="rec.pairing_phone or '-'"/>
-                                            </td>
-                                            <td data-label="Status">
-                                                <span t-att-class="'badge bg-success' if rec.status == 'open' else 'badge bg-warning text-dark' if rec.status == 'connecting' else 'badge bg-secondary'">
-                                                    <t t-esc="rec.status or '-'"/>
-                                                </span>
-                                            </td>
-                                            <td class="text-nowrap" data-label="Last Sync">
-                                                <t t-esc="rec.last_status_sync_at or '-'"/>
-                                            </td>
-                                            <td class="text-end" data-label="Actions">
-                                                <div class="dropdown evo-actions">
-                                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                        Actions
-                                                    </button>
-                                                    <ul class="dropdown-menu dropdown-menu-end">
-                                                        <t t-if="rec.status != 'open'">
-                                                            <li>
-                                                                <button type="button" class="dropdown-item js-evo-get-qr" t-att-data-record-id="rec.id" t-att-data-modal-id="'qrModal%s' % rec.id">
-                                                                    Get QR
-                                                                </button>
-                                                            </li>
-                                                        </t>
-                                                        <t t-if="rec.status == 'open'">
-                                                            <li>
-                                                                <button class="dropdown-item" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">
-                                                                    Credentials
-                                                                </button>
-                                                            </li>
-                                                        </t>
-                                                        <li><hr class="dropdown-divider"/></li>
-                                                        <li>
-                                                            <button class="dropdown-item text-danger" type="button" t-att-data-bs-target="'#deleteModal%s' % rec.id" data-bs-toggle="modal">
-                                                                Delete
-                                                            </button>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                    <tr t-if="not records">
-                                        <td colspan="5" class="text-center py-5 text-muted">No instances created yet.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <t t-foreach="records" t-as="rec">
-                        <div class="modal fade" t-att-id="'qrModal%s' % rec.id" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Scan QR Code</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"/>
-                                    </div>
-                                    <div class="modal-body text-center">
-                                        <img t-att-id="'qrImg%s' % rec.id" style="max-width:420px;width:100%;" alt="QR Code"/>
-                                    </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="modal fade" t-att-id="'credModal%s' % rec.id" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Instance Credentials</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"/>
+                    <div class="modal fade" t-att-id="'credModal%s' % rec.id" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Instance Credentials</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="alert alert-info">
+                                        Use <b>Instance Key</b> as the <code>apikey</code> header for instance-scoped actions.
+                                        Use <b>Instance ID</b> when an integration asks for instance identifier.
                                     </div>
-                                    <div class="modal-body">
-                                        <div class="alert alert-info">
-                                            Use <b>Instance Key</b> as the API key.
-                                            <br/>
-                                            Evolution API URL:
-                                            <code>
-                                                <t t-esc="evolution_base_url or '-'"/>
-                                            </code>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">Instance ID</label>
-                                            <div class="input-group">
-                                                <input t-att-id="'id%s' % rec.id" class="form-control" type="password" t-att-value="rec.evo_instance_id or ''" readonly="readonly"/>
-                                                <button class="btn btn-outline-secondary" type="button" t-att-data-target="'id%s' % rec.id" onclick="toggleSecret(this)">Show</button>
-                                                <button class="btn btn-outline-secondary" type="button" t-att-data-target="'id%s' % rec.id" onclick="copySecret(this)">Copy</button>
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-0">
-                                            <label class="form-label">Instance Key</label>
-                                            <div class="input-group">
-                                                <input t-att-id="'key%s' % rec.id" class="form-control" type="password" t-att-value="rec.evo_instance_key or ''" readonly="readonly"/>
-                                                <button class="btn btn-outline-secondary" type="button" t-att-data-target="'key%s' % rec.id" onclick="toggleSecret(this)">Show</button>
-                                                <button class="btn btn-outline-secondary" type="button" t-att-data-target="'key%s' % rec.id" onclick="copySecret(this)">Copy</button>
-                                            </div>
-                                        </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Evolution API URL</label>
+                                        <input class="form-control" type="text" t-att-value="evolution_base_url or ''" readonly="readonly"/>
                                     </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Instance ID</label>
+                                        <input class="form-control" type="text" t-att-value="rec.evo_instance_id or ''" readonly="readonly"/>
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label">Instance Key</label>
+                                        <input class="form-control" type="text" t-att-value="rec.evo_instance_key or ''" readonly="readonly"/>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </t>
 
-                        <div class="modal fade" t-att-id="'deleteModal%s' % rec.id" tabindex="-1" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-fullscreen-sm-down">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Delete Instance</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"/>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p class="mb-0">Are you sure you want to delete <b><t t-esc="rec.name"/></b>?</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <form t-attf-action="/evolution/instances/delete/{{ rec.id }}" method="post" class="d-inline">
-                                            <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
-                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </t>
-
-                    <script><![CDATA[
-                        function toggleSecret(btn) {
-                            const id = btn.dataset.target;
-                            const el = document.getElementById(id);
-                            if (!el) return;
-                            el.type = el.type === "password" ? "text" : "password";
-                            btn.innerText = el.type === "password" ? "Show" : "Hide";
-                        }
-
-                        function copySecret(btn) {
-                            const id = btn.dataset.target;
-                            const el = document.getElementById(id);
-                            if (!el) return;
-                            navigator.clipboard.writeText(el.value || "");
-                            btn.innerText = "Copied";
-                            setTimeout(function () { btn.innerText = "Copy"; }, 900);
-                        }
-
-                        document.addEventListener("DOMContentLoaded", function () {
-                            const flashData = document.getElementById("evo_flash_data");
-                            const toastContainer = document.getElementById("evo_toast_container");
-                            const successMsg = flashData ? (flashData.dataset.success || "").trim() : "";
-                            const errorMsg = flashData ? (flashData.dataset.error || "").trim() : "";
-
-                            function showToast(message, isError) {
-                                if (!message || !toastContainer) return;
-                                const toastEl = document.createElement("div");
-                                toastEl.className = "toast align-items-center text-bg-" + (isError ? "danger" : "success") + " border-0";
-                                toastEl.setAttribute("role", "alert");
-                                toastEl.setAttribute("aria-live", "assertive");
-                                toastEl.setAttribute("aria-atomic", "true");
-                                toastEl.innerHTML = '<div class="d-flex"><div class="toast-body"></div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div>';
-                                toastEl.querySelector(".toast-body").innerText = message;
-                                toastContainer.appendChild(toastEl);
-                                if (window.bootstrap && bootstrap.Toast) {
-                                    const toast = new bootstrap.Toast(toastEl, { delay: 1800, autohide: true });
-                                    toast.show();
+                <script type="text/javascript"><![CDATA[
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var buttons = document.querySelectorAll('.js-evo-get-qr');
+                        buttons.forEach(function (btn) {
+                            btn.addEventListener('click', function () {
+                                if (btn.dataset.loading === '1') {
+                                    return;
                                 }
-                            }
-
-                            showToast(successMsg, false);
-                            showToast(errorMsg, true);
-
-                            try {
-                                const currentUrl = new URL(window.location.href);
-                                if (currentUrl.searchParams.has("success") || currentUrl.searchParams.has("error")) {
-                                    currentUrl.searchParams.delete("success");
-                                    currentUrl.searchParams.delete("error");
-                                    const cleanUrl = currentUrl.pathname + (currentUrl.searchParams.toString() ? ("?" + currentUrl.searchParams.toString()) : "") + currentUrl.hash;
-                                    window.history.replaceState({}, "", cleanUrl);
-                                }
-                            } catch (e) {
-                                // Ignore URL cleanup errors.
-                            }
-
-                            const buttons = document.querySelectorAll(".js-evo-get-qr");
-                            buttons.forEach(function (btn) {
-                                btn.addEventListener("click", async function () {
-                                    const recordId = parseInt(btn.dataset.recordId, 10);
-                                    const modalId = btn.dataset.modalId;
-                                    if (!recordId || !modalId) return;
-
-                                    const img = document.getElementById("qrImg" + recordId);
-                                    const modalEl = document.getElementById(modalId);
-                                    if (!img || !modalEl) return;
-
-                                    btn.disabled = true;
-                                    const originalText = btn.innerText;
-                                    btn.innerText = "Loading...";
-
-                                    try {
-                                        const response = await fetch("/evolution/instances/qr/fetch", {
-                                            method: "POST",
-                                            headers: {
-                                                "Content-Type": "application/json"
-                                            },
-                                            body: JSON.stringify({ record_id: recordId })
-                                        });
-                                        const payload = await response.json();
-                                        const result = payload && payload.result ? payload.result : payload;
-                                        if (!result || !result.ok) {
-                                            throw new Error((result && result.error) || "Failed to fetch QR code.");
-                                        }
-
-                                        const qrImage = result.qr_code_image || "";
-                                        const qrText = result.qr_code_text || "";
-                                        if (qrImage) {
-                                            const normalized = qrImage.startsWith("data:image") ? qrImage : ("data:image/png;base64," + qrImage);
-                                            img.setAttribute("src", normalized);
-                                        } else if (qrText) {
-                                            const encoded = encodeURIComponent(qrText);
-                                            img.setAttribute("src", "https://api.qrserver.com/v1/create-qr-code/?size=420x420&data=" + encoded);
-                                        } else {
-                                            throw new Error("No QR data returned by server.");
-                                        }
-
-                                        const modal = window.bootstrap ? new bootstrap.Modal(modalEl) : null;
-                                        if (modal) modal.show();
-                                    } catch (err) {
-                                        alert((err && err.message) || "Failed to fetch QR code.");
-                                    } finally {
-                                        btn.disabled = false;
-                                        btn.innerText = originalText;
+                                btn.dataset.loading = '1';
+                                btn.disabled = true;
+                                var originalText = btn.textContent;
+                                btn.textContent = 'Loading...';
+                                var recordId = btn.getAttribute('data-record-id');
+                                var modalId = btn.getAttribute('data-modal-id');
+                                fetch('/evolution/instances/qr/fetch', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        jsonrpc: '2.0',
+                                        method: 'call',
+                                        params: { record_id: parseInt(recordId, 10) },
+                                        id: parseInt(recordId, 10)
+                                    })
+                                }).then(function (r) { return r.json(); }).then(function (payload) {
+                                    var result = payload.result || {};
+                                    if (!result.ok) {
+                                        window.alert(result.error || 'Failed to fetch QR code.');
+                                        return;
                                     }
+                                    var qrImage = result.qr_code_image || '';
+                                    var qrText = result.qr_code_text || '';
+                                    if (qrImage.slice(0, 2) === "b'" && qrImage.slice(-1) === "'") {
+                                        qrImage = qrImage.slice(2, -1);
+                                    }
+                                    var img = document.getElementById('qrImg' + recordId);
+                                    var info = document.getElementById('qrInfo' + recordId);
+                                    if (img) {
+                                        if (qrImage) {
+                                            img.src = 'data:image/png;base64,' + qrImage;
+                                            img.style.display = '';
+                                            if (info) {
+                                                info.style.display = 'none';
+                                            }
+                                        } else if (qrText) {
+                                            img.src = '/report/barcode/?type=QR&width=420&height=420&value=' + encodeURIComponent(qrText);
+                                            img.style.display = '';
+                                            if (info) {
+                                                info.style.display = 'none';
+                                            }
+                                        } else if (info) {
+                                            info.style.display = '';
+                                        }
+                                    }
+                                    var modalEl = document.getElementById(modalId);
+                                    var previewSrc = '';
+                                    if (img && img.src) {
+                                        previewSrc = img.src;
+                                    }
+                                    if (modalEl) {
+                                        if (window.bootstrap && window.bootstrap.Modal) {
+                                            window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                                        } else if (window.jQuery && window.jQuery.fn && window.jQuery.fn.modal) {
+                                            window.jQuery(modalEl).modal('show');
+                                        } else {
+                                            modalEl.style.display = 'block';
+                                            modalEl.classList.add('show');
+                                            modalEl.removeAttribute('aria-hidden');
+                                            modalEl.setAttribute('aria-modal', 'true');
+                                        }
+                                    } else if (previewSrc) {
+                                        window.open(previewSrc, '_blank');
+                                    }
+                                }).catch(function () {
+                                    window.alert('Failed to fetch QR code.');
+                                }).finally(function () {
+                                    btn.dataset.loading = '0';
+                                    btn.disabled = false;
+                                    btn.textContent = originalText;
                                 });
                             });
                         });
-                    ]]></script>
-                </div>
-            </section>
+                    });
+                ]]></script>
+            </div>
         </t>
     </template>
 

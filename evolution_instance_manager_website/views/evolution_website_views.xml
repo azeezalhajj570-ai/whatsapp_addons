@@ -24,7 +24,7 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <h5 class="card-title mb-3">Create New Instance</h5>
-                        <form action="/evolution/instances/create" method="post" class="row g-3">
+                        <form action="/evolution/instances/create" method="post" class="row g-3 js-evo-create-form">
                             <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
                             <div class="col-md-5">
                                 <label class="form-label">Name</label>
@@ -57,10 +57,25 @@
                                 <tr>
                                     <td><t t-esc="rec.name"/></td>
                                     <td><t t-esc="rec.pairing_phone or '-'"/></td>
-                                    <td><t t-esc="rec.status or '-'"/></td>
-                                    <td><t t-esc="rec.last_status_sync_at or '-'"/></td>
+                                    <td><span t-att-id="'status%s' % rec.id"><t t-esc="rec.status or '-'"/></span></td>
+                                    <td><span t-att-id="'sync%s' % rec.id"><t t-esc="rec.last_status_sync_at or '-'"/></span></td>
                                     <td class="text-end">
-                                        <div class="dropdown d-inline-block">
+                                        <div class="btn-group btn-group-sm d-none d-md-inline-flex" role="group">
+                                            <t t-if="rec.status != 'open'">
+                                                <button type="button" class="btn btn-outline-primary js-evo-get-qr" t-att-data-record-id="rec.id" t-att-data-modal-id="'qrModal%s' % rec.id">Get QR</button>
+                                            </t>
+                                            <t t-if="rec.status == 'open'">
+                                                <button class="btn btn-outline-secondary" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">Credentials</button>
+                                                <form t-attf-action="/evolution/instances/test/{{ rec.id }}" method="post" class="js-evo-test-form d-inline" t-att-data-record-id="rec.id">
+                                                    <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                                                    <button type="submit" class="btn btn-outline-secondary">Test</button>
+                                                </form>
+                                            </t>
+                                            <button type="button" class="btn btn-outline-secondary js-evo-check-status" t-att-data-record-id="rec.id">Status</button>
+                                            <button type="button" class="btn btn-outline-danger" t-att-data-bs-target="'#deleteModal%s' % rec.id" data-bs-toggle="modal">Delete</button>
+                                        </div>
+
+                                        <div class="dropdown d-inline-block d-md-none">
                                             <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                 &#8942;
                                             </button>
@@ -75,17 +90,18 @@
                                                         <button class="dropdown-item" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">Connection Credentials</button>
                                                     </li>
                                                     <li>
-                                                        <form t-attf-action="/evolution/instances/test/{{ rec.id }}" method="post">
+                                                        <form t-attf-action="/evolution/instances/test/{{ rec.id }}" method="post" class="js-evo-test-form" t-att-data-record-id="rec.id">
                                                             <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
                                                             <button type="submit" class="dropdown-item">Test Message</button>
                                                         </form>
                                                     </li>
                                                 </t>
+                                                <li>
+                                                    <button type="button" class="dropdown-item js-evo-check-status" t-att-data-record-id="rec.id">Check Status</button>
+                                                </li>
                                                 <li><hr class="dropdown-divider"/></li>
                                                 <li>
-                                                    <button type="button" class="dropdown-item text-danger" t-att-data-bs-target="'#deleteModal%s' % rec.id" data-bs-toggle="modal">
-                                                        Delete
-                                                    </button>
+                                                    <button type="button" class="dropdown-item text-danger" t-att-data-bs-target="'#deleteModal%s' % rec.id" data-bs-toggle="modal">Delete</button>
                                                 </li>
                                             </ul>
                                         </div>
@@ -173,6 +189,10 @@
 
                 <script type="text/javascript"><![CDATA[
                     document.addEventListener('DOMContentLoaded', function () {
+                        function extractResult(payload) {
+                            return (payload && payload.result) ? payload.result : (payload || {});
+                        }
+
                         function notify(title, message, type) {
                             var container = document.getElementById('evo_toast_container');
                             if (!container || !message) {
@@ -206,6 +226,133 @@
                                 notify('Error', errorMsg, 'danger');
                             }
                         }
+
+                        var createForm = document.querySelector('.js-evo-create-form');
+                        if (createForm) {
+                            createForm.addEventListener('submit', function (ev) {
+                                ev.preventDefault();
+                                var submitBtn = createForm.querySelector('button[type="submit"]');
+                                var nameInput = createForm.querySelector('input[name="name"]');
+                                var phoneInput = createForm.querySelector('input[name="pairing_phone"]');
+                                var name = (nameInput && nameInput.value ? nameInput.value : '').trim();
+                                var pairingPhone = (phoneInput && phoneInput.value ? phoneInput.value : '').trim();
+                                if (!name || !pairingPhone) {
+                                    notify('Error', 'Please fill all required fields.', 'danger');
+                                    return;
+                                }
+                                if (submitBtn) {
+                                    submitBtn.disabled = true;
+                                }
+                                fetch('/evolution/instances/create_ajax', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        jsonrpc: '2.0',
+                                        method: 'call',
+                                        params: { name: name, pairing_phone: pairingPhone },
+                                        id: Date.now()
+                                    })
+                                }).then(function (r) { return r.json(); }).then(function (payload) {
+                                    var result = extractResult(payload);
+                                    if (!result.ok) {
+                                        notify('Error', result.error || 'Failed to create instance.', 'danger');
+                                        return;
+                                    }
+                                    notify('Success', result.message || 'Instance created successfully.', 'success');
+                                    if (nameInput) { nameInput.value = ''; }
+                                    if (phoneInput) { phoneInput.value = ''; }
+                                }).catch(function () {
+                                    notify('Error', 'Failed to create instance.', 'danger');
+                                }).finally(function () {
+                                    if (submitBtn) {
+                                        submitBtn.disabled = false;
+                                    }
+                                });
+                            });
+                        }
+
+                        var testForms = document.querySelectorAll('.js-evo-test-form');
+                        testForms.forEach(function (form) {
+                            form.addEventListener('submit', function (ev) {
+                                ev.preventDefault();
+                                var recordId = form.getAttribute('data-record-id');
+                                var submitBtn = form.querySelector('button[type="submit"]');
+                                if (!recordId) {
+                                    notify('Error', 'Instance not found.', 'danger');
+                                    return;
+                                }
+                                if (submitBtn) {
+                                    submitBtn.disabled = true;
+                                }
+                                fetch('/evolution/instances/test_ajax', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        jsonrpc: '2.0',
+                                        method: 'call',
+                                        params: { record_id: parseInt(recordId, 10) },
+                                        id: parseInt(recordId, 10)
+                                    })
+                                }).then(function (r) { return r.json(); }).then(function (payload) {
+                                    var result = extractResult(payload);
+                                    if (!result.ok) {
+                                        notify('Error', result.error || 'Failed to send test message.', 'danger');
+                                        return;
+                                    }
+                                    notify('Success', result.message || 'Test message sent successfully.', 'success');
+                                }).catch(function () {
+                                    notify('Error', 'Failed to send test message.', 'danger');
+                                }).finally(function () {
+                                    if (submitBtn) {
+                                        submitBtn.disabled = false;
+                                    }
+                                });
+                            });
+                        });
+
+                        var statusButtons = document.querySelectorAll('.js-evo-check-status');
+                        statusButtons.forEach(function (btn) {
+                            btn.addEventListener('click', function () {
+                                var recordId = btn.getAttribute('data-record-id');
+                                if (!recordId) {
+                                    notify('Error', 'Instance not found.', 'danger');
+                                    return;
+                                }
+                                btn.disabled = true;
+                                var originalText = btn.textContent;
+                                btn.textContent = 'Checking...';
+                                fetch('/evolution/instances/status_check_ajax', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        jsonrpc: '2.0',
+                                        method: 'call',
+                                        params: { record_id: parseInt(recordId, 10) },
+                                        id: parseInt(recordId, 10)
+                                    })
+                                }).then(function (r) { return r.json(); }).then(function (payload) {
+                                    var result = extractResult(payload);
+                                    if (!result.ok) {
+                                        notify('Error', result.error || 'Failed to refresh status.', 'danger');
+                                        return;
+                                    }
+                                    var statusEl = document.getElementById('status' + recordId);
+                                    var syncEl = document.getElementById('sync' + recordId);
+                                    if (statusEl) {
+                                        statusEl.textContent = result.status || '-';
+                                    }
+                                    if (syncEl) {
+                                        syncEl.textContent = result.last_status_sync_at || '-';
+                                    }
+                                    notify('Success', result.message || 'Instance status refreshed successfully.', 'success');
+                                }).catch(function () {
+                                    notify('Error', 'Failed to refresh status.', 'danger');
+                                }).finally(function () {
+                                    btn.disabled = false;
+                                    btn.textContent = originalText;
+                                });
+                            });
+                        });
 
                         var buttons = document.querySelectorAll('.js-evo-get-qr');
                         buttons.forEach(function (btn) {

@@ -69,6 +69,47 @@ class EvolutionWebsiteController(http.Controller):
             msg = str(exc) or 'Failed to create instance.'
             return request.redirect('/evolution/instances?error=%s' % msg)
 
+    @http.route('/evolution/instances/create_ajax', type='json', auth='user', website=True, methods=['POST'])
+    def evolution_instances_create_ajax(self, name=None, pairing_phone=None):
+        self._check_internal_user()
+
+        raw_name = (name or '').strip()
+        raw_phone = (pairing_phone or '').strip()
+        if not raw_name or not raw_phone:
+            return {'ok': False, 'error': 'Please fill all required fields.'}
+
+        try:
+            model = request.env['evolution.instance.account'].with_context(active_test=False)
+            account = model.search([
+                ('company_id', '=', request.env.company.id),
+                ('evo_instance_name', '=', raw_name),
+            ], limit=1)
+            if account:
+                account.write({
+                    'active': True,
+                    'name': raw_name,
+                    'pairing_phone': raw_phone,
+                })
+            else:
+                account = model.create({
+                    'name': raw_name,
+                    'pairing_phone': raw_phone,
+                })
+            account.action_create_evolution_instance()
+            return {
+                'ok': True,
+                'message': 'Instance created successfully.',
+                'record': {
+                    'id': account.id,
+                    'name': account.name or '',
+                    'pairing_phone': account.pairing_phone or '',
+                    'status': account.status or '',
+                    'last_status_sync_at': str(account.last_status_sync_at or ''),
+                }
+            }
+        except (UserError, AccessError) as exc:
+            return {'ok': False, 'error': str(exc) or 'Failed to create instance.'}
+
     @http.route('/evolution/instances/delete/<int:record_id>', type='http', auth='user', website=True, methods=['POST'])
     def evolution_instances_delete(self, record_id, **post):
         self._check_internal_user()
@@ -94,6 +135,35 @@ class EvolutionWebsiteController(http.Controller):
         except (UserError, AccessError) as exc:
             msg = str(exc) or 'Failed to send test message.'
             return request.redirect('/evolution/instances?error=%s' % msg)
+
+    @http.route('/evolution/instances/test_ajax', type='json', auth='user', website=True, methods=['POST'])
+    def evolution_instances_test_ajax(self, record_id):
+        self._check_internal_user()
+        try:
+            account = request.env['evolution.instance.account'].browse(int(record_id))
+            if not account.exists():
+                return {'ok': False, 'error': 'Instance not found.'}
+            account.action_send_test_message()
+            return {'ok': True, 'message': 'Test message sent successfully.'}
+        except (UserError, AccessError) as exc:
+            return {'ok': False, 'error': str(exc) or 'Failed to send test message.'}
+
+    @http.route('/evolution/instances/status_check_ajax', type='json', auth='user', website=True, methods=['POST'])
+    def evolution_instances_status_check_ajax(self, record_id):
+        self._check_internal_user()
+        try:
+            account = request.env['evolution.instance.account'].browse(int(record_id))
+            if not account.exists():
+                return {'ok': False, 'error': 'Instance not found.'}
+            account.action_refresh_evolution_status()
+            return {
+                'ok': True,
+                'message': 'Instance status refreshed successfully.',
+                'status': account.status or '',
+                'last_status_sync_at': str(account.last_status_sync_at or ''),
+            }
+        except (UserError, AccessError) as exc:
+            return {'ok': False, 'error': str(exc) or 'Failed to refresh status.'}
 
     @http.route('/evolution/instances/qr/<int:record_id>', type='http', auth='user', website=True, methods=['POST'])
     def evolution_instances_qr(self, record_id, **post):

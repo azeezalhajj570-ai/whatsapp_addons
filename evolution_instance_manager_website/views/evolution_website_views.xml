@@ -70,12 +70,8 @@
                         <p class="text-muted mb-0">Manage your WhatsApp Evolution API connections</p>
                     </div>
 
-                    <div t-if="success" class="alert alert-success">
-                        <t t-esc="success"/>
-                    </div>
-                    <div t-if="error" class="alert alert-danger">
-                        <t t-esc="error"/>
-                    </div>
+                    <div id="evo_flash_data" class="d-none" t-att-data-success="success or ''" t-att-data-error="error or ''"/>
+                    <div id="evo_toast_container" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;"/>
 
                     <div class="o_card mb-4 evo-create-card">
                         <div class="card-body">
@@ -260,6 +256,42 @@
                         }
 
                         document.addEventListener("DOMContentLoaded", function () {
+                            const flashData = document.getElementById("evo_flash_data");
+                            const toastContainer = document.getElementById("evo_toast_container");
+                            const successMsg = flashData ? (flashData.dataset.success || "").trim() : "";
+                            const errorMsg = flashData ? (flashData.dataset.error || "").trim() : "";
+
+                            function showToast(message, isError) {
+                                if (!message || !toastContainer) return;
+                                const toastEl = document.createElement("div");
+                                toastEl.className = "toast align-items-center text-bg-" + (isError ? "danger" : "success") + " border-0";
+                                toastEl.setAttribute("role", "alert");
+                                toastEl.setAttribute("aria-live", "assertive");
+                                toastEl.setAttribute("aria-atomic", "true");
+                                toastEl.innerHTML = '<div class="d-flex"><div class="toast-body"></div><button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button></div>';
+                                toastEl.querySelector(".toast-body").innerText = message;
+                                toastContainer.appendChild(toastEl);
+                                if (window.bootstrap && bootstrap.Toast) {
+                                    const toast = new bootstrap.Toast(toastEl, { delay: 1800, autohide: true });
+                                    toast.show();
+                                }
+                            }
+
+                            showToast(successMsg, false);
+                            showToast(errorMsg, true);
+
+                            try {
+                                const currentUrl = new URL(window.location.href);
+                                if (currentUrl.searchParams.has("success") || currentUrl.searchParams.has("error")) {
+                                    currentUrl.searchParams.delete("success");
+                                    currentUrl.searchParams.delete("error");
+                                    const cleanUrl = currentUrl.pathname + (currentUrl.searchParams.toString() ? ("?" + currentUrl.searchParams.toString()) : "") + currentUrl.hash;
+                                    window.history.replaceState({}, "", cleanUrl);
+                                }
+                            } catch (e) {
+                                // Ignore URL cleanup errors.
+                            }
+
                             const buttons = document.querySelectorAll(".js-evo-get-qr");
                             buttons.forEach(function (btn) {
                                 btn.addEventListener("click", async function () {

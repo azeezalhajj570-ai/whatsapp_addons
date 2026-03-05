@@ -273,6 +273,12 @@ class EvolutionInstanceAccount(models.Model):
                 })
                 account.message_post(body=_('Evolution status refresh failed: %s') % exc)
                 raise UserError(str(exc)) from exc
+        return self._display_notification(
+            _('Success'),
+            _('Instance status refreshed successfully.'),
+            notif_type='success',
+            sticky=False,
+        )
 
     @staticmethod
     def _extract_qr_data(response):
@@ -392,6 +398,12 @@ class EvolutionInstanceAccount(models.Model):
                 })
                 account.message_post(body=_('Pairing code fetch failed: %s') % exc)
                 raise UserError(str(exc)) from exc
+        return self._display_notification(
+            _('Success'),
+            _('Pairing code fetched successfully.'),
+            notif_type='success',
+            sticky=False,
+        )
 
     def action_delete_evolution_instance(self):
         client = self.env['evolution.instance.client']
@@ -427,6 +439,12 @@ class EvolutionInstanceAccount(models.Model):
                 account.write({'last_error': str(exc)})
                 account.message_post(body=_('Evolution instance delete failed: %s') % exc)
                 raise UserError(str(exc)) from exc
+        return self._display_notification(
+            _('Success'),
+            _('Instance deleted successfully.'),
+            notif_type='success',
+            sticky=False,
+        )
 
     def action_logout_evolution_instance(self):
         client = self.env['evolution.instance.client']
@@ -449,6 +467,12 @@ class EvolutionInstanceAccount(models.Model):
                 account.write({'last_error': str(exc)})
                 account.message_post(body=_('Evolution instance disconnect failed: %s') % exc)
                 raise UserError(str(exc)) from exc
+        return self._display_notification(
+            _('Success'),
+            _('Instance disconnected successfully.'),
+            notif_type='success',
+            sticky=False,
+        )
 
     def action_send_test_message(self):
         client = self.env['evolution.instance.client']
@@ -475,6 +499,12 @@ class EvolutionInstanceAccount(models.Model):
                 account.write({'last_error': str(exc)})
                 account.message_post(body=_('Test message failed: %s') % exc)
                 raise UserError(str(exc)) from exc
+        return self._display_notification(
+            _('Success'),
+            _('Test message sent successfully.'),
+            notif_type='success',
+            sticky=False,
+        )
 
     @api.model
     def _cron_sync_evolution_status(self):
@@ -484,3 +514,16 @@ class EvolutionInstanceAccount(models.Model):
                 account.action_refresh_evolution_status()
             except Exception:
                 continue
+
+    @api.model
+    def _display_notification(self, title, message, notif_type='success', sticky=False):
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': title,
+                'message': message,
+                'type': notif_type,
+                'sticky': sticky,
+            }
+        }

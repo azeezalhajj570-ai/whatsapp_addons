@@ -99,9 +99,7 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
                                 </div>
                                 <div class="modal-body text-center">
-                                    <img t-att-id="'qrImg%s' % rec.id" t-if="rec.qr_code_image" t-att-src="'data:image/png;base64,%s' % rec.qr_code_image" style="max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
-                                    <img t-att-id="'qrImg%s' % rec.id" t-if="not rec.qr_code_image" style="display:none; max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
-                                    <p t-att-id="'qrInfo%s' % rec.id" t-if="not rec.qr_code_image" class="text-muted mb-0">No QR available. Click Get QR first.</p>
+                                    <img t-att-id="'qrImg%s' % rec.id" style="max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -178,22 +176,13 @@
                                         qrImage = qrImage.slice(2, -1);
                                     }
                                     var img = document.getElementById('qrImg' + recordId);
-                                    var info = document.getElementById('qrInfo' + recordId);
                                     if (img) {
                                         if (qrImage) {
                                             img.src = 'data:image/png;base64,' + qrImage;
-                                            img.style.display = '';
-                                            if (info) {
-                                                info.style.display = 'none';
-                                            }
                                         } else if (qrText) {
                                             img.src = '/report/barcode/?type=QR&width=420&height=420&value=' + encodeURIComponent(qrText);
-                                            img.style.display = '';
-                                            if (info) {
-                                                info.style.display = 'none';
-                                            }
-                                        } else if (info) {
-                                            info.style.display = '';
+                                        } else {
+                                            img.removeAttribute('src');
                                         }
                                     }
                                     var modalEl = document.getElementById(modalId);

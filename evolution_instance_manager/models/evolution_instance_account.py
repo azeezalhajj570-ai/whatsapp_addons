@@ -336,6 +336,7 @@ class EvolutionInstanceAccount(models.Model):
             if not account.evo_instance_name:
                 raise UserError(_('Set Evolution Instance Name first.'))
             clear_vals = {
+                'active': False,
                 'evo_instance_id': False,
                 'evo_remote_exists': False,
                 'evo_instance_key': False,

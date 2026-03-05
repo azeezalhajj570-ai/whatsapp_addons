@@ -19,7 +19,7 @@ class EvolutionWebsiteController(http.Controller):
         self._check_internal_user()
 
         try:
-            records = request.env['evolution.instance.account'].search([], order='id desc')
+            records = request.env['evolution.instance.account'].search([('active', '=', True)], order='id desc')
         except AccessError:
             raise Forbidden()
 

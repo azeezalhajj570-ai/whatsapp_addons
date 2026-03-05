@@ -6,8 +6,7 @@
                 <div class="container o_container_small">
                     <style>
                         .evo-table-wrap {
-                            overflow-x: auto;
-                            overflow-y: visible;
+                            overflow: visible;
                         }
                         .evo-create-card {
                             position: relative;
@@ -21,13 +20,10 @@
                         .evo-table .dropdown-menu {
                             z-index: 1080;
                         }
-                        @media (min-width: 768px) {
-                            .evo-actions.dropup .dropdown-menu {
-                                inset: auto 0 100% auto !important;
-                                margin-bottom: 0.25rem;
-                            }
-                        }
                         @media (max-width: 767.98px) {
+                            .evo-table-wrap {
+                                overflow-x: auto;
+                            }
                             .evo-table thead {
                                 display: none;
                             }
@@ -123,7 +119,7 @@
                                                 <t t-esc="rec.last_status_sync_at or '-'"/>
                                             </td>
                                             <td class="text-end" data-label="Actions">
-                                                <div class="dropdown dropup evo-actions">
+                                                <div class="dropdown evo-actions">
                                                     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                                         Actions
                                                     </button>

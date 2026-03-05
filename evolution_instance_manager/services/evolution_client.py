@@ -57,7 +57,7 @@ class EvolutionClient(models.AbstractModel):
             response_data = {}
 
         if not response.ok:
-            error_message = response_data.get('message') or response_data.get('error') or response.text
+            error_message = self._extract_error_message(response_data) or response.text
             _logger.error(
                 'Evolution API error %s %s status=%s response=%s',
                 method,
@@ -67,7 +67,43 @@ class EvolutionClient(models.AbstractModel):
             )
             raise UserError(_('Evolution API error (%s): %s') % (response.status_code, error_message or _('Unknown error')))
 
-        return response_data
+        if isinstance(response_data, dict):
+            return response_data
+        if isinstance(response_data, list):
+            return {'data': response_data}
+        if isinstance(response_data, str):
+            return {'message': response_data}
+        return {}
+
+    @staticmethod
+    def _extract_error_message(payload):
+        if isinstance(payload, str):
+            return payload
+        if isinstance(payload, list):
+            return '; '.join(str(item) for item in payload if item)
+        if not isinstance(payload, dict):
+            return None
+
+        # Common Evolution error shape:
+        # {"status":403,"error":"Forbidden","response":{"message":["..."]}}
+        nested = payload.get('response')
+        if isinstance(nested, dict):
+            nested_message = nested.get('message')
+            if isinstance(nested_message, list):
+                return '; '.join(str(item) for item in nested_message if item)
+            if nested_message:
+                return str(nested_message)
+
+        message = payload.get('message')
+        if isinstance(message, list):
+            return '; '.join(str(item) for item in message if item)
+        if message:
+            return str(message)
+
+        error = payload.get('error')
+        if error:
+            return str(error)
+        return None
 
     def create_instance(self, payload):
         return self._request('POST', '/instance/create', payload=payload)

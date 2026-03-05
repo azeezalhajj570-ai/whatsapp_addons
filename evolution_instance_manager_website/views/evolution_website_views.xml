@@ -148,7 +148,7 @@
                         </div>
                     </t>
 
-                    <script>
+                    <script><![CDATA[
                         function toggleSecret(btn) {
                             const id = btn.dataset.target;
                             const el = document.getElementById(id);
@@ -219,7 +219,7 @@
                                 });
                             });
                         });
-                    </script>
+                    ]]></script>
                 </div>
             </section>
         </t>

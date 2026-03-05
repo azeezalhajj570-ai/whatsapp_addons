@@ -208,40 +208,41 @@ msgstr "مزامنة حالة مثيل Evolution"
 
 msgid "Evolution Instance Account Company Isolation"
 msgstr "عزل الشركات لحساب مثيل Evolution"
+
 msgid "Phone"
-msgstr "������"
+msgstr "الهاتف"
 
 msgid "Set Phone first."
-msgstr "���� ����� ������ �����."
+msgstr "يرجى إدخال رقم الهاتف أولاً."
 
 msgid "Disconnect"
-msgstr "��� �������"
+msgstr "قطع الاتصال"
 
 msgid "Disconnect this instance from WhatsApp?"
-msgstr "�� ���� ��� ����� ��� ������ �� �����ȿ"
+msgstr "هل تريد قطع اتصال هذا المثيل من واتساب؟"
 
 msgid "Evolution instance disconnected successfully."
-msgstr "�� ��� ����� ���� Evolution �����."
+msgstr "تم قطع اتصال مثيل Evolution بنجاح."
 
 msgid "Evolution instance disconnect failed: %s"
-msgstr "��� ��� ����� ���� Evolution: %s"
+msgstr "فشل قطع اتصال مثيل Evolution: %s"
 
 msgid "Connection must be open to send a test message."
-msgstr "��� �� ���� ���� ������� ������ ������ ����� ������."
+msgstr "يجب أن تكون الحالة مفتوحة لإرسال رسالة اختبار."
 
 msgid "Instance ID and Instance Key are required to send test message."
-msgstr "���� ������ ������ ������ ������� ������ ����� ������."
+msgstr "معرّف المثيل ومفتاح المثيل مطلوبان لإرسال رسالة اختبار."
 
 msgid "Test message from Odoo. Instance ID: %s"
-msgstr "����� ������ �� ����. ���� ������: %s"
+msgstr "رسالة اختبار من أودو. معرّف المثيل: %s"
 
 msgid "Test message sent successfully."
-msgstr "�� ����� ����� �������� �����."
+msgstr "تم إرسال رسالة الاختبار بنجاح."
 
 msgid "Test message failed: %s"
-msgstr "��� ����� ����� ��������: %s"
+msgstr "فشل إرسال رسالة الاختبار: %s"
 
 msgid "Evolution instance was already deleted remotely. Local data cleared."
-msgstr "�� ��� ���� Evolution ������ �� ����� ������. �� ����� �������� �������."
+msgstr "تم حذف مثيل Evolution مسبقاً من الطرف البعيد. تم تنظيف البيانات المحلية."
 
 

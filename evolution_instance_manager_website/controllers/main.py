@@ -104,6 +104,14 @@ class EvolutionWebsiteController(http.Controller):
             # Defensive cleanup for values serialized as b'...'
             if isinstance(qr_value, str) and qr_value.startswith("b'") and qr_value.endswith("'"):
                 qr_value = qr_value[2:-1]
-            return {'ok': True, 'record_id': account.id, 'qr_code_image': qr_value}
+            qr_text = account.qr_code_text or ''
+            if isinstance(qr_text, bytes):
+                qr_text = qr_text.decode('utf-8')
+            return {
+                'ok': True,
+                'record_id': account.id,
+                'qr_code_image': qr_value,
+                'qr_code_text': qr_text,
+            }
         except (UserError, AccessError) as exc:
             return {'ok': False, 'error': str(exc) or 'Failed to fetch QR code.'}

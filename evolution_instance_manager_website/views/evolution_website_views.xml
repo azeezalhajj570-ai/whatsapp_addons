@@ -50,9 +50,11 @@
                                     <td><t t-esc="rec.status or '-'"/></td>
                                     <td><t t-esc="rec.last_status_sync_at or '-'"/></td>
                                     <td class="text-end">
-                                        <button class="btn btn-sm btn-secondary me-1" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">
-                                            ID/Key
-                                        </button>
+                                        <t t-if="rec.status == 'open'">
+                                            <button class="btn btn-sm btn-secondary me-1" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">
+                                                ID/Key
+                                            </button>
+                                        </t>
                                         <t t-if="rec.status != 'open'">
                                             <button type="button" class="btn btn-sm btn-info me-1 js-evo-get-qr" t-att-data-record-id="rec.id" t-att-data-modal-id="'qrModal%s' % rec.id">Get QR</button>
                                         </t>
@@ -84,7 +86,7 @@
                                 <div class="modal-body text-center">
                                     <img t-att-id="'qrImg%s' % rec.id" t-if="rec.qr_code_image" t-att-src="'data:image/png;base64,%s' % rec.qr_code_image" style="max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
                                     <img t-att-id="'qrImg%s' % rec.id" t-if="not rec.qr_code_image" style="display:none; max-width: 420px; width: 100%; height: auto;" alt="QR Code"/>
-                                    <p t-if="not rec.qr_code_image" class="text-muted mb-0">No QR available. Click Get QR first.</p>
+                                    <p t-att-id="'qrInfo%s' % rec.id" t-if="not rec.qr_code_image" class="text-muted mb-0">No QR available. Click Get QR first.</p>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -141,13 +143,28 @@
                                         return;
                                     }
                                     var qrImage = result.qr_code_image || '';
+                                    var qrText = result.qr_code_text || '';
                                     if (qrImage.slice(0, 2) === "b'" &amp;&amp; qrImage.slice(-1) === "'") {
                                         qrImage = qrImage.slice(2, -1);
                                     }
                                     var img = document.getElementById('qrImg' + recordId);
+                                    var info = document.getElementById('qrInfo' + recordId);
                                     if (img) {
-                                        img.src = 'data:image/png;base64,' + qrImage;
-                                        img.style.display = '';
+                                        if (qrImage) {
+                                            img.src = 'data:image/png;base64,' + qrImage;
+                                            img.style.display = '';
+                                            if (info) {
+                                                info.style.display = 'none';
+                                            }
+                                        } else if (qrText) {
+                                            img.src = '/report/barcode/?type=QR&amp;width=420&amp;height=420&amp;value=' + encodeURIComponent(qrText);
+                                            img.style.display = '';
+                                            if (info) {
+                                                info.style.display = 'none';
+                                            }
+                                        } else if (info) {
+                                            info.style.display = '';
+                                        }
                                     }
                                     var modalEl = document.getElementById(modalId);
                                     if (modalEl &amp;&amp; window.bootstrap &amp;&amp; window.bootstrap.Modal) {

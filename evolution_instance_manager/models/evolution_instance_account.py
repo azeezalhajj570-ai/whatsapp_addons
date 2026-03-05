@@ -78,6 +78,7 @@ class EvolutionInstanceAccount(models.Model):
     )
     pairing_phone = fields.Char(
         string='Pairing Phone',
+        required=True,
         help='Phone number used to request a pairing code (international format).',
     )
     pairing_code = fields.Char(

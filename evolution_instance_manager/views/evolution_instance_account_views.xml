@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="evolution_instance_account_view_tree" model="ir.ui.view">
+        <field name="name">evolution.instance.account.view.tree</field>
+        <field name="model">evolution.instance.account</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="evo_instance_name"/>
+                <field name="status"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+                <field name="last_status_sync_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="evolution_instance_account_view_form" model="ir.ui.view">
+        <field name="name">evolution.instance.account.view.form</field>
+        <field name="model">evolution.instance.account</field>
+        <field name="arch" type="xml">
+            <form string="Evolution Instance Account">
+                <header>
+                    <button name="action_create_evolution_instance" type="object" string="Create Instance in Evolution" class="oe_highlight"/>
+                    <button name="action_refresh_evolution_status" type="object" string="Refresh Status"/>
+                    <button name="action_get_qr_code" type="object" string="Get QR Code"/>
+                    <button name="action_get_pairing_code" type="object" string="Get Pairing Code"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="active" invisible="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="evo_instance_name"/>
+                            <field name="integration"/>
+                        </group>
+                        <group>
+                            <field name="status" readonly="1"/>
+                            <field name="last_status_sync_at" readonly="1"/>
+                            <field name="evo_instance_id" readonly="1"/>
+                            <field name="evo_instance_key" readonly="1" password="True" groups="base.group_system"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="last_error" readonly="1"/>
+                    </group>
+                    <group string="Pairing">
+                        <group>
+                            <field name="pairing_phone" placeholder="+15551234567"/>
+                            <field name="pairing_code" readonly="1"/>
+                            <field name="qr_last_fetched_at" readonly="1"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="evolution_instance_account_view_search" model="ir.ui.view">
+        <field name="name">evolution.instance.account.view.search</field>
+        <field name="model">evolution.instance.account</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="evo_instance_name"/>
+                <field name="status"/>
+                <filter string="Archived" name="archived" domain="[('active', '=', False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Company" name="group_company" context="{'group_by': 'company_id'}"/>
+                    <filter string="Status" name="group_status" context="{'group_by': 'status'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="evolution_instance_account_action" model="ir.actions.act_window">
+        <field name="name">Evolution Instances</field>
+        <field name="res_model">evolution.instance.account</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first Evolution API instance account.</p>
+        </field>
+    </record>
+
+    <menuitem id="menu_evolution_instance_root" name="Evolution API" sequence="270"/>
+    <menuitem id="menu_evolution_instance_accounts" name="Instances" parent="menu_evolution_instance_root" action="evolution_instance_account_action" sequence="10"/>
+</odoo>

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_evolution_instance_account_user,access.evolution.instance.account.user,model_evolution_instance_account,base.group_user,1,1,1,0
+access_evolution_instance_account_admin,access.evolution.instance.account.admin,model_evolution_instance_account,base.group_system,1,1,1,1
+access_evolution_instance_qr_wizard_user,access.evolution.instance.qr.wizard.user,model_evolution_instance_qr_wizard,base.group_user,1,1,1,1

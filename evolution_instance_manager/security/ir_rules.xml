@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="rule_evolution_instance_account_multi_company" model="ir.rule">
+        <field name="name">Evolution Instance Account Company Isolation</field>
+        <field name="model_id" ref="model_evolution_instance_account"/>
+        <field name="domain_force">['|', ('company_id', '=', False), ('company_id', 'in', company_ids)]</field>
+        <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+</odoo>

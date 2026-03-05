@@ -1,0 +1,280 @@
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+import base64
+
+from odoo import _, api, fields, models
+from odoo.exceptions import UserError, ValidationError
+
+
+class EvolutionInstanceAccount(models.Model):
+    _name = 'evolution.instance.account'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _description = 'Evolution API Instance Account'
+
+    name = fields.Char(string='Name', required=True, tracking=True)
+    active = fields.Boolean(default=True, tracking=True)
+    company_id = fields.Many2one(
+        'res.company',
+        string='Company',
+        required=True,
+        default=lambda self: self.env.company,
+        index=True,
+    )
+
+    evo_instance_name = fields.Char(
+        string='Evolution Instance Name',
+        tracking=True,
+        required=True,
+        help='Evolution instance identifier used in API paths.',
+    )
+    evo_instance_id = fields.Char(
+        string='Evolution Instance ID',
+        tracking=True,
+        copy=False,
+        readonly=True,
+    )
+    evo_instance_key = fields.Char(
+        string='Evolution Instance Key',
+        groups='base.group_system',
+        copy=False,
+        readonly=True,
+    )
+    integration = fields.Char(
+        string='Integration',
+        tracking=True,
+        default='WHATSAPP-BAILEYS',
+        help='Integration value sent during instance creation.',
+    )
+    status = fields.Char(
+        string='Evolution Status',
+        tracking=True,
+        copy=False,
+    )
+    last_status_sync_at = fields.Datetime(
+        string='Last Status Sync At',
+        copy=False,
+        readonly=True,
+    )
+    last_error = fields.Text(
+        string='Last Error',
+        copy=False,
+        readonly=True,
+    )
+    qr_code_text = fields.Text(
+        string='QR Payload',
+        copy=False,
+        readonly=True,
+    )
+    qr_code_image = fields.Binary(
+        string='QR Code Image',
+        copy=False,
+        readonly=True,
+        attachment=True,
+    )
+    pairing_phone = fields.Char(
+        string='Pairing Phone',
+        help='Phone number used to request a pairing code (international format).',
+    )
+    pairing_code = fields.Char(
+        string='Pairing Code',
+        copy=False,
+        readonly=True,
+    )
+    qr_last_fetched_at = fields.Datetime(
+        string='Last QR/Pairing Fetch At',
+        copy=False,
+        readonly=True,
+    )
+
+    _sql_constraints = [
+        (
+            'evolution_instance_name_company_uniq',
+            'unique(company_id, evo_instance_name)',
+            'Evolution instance name must be unique per company.',
+        ),
+        (
+            'evolution_instance_id_uniq',
+            'unique(evo_instance_id)',
+            'Evolution instance ID must be unique.',
+        ),
+    ]
+
+    @api.constrains('evo_instance_name')
+    def _check_evo_instance_name(self):
+        for account in self:
+            if account.evo_instance_name and ' ' in account.evo_instance_name:
+                raise ValidationError(_('Evolution instance name must not contain spaces.'))
+
+    def action_create_evolution_instance(self):
+        client = self.env['evolution.instance.client']
+        for account in self:
+            payload = {
+                'instanceName': account.evo_instance_name,
+                'integration': account.integration or 'WHATSAPP-BAILEYS',
+            }
+
+            try:
+                response = client.create_instance(payload)
+                instance_data = response.get('instance', {}) if isinstance(response, dict) else {}
+                hash_data = response.get('hash', {}) if isinstance(response, dict) else {}
+
+                account.write({
+                    'evo_instance_id': instance_data.get('instanceId') or instance_data.get('id') or account.evo_instance_id,
+                    'evo_instance_key': hash_data.get('apikey') or hash_data.get('apiKey') or account.evo_instance_key,
+                    'status': instance_data.get('status') or instance_data.get('state') or account.status,
+                    'last_error': False,
+                })
+                account.message_post(body=_('Evolution instance created or confirmed successfully.'))
+            except Exception as exc:
+                account.write({'last_error': str(exc)})
+                account.message_post(body=_('Evolution instance creation failed: %s') % exc)
+                raise UserError(str(exc)) from exc
+
+    def action_refresh_evolution_status(self):
+        client = self.env['evolution.instance.client']
+        now = fields.Datetime.now()
+
+        for account in self:
+            try:
+                response = client.connection_state(account.evo_instance_name)
+                instance_data = response.get('instance', {}) if isinstance(response, dict) else {}
+                new_status = instance_data.get('state') or response.get('state') or response.get('status')
+
+                account.write({
+                    'status': new_status or account.status,
+                    'last_status_sync_at': now,
+                    'last_error': False,
+                })
+                account.message_post(body=_('Evolution status refreshed successfully.'))
+            except Exception as exc:
+                account.write({
+                    'last_status_sync_at': now,
+                    'last_error': str(exc),
+                })
+                account.message_post(body=_('Evolution status refresh failed: %s') % exc)
+                raise UserError(str(exc)) from exc
+
+    @staticmethod
+    def _extract_qr_data(response):
+        data = response if isinstance(response, dict) else {}
+        qr_container = data.get('qrcode') or data.get('qr') or {}
+        instance = data.get('instance') if isinstance(data.get('instance'), dict) else {}
+
+        base64_qr = (
+            qr_container.get('base64')
+            or data.get('base64')
+            or data.get('qrBase64')
+            or instance.get('base64')
+        )
+        qr_text = (
+            qr_container.get('code')
+            or data.get('code')
+            or data.get('pairingCode')
+            or instance.get('code')
+        )
+        status = (
+            data.get('status')
+            or instance.get('status')
+            or instance.get('state')
+        )
+        return base64_qr, qr_text, status
+
+    @staticmethod
+    def _to_binary_image(base64_qr):
+        if not base64_qr:
+            return False
+        if base64_qr.startswith('data:image'):
+            _, _, payload = base64_qr.partition(',')
+            return payload or False
+        try:
+            base64.b64decode(base64_qr, validate=True)
+            return base64_qr
+        except Exception:
+            return False
+
+    @staticmethod
+    def _extract_pairing_code(response):
+        data = response if isinstance(response, dict) else {}
+        instance = data.get('instance') if isinstance(data.get('instance'), dict) else {}
+        return (
+            data.get('pairingCode')
+            or data.get('code')
+            or instance.get('pairingCode')
+            or instance.get('code')
+        )
+
+    def action_get_qr_code(self):
+        self.ensure_one()
+        client = self.env['evolution.instance.client']
+        now = fields.Datetime.now()
+        account = self
+        try:
+            response = client.fetch_qr(account.evo_instance_name)
+            base64_qr, qr_text, status = self._extract_qr_data(response)
+            qr_image = self._to_binary_image(base64_qr)
+            account.write({
+                'qr_code_image': qr_image,
+                'qr_code_text': qr_text or account.qr_code_text,
+                'status': status or account.status,
+                'last_error': False,
+                'qr_last_fetched_at': now,
+            })
+            account.message_post(body=_('QR code fetched successfully.'))
+            wizard = self.env['evolution.instance.qr.wizard'].create({
+                'account_id': account.id,
+                'status': account.status,
+                'qr_code_image': qr_image,
+                'qr_code_text': qr_text or account.qr_code_text,
+                'pairing_phone': account.pairing_phone,
+                'pairing_code': account.pairing_code,
+                'fetched_at': now,
+            })
+            return {
+                'type': 'ir.actions.act_window',
+                'name': _('Scan QR Code'),
+                'res_model': 'evolution.instance.qr.wizard',
+                'view_mode': 'form',
+                'res_id': wizard.id,
+                'target': 'new',
+            }
+        except Exception as exc:
+            account.write({
+                'last_error': str(exc),
+                'qr_last_fetched_at': now,
+            })
+            account.message_post(body=_('QR code fetch failed: %s') % exc)
+            raise UserError(str(exc)) from exc
+
+    def action_get_pairing_code(self):
+        client = self.env['evolution.instance.client']
+        now = fields.Datetime.now()
+        for account in self:
+            if not account.pairing_phone:
+                raise UserError(_('Set Pairing Phone first.'))
+            try:
+                response = client.fetch_pairing_code(account.evo_instance_name, account.pairing_phone)
+                pairing_code = self._extract_pairing_code(response)
+                if not pairing_code:
+                    raise UserError(_('No pairing code returned by Evolution API.'))
+                account.write({
+                    'pairing_code': pairing_code,
+                    'last_error': False,
+                    'qr_last_fetched_at': now,
+                })
+                account.message_post(body=_('Pairing code fetched successfully.'))
+            except Exception as exc:
+                account.write({
+                    'last_error': str(exc),
+                    'qr_last_fetched_at': now,
+                })
+                account.message_post(body=_('Pairing code fetch failed: %s') % exc)
+                raise UserError(str(exc)) from exc
+
+    @api.model
+    def _cron_sync_evolution_status(self):
+        accounts = self.search([('evo_instance_name', '!=', False), ('active', '=', True)])
+        for account in accounts:
+            try:
+                account.action_refresh_evolution_status()
+            except Exception:
+                continue

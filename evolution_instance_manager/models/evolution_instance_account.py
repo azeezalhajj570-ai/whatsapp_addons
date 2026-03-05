@@ -120,6 +120,26 @@ class EvolutionInstanceAccount(models.Model):
         text = str(exc).lower()
         return 'already in use' in text or 'already exists' in text
 
+    @staticmethod
+    def _extract_instance_key(data, instance_data):
+        # Common create response shape (v2 docs):
+        # {"hash": {"apikey": "..."}, "instance": {...}}
+        hash_value = data.get('hash')
+        if isinstance(hash_value, dict):
+            key = hash_value.get('apikey') or hash_value.get('apiKey')
+            if key:
+                return key
+        elif isinstance(hash_value, str) and hash_value.strip():
+            return hash_value.strip()
+
+        # Fallbacks found in some deployments/custom builds.
+        return (
+            data.get('apikey')
+            or data.get('apiKey')
+            or instance_data.get('apikey')
+            or instance_data.get('apiKey')
+        )
+
     def action_create_evolution_instance(self):
         client = self.env['evolution.instance.client']
         for account in self:
@@ -132,11 +152,11 @@ class EvolutionInstanceAccount(models.Model):
                 response = client.create_instance(payload)
                 data = self._as_dict(response)
                 instance_data = self._as_dict(data.get('instance'))
-                hash_data = self._as_dict(data.get('hash'))
+                instance_key = self._extract_instance_key(data, instance_data)
 
                 account.write({
                     'evo_instance_id': instance_data.get('instanceId') or instance_data.get('id') or account.evo_instance_id,
-                    'evo_instance_key': hash_data.get('apikey') or hash_data.get('apiKey') or account.evo_instance_key,
+                    'evo_instance_key': instance_key or account.evo_instance_key,
                     'status': instance_data.get('status') or instance_data.get('state') or account.status,
                     'evo_remote_exists': True,
                     'last_error': False,

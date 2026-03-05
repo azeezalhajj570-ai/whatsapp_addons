@@ -134,6 +134,11 @@ class EvolutionInstanceAccount(models.Model):
         return 'already in use' in text or 'already exists' in text
 
     @staticmethod
+    def _is_remote_not_found_error(exc):
+        text = str(exc).lower()
+        return '(404)' in text or 'does not exist' in text or 'not found' in text
+
+    @staticmethod
     def _extract_instance_key(data, instance_data):
         # Common create response shape (v2 docs):
         # {"hash": {"apikey": "..."}, "instance": {...}}
@@ -330,22 +335,27 @@ class EvolutionInstanceAccount(models.Model):
         for account in self:
             if not account.evo_instance_name:
                 raise UserError(_('Set Evolution Instance Name first.'))
+            clear_vals = {
+                'evo_instance_id': False,
+                'evo_remote_exists': False,
+                'evo_instance_key': False,
+                'status': False,
+                'last_status_sync_at': False,
+                'pairing_code': False,
+                'qr_code_text': False,
+                'qr_code_image': False,
+                'qr_last_fetched_at': False,
+                'last_error': False,
+            }
             try:
                 client.delete_instance(account.evo_instance_name)
-                account.write({
-                    'evo_instance_id': False,
-                    'evo_remote_exists': False,
-                    'evo_instance_key': False,
-                    'status': False,
-                    'last_status_sync_at': False,
-                    'pairing_code': False,
-                    'qr_code_text': False,
-                    'qr_code_image': False,
-                    'qr_last_fetched_at': False,
-                    'last_error': False,
-                })
+                account.write(clear_vals)
                 account.message_post(body=_('Evolution instance deleted successfully.'))
             except Exception as exc:
+                if self._is_remote_not_found_error(exc):
+                    account.write(clear_vals)
+                    account.message_post(body=_('Evolution instance was already deleted remotely. Local data cleared.'))
+                    continue
                 account.write({'last_error': str(exc)})
                 account.message_post(body=_('Evolution instance delete failed: %s') % exc)
                 raise UserError(str(exc)) from exc

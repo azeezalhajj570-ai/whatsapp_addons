@@ -171,6 +171,36 @@ class EvolutionInstanceAccount(models.Model):
         digits = re.sub(r'\D+', '', phone)
         return digits
 
+    @api.model
+    def _get_max_instances_per_user(self):
+        value = self.env['ir.config_parameter'].sudo().get_param(
+            'evolution_instance_manager.max_instances_per_user',
+            default='0',
+        )
+        try:
+            return int(value or 0)
+        except (TypeError, ValueError):
+            return 0
+
+    def _check_max_instances_for_current_user(self):
+        self.ensure_one()
+        max_allowed = self._get_max_instances_per_user()
+        if max_allowed <= 0:
+            return
+
+        user = self.env.user
+        connected_count = self.search_count([
+            ('active', '=', True),
+            ('create_uid', '=', user.id),
+            '|',
+            ('evo_remote_exists', '=', True),
+            ('evo_instance_id', '!=', False),
+        ])
+        if not (self.evo_remote_exists or self.evo_instance_id) and connected_count >= max_allowed:
+            raise UserError(
+                _('You reached the maximum number of instances per user (%s).') % max_allowed
+            )
+
     def action_create_evolution_instance(self):
         self.ensure_one()
         client = self.env['evolution.instance.client']
@@ -183,6 +213,7 @@ class EvolutionInstanceAccount(models.Model):
         }
 
         try:
+            account._check_max_instances_for_current_user()
             response = client.create_instance(payload)
             data = self._as_dict(response)
             instance_data = self._as_dict(data.get('instance'))

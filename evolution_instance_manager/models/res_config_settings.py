@@ -17,3 +17,9 @@ class ResConfigSettings(models.TransientModel):
         groups='base.group_system',
         help='Server-level apikey used for instance management endpoints.',
     )
+    evolution_max_instances_per_user = fields.Integer(
+        string='Max Instances Per User',
+        config_parameter='evolution_instance_manager.max_instances_per_user',
+        default=0,
+        help='Maximum number of active connected instances allowed per user. Set 0 for unlimited.',
+    )

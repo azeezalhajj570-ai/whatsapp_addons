@@ -10,6 +10,7 @@
                     <group>
                         <field name="evolution_base_url" placeholder="https://api.example.com"/>
                         <field name="evolution_server_api_key" password="True"/>
+                        <field name="evolution_max_instances_per_user"/>
                     </group>
                 </group>
             </xpath>

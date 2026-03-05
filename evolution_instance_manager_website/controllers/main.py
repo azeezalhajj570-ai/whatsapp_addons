@@ -22,12 +22,17 @@ class EvolutionWebsiteController(http.Controller):
             records = request.env['evolution.instance.account'].search([('active', '=', True)], order='id desc')
         except AccessError:
             raise Forbidden()
+        evolution_base_url = request.env['ir.config_parameter'].sudo().get_param(
+            'evolution_instance_manager.base_url',
+            default='',
+        )
 
         return request.render('evolution_instance_manager_website.evolution_instances_website_page', {
             'records': records,
             'success': success,
             'error': error,
             'show_qr_id': int(show_qr_id) if show_qr_id else False,
+            'evolution_base_url': evolution_base_url,
             'csrf_token': request.csrf_token(),
         })
 

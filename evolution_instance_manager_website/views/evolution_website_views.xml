@@ -62,7 +62,7 @@
                                                 </t>
                                                 <t t-if="rec.status == 'open'">
                                                     <li>
-                                                        <button class="dropdown-item" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">ID/Key</button>
+                                                        <button class="dropdown-item" type="button" t-att-data-bs-target="'#credModal%s' % rec.id" data-bs-toggle="modal">Connection Credentials</button>
                                                     </li>
                                                     <li>
                                                         <form t-attf-action="/evolution/instances/test/{{ rec.id }}" method="post">
@@ -118,6 +118,14 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"/>
                                 </div>
                                 <div class="modal-body">
+                                    <div class="alert alert-info">
+                                        Use <b>Instance Key</b> as the <code>apikey</code> header for instance-scoped actions.
+                                        Use <b>Instance ID</b> when an integration asks for instance identifier.
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Evolution API URL</label>
+                                        <input class="form-control" type="text" t-att-value="evolution_base_url or ''" readonly="readonly"/>
+                                    </div>
                                     <div class="mb-3">
                                         <label class="form-label">Instance ID</label>
                                         <input class="form-control" type="text" t-att-value="rec.evo_instance_id or ''" readonly="readonly"/>

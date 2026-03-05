@@ -1,4 +1,4 @@
-# Translation of Odoo Server.
+﻿# Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* evolution_instance_manager_website
 msgid ""
@@ -93,3 +93,4 @@ msgstr "تم حذف المثيل بنجاح."
 
 msgid "Failed to delete instance."
 msgstr "فشل حذف المثيل."
+

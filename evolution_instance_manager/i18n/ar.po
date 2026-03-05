@@ -1,4 +1,4 @@
-# Translation of Odoo Server.
+﻿# Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* evolution_instance_manager
 msgid ""
@@ -15,231 +15,233 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
 
 msgid "Evolution API"
-msgstr "ظˆط§ط¬ظ‡ط© Evolution API"
+msgstr "واجهة Evolution API"
 
 msgid "Evolution Base URL"
-msgstr "ط±ط§ط¨ط· Evolution ط§ظ„ط£ط³ط§ط³ظٹ"
+msgstr "رابط Evolution الأساسي"
 
 msgid "Evolution Server API Key"
-msgstr "ظ…ظپطھط§ط­ API ط§ظ„ط®ط§طµ ط¨ط®ط§ط¯ظ… Evolution"
+msgstr "مفتاح API الخاص بخادم Evolution"
 
 msgid "Base URL for your Evolution API server, for example https://api.example.com"
-msgstr "ط§ظ„ط±ط§ط¨ط· ط§ظ„ط£ط³ط§ط³ظٹ ظ„ط®ط§ط¯ظ… Evolution APIطŒ ظ…ط«ط§ظ„: https://api.example.com"
+msgstr "الرابط الأساسي لخادم Evolution API، مثال: https://api.example.com"
 
 msgid "Server-level apikey used for instance management endpoints."
-msgstr "ظ…ظپطھط§ط­ API ط¹ظ„ظ‰ ظ…ط³طھظˆظ‰ ط§ظ„ط®ط§ط¯ظ… ط§ظ„ظ…ط³طھط®ط¯ظ… ظ„ظ†ظ‚ط§ط· ط¥ط¯ط§ط±ط© ط§ظ„ظ…ط«ظٹظ„ط§طھ."
+msgstr "مفتاح API على مستوى الخادم المستخدم لنقاط إدارة المثيلات."
 
 msgid "Evolution Instance Account"
-msgstr "ط­ط³ط§ط¨ ظ…ط«ظٹظ„ Evolution"
+msgstr "حساب مثيل Evolution"
 
 msgid "Evolution Instances"
-msgstr "ظ…ط«ظٹظ„ط§طھ Evolution"
+msgstr "مثيلات Evolution"
 
 msgid "Evolution Instance Name"
-msgstr "ط§ط³ظ… ظ…ط«ظٹظ„ Evolution"
+msgstr "اسم مثيل Evolution"
 
 msgid "Evolution Instance ID"
-msgstr "ظ…ط¹ط±ظپ ظ…ط«ظٹظ„ Evolution"
+msgstr "معرف مثيل Evolution"
 
 msgid "Evolution Instance Key"
-msgstr "ظ…ظپطھط§ط­ ظ…ط«ظٹظ„ Evolution"
+msgstr "مفتاح مثيل Evolution"
 
 msgid "Evolution Instance Exists"
-msgstr "ط§ظ„ظ…ط«ظٹظ„ ظ…ظˆط¬ظˆط¯ ظپظٹ Evolution"
+msgstr "المثيل موجود في Evolution"
 
 msgid "Evolution Status"
-msgstr "ط­ط§ظ„ط© Evolution"
+msgstr "حالة Evolution"
 
 msgid "Integration"
-msgstr "ط§ظ„طھظƒط§ظ…ظ„"
+msgstr "التكامل"
 
 msgid "Company"
-msgstr "ط§ظ„ط´ط±ظƒط©"
+msgstr "الشركة"
 
 msgid "Name"
-msgstr "ط§ظ„ط§ط³ظ…"
+msgstr "الاسم"
 
 msgid "Last Status Sync At"
-msgstr "ط¢ط®ط± ظˆظ‚طھ ظ…ط²ط§ظ…ظ†ط© ظ„ظ„ط­ط§ظ„ط©"
+msgstr "آخر وقت مزامنة للحالة"
 
 msgid "Last Error"
-msgstr "ط¢ط®ط± ط®ط·ط£"
+msgstr "آخر خطأ"
 
 msgid "Pairing"
-msgstr "ط§ظ„ط¥ظ‚ط±ط§ظ†"
+msgstr "الإقران"
 
 msgid "Pairing Phone"
-msgstr "ظ‡ط§طھظپ ط§ظ„ط¥ظ‚ط±ط§ظ†"
+msgstr "هاتف الإقران"
 
 msgid "Pairing Code"
-msgstr "ط±ظ…ط² ط§ظ„ط¥ظ‚ط±ط§ظ†"
+msgstr "رمز الإقران"
 
 msgid "Last QR/Pairing Fetch At"
-msgstr "ط¢ط®ط± ظˆظ‚طھ ظ„ط¬ظ„ط¨ QR/ط§ظ„ط¥ظ‚ط±ط§ظ†"
+msgstr "آخر وقت لجلب QR/الإقران"
 
 msgid "QR Payload"
-msgstr "ط¨ظٹط§ظ†ط§طھ QR"
+msgstr "بيانات QR"
 
 msgid "QR Code Image"
-msgstr "طµظˆط±ط© ط±ظ…ط² QR"
+msgstr "صورة رمز QR"
 
 msgid "QR Code"
-msgstr "ط±ظ…ط² QR"
+msgstr "رمز QR"
 
 msgid "Fetched At"
-msgstr "ظˆظ‚طھ ط§ظ„ط¬ظ„ط¨"
+msgstr "وقت الجلب"
 
 msgid "Scan QR Code"
-msgstr "ظ…ط³ط­ ط±ظ…ط² QR"
+msgstr "مسح رمز QR"
 
 msgid "Create Instance in Evolution"
-msgstr "ط¥ظ†ط´ط§ط، ظ…ط«ظٹظ„ ظپظٹ Evolution"
+msgstr "إنشاء مثيل في Evolution"
 
 msgid "Refresh Status"
-msgstr "طھط­ط¯ظٹط« ط§ظ„ط­ط§ظ„ط©"
+msgstr "تحديث الحالة"
 
 msgid "Get QR Code"
-msgstr "ط¬ظ„ط¨ ط±ظ…ط² QR"
+msgstr "جلب رمز QR"
 
 msgid "Get Pairing Code"
-msgstr "ط¬ظ„ط¨ ط±ظ…ط² ط§ظ„ط¥ظ‚ط±ط§ظ†"
+msgstr "جلب رمز الإقران"
 
 msgid "Delete Instance"
-msgstr "ط­ط°ظپ ط§ظ„ظ…ط«ظٹظ„"
+msgstr "حذف المثيل"
 
 msgid "Close"
-msgstr "ط¥ط؛ظ„ط§ظ‚"
+msgstr "إغلاق"
 
 msgid "Archived"
-msgstr "ظ…ط¤ط±ط´ظپ"
+msgstr "مؤرشف"
 
 msgid "Group By"
-msgstr "طھط¬ظ…ظٹط¹ ط­ط³ط¨"
+msgstr "تجميع حسب"
 
 msgid "Status"
-msgstr "ط§ظ„ط­ط§ظ„ط©"
+msgstr "الحالة"
 
 msgid "Instances"
-msgstr "ط§ظ„ظ…ط«ظٹظ„ط§طھ"
+msgstr "المثيلات"
 
 msgid "Evolution API error (%s): %s"
-msgstr "ط®ط·ط£ Evolution API (%s): %s"
+msgstr "خطأ Evolution API (%s): %s"
 
 msgid "Please configure Evolution Base URL in Settings."
-msgstr "ظٹط±ط¬ظ‰ ط¶ط¨ط· ط±ط§ط¨ط· Evolution ط§ظ„ط£ط³ط§ط³ظٹ ظپظٹ ط§ظ„ط¥ط¹ط¯ط§ط¯ط§طھ."
+msgstr "يرجى ضبط رابط Evolution الأساسي في الإعدادات."
 
 msgid "Please configure Evolution Server API Key in Settings."
-msgstr "ظٹط±ط¬ظ‰ ط¶ط¨ط· ظ…ظپطھط§ط­ API ظ„ط®ط§ط¯ظ… Evolution ظپظٹ ط§ظ„ط¥ط¹ط¯ط§ط¯ط§طھ."
+msgstr "يرجى ضبط مفتاح API لخادم Evolution في الإعدادات."
 
 msgid "Evolution API request timed out."
-msgstr "ط§ظ†طھظ‡طھ ظ…ظ‡ظ„ط© ط·ظ„ط¨ Evolution API."
+msgstr "انتهت مهلة طلب Evolution API."
 
 msgid "Could not reach Evolution API server: %s"
-msgstr "طھط¹ط°ط± ط§ظ„ظˆطµظˆظ„ ط¥ظ„ظ‰ ط®ط§ط¯ظ… Evolution API: %s"
+msgstr "تعذر الوصول إلى خادم Evolution API: %s"
 
 msgid "Unknown error"
-msgstr "ط®ط·ط£ ط؛ظٹط± ظ…ط¹ط±ظˆظپ"
+msgstr "خطأ غير معروف"
 
 msgid "Evolution instance name must be unique per company."
-msgstr "ظٹط¬ط¨ ط£ظ† ظٹظƒظˆظ† ط§ط³ظ… ظ…ط«ظٹظ„ Evolution ظپط±ظٹط¯ظ‹ط§ ظ„ظƒظ„ ط´ط±ظƒط©."
+msgstr "يجب أن يكون اسم مثيل Evolution فريدًا لكل شركة."
 
 msgid "Evolution instance ID must be unique."
-msgstr "ظٹط¬ط¨ ط£ظ† ظٹظƒظˆظ† ظ…ط¹ط±ظپ ظ…ط«ظٹظ„ Evolution ظپط±ظٹط¯ظ‹ط§."
+msgstr "يجب أن يكون معرف مثيل Evolution فريدًا."
 
 msgid "Evolution instance name must not contain spaces."
-msgstr "ظٹط¬ط¨ ط£ظ„ط§ ظٹط­طھظˆظٹ ط§ط³ظ… ظ…ط«ظٹظ„ Evolution ط¹ظ„ظ‰ ظ…ط³ط§ظپط§طھ."
+msgstr "يجب ألا يحتوي اسم مثيل Evolution على مسافات."
 
 msgid "Evolution instance identifier used in API paths."
-msgstr "ظ…ط¹ط±ظ‘ظپ ظ…ط«ظٹظ„ Evolution ط§ظ„ظ…ط³طھط®ط¯ظ… ظپظٹ ظ…ط³ط§ط±ط§طھ API."
+msgstr "معرّف مثيل Evolution المستخدم في مسارات API."
 
 msgid "Integration value sent during instance creation."
-msgstr "ظ‚ظٹظ…ط© ط§ظ„طھظƒط§ظ…ظ„ ط§ظ„ظ…ط±ط³ظ„ط© ط£ط«ظ†ط§ط، ط¥ظ†ط´ط§ط، ط§ظ„ظ…ط«ظٹظ„."
+msgstr "قيمة التكامل المرسلة أثناء إنشاء المثيل."
 
 msgid "Phone number used to request a pairing code (international format)."
-msgstr "ط±ظ‚ظ… ط§ظ„ظ‡ط§طھظپ ط§ظ„ظ…ط³طھط®ط¯ظ… ظ„ط·ظ„ط¨ ط±ظ…ط² ط§ظ„ط¥ظ‚ط±ط§ظ† (ط¨طµظٹط؛ط© ط¯ظˆظ„ظٹط©)."
+msgstr "رقم الهاتف المستخدم لطلب رمز الإقران (بصيغة دولية)."
 
 msgid "Evolution instance created or confirmed successfully."
-msgstr "طھظ… ط¥ظ†ط´ط§ط، ظ…ط«ظٹظ„ Evolution ط£ظˆ طھط£ظƒظٹط¯ظ‡ ط¨ظ†ط¬ط§ط­."
+msgstr "تم إنشاء مثيل Evolution أو تأكيده بنجاح."
 
 msgid "Evolution instance creation failed: %s"
-msgstr "ظپط´ظ„ ط¥ظ†ط´ط§ط، ظ…ط«ظٹظ„ Evolution: %s"
+msgstr "فشل إنشاء مثيل Evolution: %s"
 
 msgid "Evolution status refreshed successfully."
-msgstr "طھظ… طھط­ط¯ظٹط« ط­ط§ظ„ط© Evolution ط¨ظ†ط¬ط§ط­."
+msgstr "تم تحديث حالة Evolution بنجاح."
 
 msgid "Evolution status refresh failed: %s"
-msgstr "ظپط´ظ„ طھط­ط¯ظٹط« ط­ط§ظ„ط© Evolution: %s"
+msgstr "فشل تحديث حالة Evolution: %s"
 
 msgid "QR code fetched successfully."
-msgstr "طھظ… ط¬ظ„ط¨ ط±ظ…ط² QR ط¨ظ†ط¬ط§ط­."
+msgstr "تم جلب رمز QR بنجاح."
 
 msgid "QR code fetch failed: %s"
-msgstr "ظپط´ظ„ ط¬ظ„ط¨ ط±ظ…ط² QR: %s"
+msgstr "فشل جلب رمز QR: %s"
 
 msgid "Set Pairing Phone first."
-msgstr "ظٹط±ط¬ظ‰ ط¥ط¯ط®ط§ظ„ ط±ظ‚ظ… ظ‡ط§طھظپ ط§ظ„ط¥ظ‚ط±ط§ظ† ط£ظˆظ„ط§ظ‹."
+msgstr "يرجى إدخال رقم هاتف الإقران أولاً."
 
 msgid "No pairing code returned by Evolution API."
-msgstr "ظ„ظ… ظٹطھظ… ط¥ط±ط¬ط§ط¹ ط±ظ…ط² ط¥ظ‚ط±ط§ظ† ظ…ظ† Evolution API."
+msgstr "لم يتم إرجاع رمز إقران من Evolution API."
 
 msgid "Pairing code fetched successfully."
-msgstr "طھظ… ط¬ظ„ط¨ ط±ظ…ط² ط§ظ„ط¥ظ‚ط±ط§ظ† ط¨ظ†ط¬ط§ط­."
+msgstr "تم جلب رمز الإقران بنجاح."
 
 msgid "Pairing code fetch failed: %s"
-msgstr "ظپط´ظ„ ط¬ظ„ط¨ ط±ظ…ط² ط§ظ„ط¥ظ‚ط±ط§ظ†: %s"
+msgstr "فشل جلب رمز الإقران: %s"
 
 msgid "Set Evolution Instance Name first."
-msgstr "ظٹط±ط¬ظ‰ ط¥ط¯ط®ط§ظ„ ط§ط³ظ… ظ…ط«ظٹظ„ Evolution ط£ظˆظ„ط§ظ‹."
+msgstr "يرجى إدخال اسم مثيل Evolution أولاً."
 
 msgid "Evolution instance deleted successfully."
-msgstr "طھظ… ط­ط°ظپ ظ…ط«ظٹظ„ Evolution ط¨ظ†ط¬ط§ط­."
+msgstr "تم حذف مثيل Evolution بنجاح."
 
 msgid "Evolution instance delete failed: %s"
-msgstr "ظپط´ظ„ ط­ط°ظپ ظ…ط«ظٹظ„ Evolution: %s"
+msgstr "فشل حذف مثيل Evolution: %s"
 
 msgid "This will delete the instance on Evolution API. Continue?"
-msgstr "ط³ظٹط¤ط¯ظٹ ظ‡ط°ط§ ط¥ظ„ظ‰ ط­ط°ظپ ط§ظ„ظ…ط«ظٹظ„ ظ…ظ† Evolution API. ظ‡ظ„ طھط±ظٹط¯ ط§ظ„ظ…طھط§ط¨ط¹ط©طں"
+msgstr "سيؤدي هذا إلى حذف المثيل من Evolution API. هل تريد المتابعة؟"
 
 msgid "Create your first Evolution API instance account."
-msgstr "ط£ظ†ط´ط¦ ط£ظˆظ„ ط­ط³ط§ط¨ ظ…ط«ظٹظ„ Evolution API ط§ظ„ط®ط§طµ ط¨ظƒ."
+msgstr "أنشئ أول حساب مثيل Evolution API الخاص بك."
 
 msgid "Evolution Instance Status Sync"
-msgstr "ظ…ط²ط§ظ…ظ†ط© ط­ط§ظ„ط© ظ…ط«ظٹظ„ Evolution"
+msgstr "مزامنة حالة مثيل Evolution"
 
 msgid "Evolution Instance Account Company Isolation"
-msgstr "ط¹ط²ظ„ ط§ظ„ط´ط±ظƒط§طھ ظ„ط­ط³ط§ط¨ ظ…ط«ظٹظ„ Evolution"
+msgstr "عزل الشركات لحساب مثيل Evolution"
 msgid "Phone"
-msgstr "الهاتف"
+msgstr "������"
 
 msgid "Set Phone first."
-msgstr "يرجى إدخال الهاتف أولاً."
+msgstr "���� ����� ������ �����."
 
 msgid "Disconnect"
-msgstr "قطع الاتصال"
+msgstr "��� �������"
 
 msgid "Disconnect this instance from WhatsApp?"
-msgstr "هل تريد قطع اتصال هذا المثيل من واتساب؟"
+msgstr "�� ���� ��� ����� ��� ������ �� �����ȿ"
 
 msgid "Evolution instance disconnected successfully."
-msgstr "تم قطع اتصال مثيل Evolution بنجاح."
+msgstr "�� ��� ����� ���� Evolution �����."
 
 msgid "Evolution instance disconnect failed: %s"
-msgstr "فشل قطع اتصال مثيل Evolution: %s"
+msgstr "��� ��� ����� ���� Evolution: %s"
 
 msgid "Connection must be open to send a test message."
-msgstr "يجب أن تكون حالة الاتصال مفتوحة لإرسال رسالة اختبار."
+msgstr "��� �� ���� ���� ������� ������ ������ ����� ������."
 
 msgid "Instance ID and Instance Key are required to send test message."
-msgstr "معرف المثيل ومفتاح المثيل مطلوبان لإرسال رسالة اختبار."
+msgstr "���� ������ ������ ������ ������� ������ ����� ������."
 
 msgid "Test message from Odoo. Instance ID: %s"
-msgstr "رسالة اختبار من أودو. معرف المثيل: %s"
+msgstr "����� ������ �� ����. ���� ������: %s"
 
 msgid "Test message sent successfully."
-msgstr "تم إرسال رسالة الاختبار بنجاح."
+msgstr "�� ����� ����� �������� �����."
 
 msgid "Test message failed: %s"
-msgstr "فشل إرسال رسالة الاختبار: %s"
+msgstr "��� ����� ����� ��������: %s"
 
 msgid "Evolution instance was already deleted remotely. Local data cleared."
-msgstr "تم حذف مثيل Evolution مسبقاً من الطرف البعيد. تم تنظيف البيانات المحلية."
+msgstr "�� ��� ���� Evolution ������ �� ����� ������. �� ����� �������� �������."
+
+

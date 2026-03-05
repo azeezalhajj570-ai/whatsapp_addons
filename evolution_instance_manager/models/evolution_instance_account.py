@@ -105,6 +105,10 @@ class EvolutionInstanceAccount(models.Model):
             if account.evo_instance_name and ' ' in account.evo_instance_name:
                 raise ValidationError(_('Evolution instance name must not contain spaces.'))
 
+    @staticmethod
+    def _as_dict(value):
+        return value if isinstance(value, dict) else {}
+
     def action_create_evolution_instance(self):
         client = self.env['evolution.instance.client']
         for account in self:
@@ -115,8 +119,9 @@ class EvolutionInstanceAccount(models.Model):
 
             try:
                 response = client.create_instance(payload)
-                instance_data = response.get('instance', {}) if isinstance(response, dict) else {}
-                hash_data = response.get('hash', {}) if isinstance(response, dict) else {}
+                data = self._as_dict(response)
+                instance_data = self._as_dict(data.get('instance'))
+                hash_data = self._as_dict(data.get('hash'))
 
                 account.write({
                     'evo_instance_id': instance_data.get('instanceId') or instance_data.get('id') or account.evo_instance_id,
@@ -137,8 +142,9 @@ class EvolutionInstanceAccount(models.Model):
         for account in self:
             try:
                 response = client.connection_state(account.evo_instance_name)
-                instance_data = response.get('instance', {}) if isinstance(response, dict) else {}
-                new_status = instance_data.get('state') or response.get('state') or response.get('status')
+                data = self._as_dict(response)
+                instance_data = self._as_dict(data.get('instance'))
+                new_status = instance_data.get('state') or data.get('state') or data.get('status')
 
                 account.write({
                     'status': new_status or account.status,
@@ -156,9 +162,9 @@ class EvolutionInstanceAccount(models.Model):
 
     @staticmethod
     def _extract_qr_data(response):
-        data = response if isinstance(response, dict) else {}
-        qr_container = data.get('qrcode') or data.get('qr') or {}
-        instance = data.get('instance') if isinstance(data.get('instance'), dict) else {}
+        data = EvolutionInstanceAccount._as_dict(response)
+        qr_container = EvolutionInstanceAccount._as_dict(data.get('qrcode') or data.get('qr'))
+        instance = EvolutionInstanceAccount._as_dict(data.get('instance'))
 
         base64_qr = (
             qr_container.get('base64')
@@ -194,8 +200,8 @@ class EvolutionInstanceAccount(models.Model):
 
     @staticmethod
     def _extract_pairing_code(response):
-        data = response if isinstance(response, dict) else {}
-        instance = data.get('instance') if isinstance(data.get('instance'), dict) else {}
+        data = EvolutionInstanceAccount._as_dict(response)
+        instance = EvolutionInstanceAccount._as_dict(data.get('instance'))
         return (
             data.get('pairingCode')
             or data.get('code')
@@ -268,6 +274,30 @@ class EvolutionInstanceAccount(models.Model):
                     'qr_last_fetched_at': now,
                 })
                 account.message_post(body=_('Pairing code fetch failed: %s') % exc)
+                raise UserError(str(exc)) from exc
+
+    def action_delete_evolution_instance(self):
+        client = self.env['evolution.instance.client']
+        for account in self:
+            if not account.evo_instance_name:
+                raise UserError(_('Set Evolution Instance Name first.'))
+            try:
+                client.delete_instance(account.evo_instance_name)
+                account.write({
+                    'evo_instance_id': False,
+                    'evo_instance_key': False,
+                    'status': False,
+                    'last_status_sync_at': False,
+                    'pairing_code': False,
+                    'qr_code_text': False,
+                    'qr_code_image': False,
+                    'qr_last_fetched_at': False,
+                    'last_error': False,
+                })
+                account.message_post(body=_('Evolution instance deleted successfully.'))
+            except Exception as exc:
+                account.write({'last_error': str(exc)})
+                account.message_post(body=_('Evolution instance delete failed: %s') % exc)
                 raise UserError(str(exc)) from exc
 
     @api.model

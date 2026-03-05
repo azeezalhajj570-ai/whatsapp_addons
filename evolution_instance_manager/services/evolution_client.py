@@ -2,6 +2,7 @@
 
 import json
 import logging
+from urllib.parse import quote, urlencode
 
 import requests
 
@@ -109,41 +110,21 @@ class EvolutionClient(models.AbstractModel):
         return self._request('POST', '/instance/create', payload=payload)
 
     def connection_state(self, instance_name):
-        return self._request('GET', '/instance/connectionState/%s' % instance_name)
-
-    @staticmethod
-    def _is_404_error(error):
-        return '(404)' in str(error)
+        instance = quote(instance_name, safe='')
+        return self._request('GET', '/instance/connectionState/%s' % instance)
 
     def fetch_qr(self, instance_name):
-        # Endpoint naming varies across Evolution versions, so we try common routes.
-        attempts = [
-            ('GET', '/instance/connect/%s' % instance_name, None),
-            ('GET', '/instance/qr/%s' % instance_name, None),
-        ]
-        last_error = None
-        for method, endpoint, payload in attempts:
-            try:
-                return self._request(method, endpoint, payload=payload)
-            except UserError as exc:
-                last_error = exc
-                if not self._is_404_error(exc):
-                    raise
-        raise last_error
+        # Docs: GET /instance/connect/{instance}
+        instance = quote(instance_name, safe='')
+        return self._request('GET', '/instance/connect/%s' % instance)
 
     def fetch_pairing_code(self, instance_name, phone_number):
-        # Endpoint and payload shape differ by Evolution release; try common options.
-        attempts = [
-            ('POST', '/instance/connect/%s' % instance_name, {'number': phone_number}),
-            ('POST', '/instance/pairingCode/%s' % instance_name, {'number': phone_number}),
-            ('GET', '/instance/connect/%s?number=%s' % (instance_name, phone_number), None),
-        ]
-        last_error = None
-        for method, endpoint, payload in attempts:
-            try:
-                return self._request(method, endpoint, payload=payload)
-            except UserError as exc:
-                last_error = exc
-                if not self._is_404_error(exc):
-                    raise
-        raise last_error
+        # Docs: GET /instance/connect/{instance}?number=<phone>
+        instance = quote(instance_name, safe='')
+        query = urlencode({'number': phone_number})
+        return self._request('GET', '/instance/connect/%s?%s' % (instance, query))
+
+    def delete_instance(self, instance_name):
+        # Docs: DELETE /instance/delete/{instance}
+        instance = quote(instance_name, safe='')
+        return self._request('DELETE', '/instance/delete/%s' % instance)

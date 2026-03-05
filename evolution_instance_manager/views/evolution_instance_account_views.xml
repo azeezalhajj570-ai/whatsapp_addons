@@ -20,10 +20,11 @@
         <field name="arch" type="xml">
             <form string="Evolution Instance Account">
                 <header>
-                    <button name="action_create_evolution_instance" type="object" string="Create Instance in Evolution" class="oe_highlight"/>
-                    <button name="action_refresh_evolution_status" type="object" string="Refresh Status"/>
-                    <button name="action_get_qr_code" type="object" string="Get QR Code"/>
-                    <button name="action_get_pairing_code" type="object" string="Get Pairing Code"/>
+                    <button name="action_create_evolution_instance" type="object" string="Create Instance in Evolution" class="oe_highlight" invisible="evo_instance_id"/>
+                    <button name="action_refresh_evolution_status" type="object" string="Refresh Status" invisible="not evo_instance_id"/>
+                    <button name="action_get_qr_code" type="object" string="Get QR Code" invisible="not evo_instance_id"/>
+                    <button name="action_get_pairing_code" type="object" string="Get Pairing Code" invisible="not evo_instance_id"/>
+                    <button name="action_delete_evolution_instance" type="object" string="Delete Instance" class="btn-danger" confirm="This will delete the instance on Evolution API. Continue?" invisible="not evo_instance_id"/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
@@ -36,16 +37,16 @@
                             <field name="integration"/>
                         </group>
                         <group>
-                            <field name="status" readonly="1"/>
-                            <field name="last_status_sync_at" readonly="1"/>
-                            <field name="evo_instance_id" readonly="1"/>
-                            <field name="evo_instance_key" readonly="1" password="True" groups="base.group_system"/>
+                            <field name="status" readonly="1" invisible="not evo_instance_id"/>
+                            <field name="last_status_sync_at" readonly="1" invisible="not evo_instance_id"/>
+                            <field name="evo_instance_id" readonly="1" invisible="not evo_instance_id"/>
+                            <field name="evo_instance_key" readonly="1" password="True" groups="base.group_system" invisible="not evo_instance_id"/>
                         </group>
                     </group>
-                    <group>
+                    <group invisible="not last_error">
                         <field name="last_error" readonly="1"/>
                     </group>
-                    <group string="Pairing">
+                    <group string="Pairing" invisible="not evo_instance_id">
                         <group>
                             <field name="pairing_phone" placeholder="+15551234567"/>
                             <field name="pairing_code" readonly="1"/>

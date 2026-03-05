@@ -20,11 +20,11 @@
         <field name="arch" type="xml">
             <form string="Evolution Instance Account">
                 <header>
-                    <button name="action_create_evolution_instance" type="object" string="Create Instance in Evolution" class="oe_highlight" invisible="evo_instance_id"/>
-                    <button name="action_refresh_evolution_status" type="object" string="Refresh Status" invisible="not evo_instance_id"/>
-                    <button name="action_get_qr_code" type="object" string="Get QR Code" invisible="not evo_instance_id"/>
-                    <button name="action_get_pairing_code" type="object" string="Get Pairing Code" invisible="not evo_instance_id"/>
-                    <button name="action_delete_evolution_instance" type="object" string="Delete Instance" class="btn-danger" confirm="This will delete the instance on Evolution API. Continue?" invisible="not evo_instance_id"/>
+                    <button name="action_create_evolution_instance" type="object" string="Create Instance in Evolution" class="oe_highlight" invisible="evo_instance_id != False"/>
+                    <button name="action_refresh_evolution_status" type="object" string="Refresh Status" invisible="evo_instance_id == False"/>
+                    <button name="action_get_qr_code" type="object" string="Get QR Code" invisible="evo_instance_id == False"/>
+                    <button name="action_get_pairing_code" type="object" string="Get Pairing Code" invisible="evo_instance_id == False"/>
+                    <button name="action_delete_evolution_instance" type="object" string="Delete Instance" class="btn-danger" confirm="This will delete the instance on Evolution API. Continue?" invisible="evo_instance_id == False"/>
                 </header>
                 <sheet>
                     <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>

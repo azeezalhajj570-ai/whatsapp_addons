@@ -109,6 +109,8 @@ class EvolutionWebsiteController(http.Controller):
             }
         except (UserError, AccessError) as exc:
             return {'ok': False, 'error': str(exc) or 'Failed to create instance.'}
+        except Exception as exc:
+            return {'ok': False, 'error': str(exc) or 'Failed to create instance.'}
 
     @http.route('/evolution/instances/delete/<int:record_id>', type='http', auth='user', website=True, methods=['POST'])
     def evolution_instances_delete(self, record_id, **post):
@@ -147,6 +149,8 @@ class EvolutionWebsiteController(http.Controller):
             return {'ok': True, 'message': 'Test message sent successfully.'}
         except (UserError, AccessError) as exc:
             return {'ok': False, 'error': str(exc) or 'Failed to send test message.'}
+        except Exception as exc:
+            return {'ok': False, 'error': str(exc) or 'Failed to send test message.'}
 
     @http.route('/evolution/instances/status_check_ajax', type='json', auth='user', website=True, methods=['POST'])
     def evolution_instances_status_check_ajax(self, record_id):
@@ -163,6 +167,8 @@ class EvolutionWebsiteController(http.Controller):
                 'last_status_sync_at': str(account.last_status_sync_at or ''),
             }
         except (UserError, AccessError) as exc:
+            return {'ok': False, 'error': str(exc) or 'Failed to refresh status.'}
+        except Exception as exc:
             return {'ok': False, 'error': str(exc) or 'Failed to refresh status.'}
 
     @http.route('/evolution/instances/qr/<int:record_id>', type='http', auth='user', website=True, methods=['POST'])
@@ -204,4 +210,6 @@ class EvolutionWebsiteController(http.Controller):
                 'qr_code_text': qr_text,
             }
         except (UserError, AccessError) as exc:
+            return {'ok': False, 'error': str(exc) or 'Failed to fetch QR code.'}
+        except Exception as exc:
             return {'ok': False, 'error': str(exc) or 'Failed to fetch QR code.'}

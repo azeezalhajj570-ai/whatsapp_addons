@@ -211,7 +211,8 @@
                                 '</div>';
                             container.appendChild(toastEl);
                             if (window.bootstrap && window.bootstrap.Toast) {
-                                window.bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 1800, autohide: true }).show();
+                                var isError = type !== 'success';
+                                window.bootstrap.Toast.getOrCreateInstance(toastEl, { delay: isError ? 7000 : 1800, autohide: true }).show();
                             }
                         }
 
@@ -376,7 +377,7 @@
                                         id: parseInt(recordId, 10)
                                     })
                                 }).then(function (r) { return r.json(); }).then(function (payload) {
-                                    var result = payload.result || {};
+                                    var result = extractResult(payload);
                                     if (!result.ok) {
                                         notify('Error', (result.error || 'Failed to fetch QR code.'), 'danger');
                                         return;

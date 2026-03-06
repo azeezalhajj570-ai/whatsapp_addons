@@ -425,6 +425,13 @@
                                 });
                             });
                         });
+
+                        var qrModals = document.querySelectorAll('[id^="qrModal"]');
+                        qrModals.forEach(function (modalEl) {
+                            modalEl.addEventListener('hidden.bs.modal', function () {
+                                window.location.reload();
+                            });
+                        });
                     });
                 ]]></script>
             </div>

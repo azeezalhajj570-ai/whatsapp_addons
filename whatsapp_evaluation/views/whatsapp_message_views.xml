@@ -69,6 +69,18 @@
 
 
 
+    <record id="whatsapp_evaluation_message_view_search" model="ir.ui.view">
+        <field name="name">whatsapp_evaluation.message.view.search</field>
+        <field name="model">whatsapp_evaluation.message</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="partner_id"/>
+                <field name="mobile_number"/>
+                <field name="state"/>
+            </search>
+        </field>
+    </record>
+
     <record id="whatsapp_evaluation_message_action" model="ir.actions.act_window">
         <field name="name">WhatsApp Messages</field>
         <field name="res_model">whatsapp_evaluation.message</field>

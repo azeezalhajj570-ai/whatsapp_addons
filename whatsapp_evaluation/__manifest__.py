@@ -66,6 +66,6 @@ Fully integrated with Odoo’s messaging and contact management system.
     'license': 'OPL-1',
     'application': True,
     'installable': True,
-    'price': 99.00,
+    'price': 0.0,
     'currency': 'EUR',
 }

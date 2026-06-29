@@ -64,7 +64,7 @@ Fully integrated with Odoo’s messaging and contact management system.
         'python': ['phonenumbers'],
     },
     'author': 'Azeez',
-    'website': 'https://github.com/mekhlafi98',
+    'website': 'https://github.com/azeezalhajj570-ai/whatsapp_addons',
     'license': 'OPL-1',
     'application': True,
     'installable': True,

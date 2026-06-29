@@ -40,8 +40,8 @@ class DiscussChannel(models.Model):
             self._bus_send_store(Store(new_member).add(self, {"memberCount": self.member_count}))
         return Store(self).get_result()
 
-    def _to_store(self, store: Store):
-        super()._to_store(store)
+    def _to_store(self, store: Store, fields):
+        super()._to_store(store, fields)
         for channel in self.filtered(lambda channel: channel.channel_type == "whatsapp"):
             store.add(channel, {
                 "whatsapp_channel_valid_until": channel.whatsapp_channel_valid_until,

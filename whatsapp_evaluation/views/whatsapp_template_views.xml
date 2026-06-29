@@ -74,18 +74,6 @@
             <search>
                 <field name="name"/>
                 <field name="model_id"/>
-                <filter string="Model" name="groupby_model_id" context="{'group_by': 'model_id'}"/>
-            </search>
-        </field>
-    </record>
-
-    <record id="whatsapp_evaluation_template_view_search" model="ir.ui.view">
-        <field name="name">whatsapp_evaluation.template.view.search</field>
-        <field name="model">whatsapp_evaluation.template</field>
-        <field name="arch" type="xml">
-            <search>
-                <field name="name"/>
-                <field name="model_id"/>
             </search>
         </field>
     </record>
